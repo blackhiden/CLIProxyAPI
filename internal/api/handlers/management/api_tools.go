@@ -13,6 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	xaiauth "github.com/router-for-me/CLIProxyAPI/v7/internal/auth/xai"
+	"github.com/router-for-me/CLIProxyAPI/v7/internal/clienterror"
 	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
 	"github.com/router-for-me/CLIProxyAPI/v7/internal/runtime/executor"
 	coreauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
@@ -63,9 +64,8 @@ type apiCallResponse struct {
 // Request JSON:
 //   - auth_index / authIndex / AuthIndex (optional):
 //     The credential "auth_index" from GET /v0/management/auth-files (or other endpoints returning it).
-//     If omitted or not found, APICall attempts to identify one unambiguous API-key credential from a
-//     Bearer, X-Api-Key, or X-Goog-Api-Key request header and the target URL. This lets provider-key
-//     tests apply that credential's proxy_url, including "direct".
+//     If omitted, credential-specific proxy selection is skipped.
+//     If "$TOKEN$" is present and the credential or token cannot be resolved, the request fails with HTTP 400.
 //   - method (required): HTTP method, e.g. GET, POST, PUT, PATCH, DELETE.
 //   - url (required): Absolute URL including scheme and host, e.g. "https://api.example.com/v1/ping".
 //   - proxy_url (optional): Proxy used for this request. Supports HTTP, HTTPS, SOCKS5, SOCKS5H,
@@ -104,7 +104,7 @@ type apiCallResponse struct {
 func (h *Handler) APICall(c *gin.Context) {
 	var body apiCallRequest
 	if errBindJSON := c.ShouldBindJSON(&body); errBindJSON != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
+		c.JSON(clienterror.HTTPStatusFromErrorOr(errBindJSON, http.StatusBadRequest), gin.H{"error": "invalid body"})
 		return
 	}
 
@@ -133,14 +133,12 @@ func (h *Handler) APICall(c *gin.Context) {
 		}
 	}
 
+	authIndex := firstNonEmptyString(body.AuthIndexSnake, body.AuthIndexCamel, body.AuthIndexPascal)
+	auth := h.authByIndex(authIndex)
+
 	reqHeaders := body.Header
 	if reqHeaders == nil {
 		reqHeaders = map[string]string{}
-	}
-	authIndex := firstNonEmptyString(body.AuthIndexSnake, body.AuthIndexCamel, body.AuthIndexPascal)
-	auth := h.authByIndex(authIndex)
-	if auth == nil {
-		auth = h.authForAPICall(reqHeaders, parsedURL)
 	}
 
 	var hostOverride string
@@ -834,66 +832,6 @@ func (h *Handler) authByIndex(authIndex string) *coreauth.Auth {
 		}
 	}
 	return nil
-}
-
-// authForAPICall resolves an API-key credential for management probes that do
-// not provide a valid auth index. The API key and target URL must identify
-// exactly one configured credential.
-func (h *Handler) authForAPICall(headers map[string]string, targetURL *url.URL) *coreauth.Auth {
-	apiKey := apiCallAPIKey(headers)
-	if apiKey == "" || h == nil || h.authManager == nil {
-		return nil
-	}
-
-	var matches []*coreauth.Auth
-	for _, auth := range h.authManager.List() {
-		kind, account := auth.AccountInfo()
-		if !strings.EqualFold(kind, "api_key") || account != apiKey {
-			continue
-		}
-		if authAPICallBaseURLMatchesTarget(auth, targetURL) {
-			matches = append(matches, auth)
-		}
-	}
-
-	if len(matches) != 1 {
-		return nil
-	}
-	return matches[0]
-}
-
-func apiCallAPIKey(headers map[string]string) string {
-	for key, value := range headers {
-		switch strings.ToLower(strings.TrimSpace(key)) {
-		case "authorization":
-			parts := strings.Fields(value)
-			if len(parts) == 2 && strings.EqualFold(parts[0], "bearer") {
-				return strings.TrimSpace(parts[1])
-			}
-		case "x-api-key", "x-goog-api-key":
-			if apiKey := strings.TrimSpace(value); apiKey != "" {
-				return apiKey
-			}
-		}
-	}
-	return ""
-}
-
-func authAPICallBaseURLMatchesTarget(auth *coreauth.Auth, targetURL *url.URL) bool {
-	if auth == nil || targetURL == nil || auth.Attributes == nil {
-		return false
-	}
-	baseURL, errParse := url.Parse(strings.TrimSpace(auth.Attributes["base_url"]))
-	if errParse != nil || baseURL.Scheme == "" || baseURL.Host == "" {
-		return false
-	}
-	if !strings.EqualFold(baseURL.Scheme, targetURL.Scheme) || !strings.EqualFold(baseURL.Host, targetURL.Host) {
-		return false
-	}
-
-	basePath := strings.TrimSuffix(baseURL.EscapedPath(), "/")
-	targetPath := strings.TrimSuffix(targetURL.EscapedPath(), "/")
-	return basePath == "" || targetPath == basePath || strings.HasPrefix(targetPath, basePath+"/")
 }
 
 func (h *Handler) apiCallTransport(auth *coreauth.Auth, requestProxyURL string) http.RoundTripper {
