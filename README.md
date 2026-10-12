@@ -90,7 +90,7 @@ PackyCode provides special discounts for our software users: register using <a h
 </tr>
 <tr>
 <td width="180"><a href="https://www.axisnow.io/zh"><img src="./assets/axisnow.png" alt="AxisNow" width="150"></a></td>
-<td>Protect and accelerate websites and APIs while optimizing access from both mainland China and the rest of the world. Extend acceleration and security to native and mobile apps through client SDKs � <b>self-hosted private CDN | subscription-based DDoS-protected CDN | independently controlled, flexibly composable CDN networks.</b></td>
+<td>Protect and accelerate websites and APIs while optimizing access from both mainland China and the rest of the world. Extend acceleration and security to native and mobile apps through client SDKs — <b>self-hosted private CDN | subscription-based DDoS-protected CDN | independently controlled, flexibly composable CDN networks.</b></td>
 </tr>
 <tr>
 <td width="180"><a href="https://www.swiftproxy.net/?code=PR67S9A95"><img src="./assets/swiftproxy.png" alt="Swiftproxy" width="150"></a></td>
@@ -98,7 +98,7 @@ PackyCode provides special discounts for our software users: register using <a h
 </tr>
 <tr>
 <td width="180"><a href="https://aiberm.com?ref=cpa"><img src="./assets/aiberm.png" alt="Aiberm" width="150"></a></td>
-<td>This project is sponsored by Aiberm � a unified, discounted AI API for developers. One endpoint for Claude, GPT, Grok, DeepSeek, GLM, Kimi, and MiniMax: 85201390% off Claude, 90% off GPT, and 80% off Grok. Image generation included, with GPT Image 2 and Nano Banana. <a href="https://aiberm.com?ref=cpa">Visit Aiberm</a>.</td>
+<td>This project is sponsored by Aiberm — a unified, discounted AI API for developers. One endpoint for Claude, GPT, Grok, DeepSeek, GLM, Kimi, and MiniMax: 85–90% off Claude, 90% off GPT, and 80% off Grok. Image generation included, with GPT Image 2 and Nano Banana. <a href="https://aiberm.com?ref=cpa">Visit Aiberm</a>.</td>
 </tr>
 <tr>
 <td width="180"><a href="https://www.rapidproxy.io/?code=KHM9B6E6M"><img src="./assets/rapidproxy.png" alt="RapidProxy" width="150"></a></td>
@@ -115,6 +115,10 @@ PackyCode provides special discounts for our software users: register using <a h
 <tr>
 <td width="180"><a href="https://www.openlux.ai/register?channel=c_6axb1q5n"><img src="./assets/openlux.png" alt="OpenLux" width="150"></a></td>
 <td>Thank you to OpenLux for sponsoring this project!<br><br>OpenLux is an all-in-one AI platform for businesses, bringing together leading AI models from major providers worldwide. With fast, reliable service and responsive technical support, OpenLux offers base pricing for Claude, OpenAI, and Gemini models as low as 8.82%, 4%, and 8% of official rates, respectively.<br><br>Exclusive offer for CLI Proxy API users: Sign up through our referral link and enjoy up to 7.5% off credit top-ups!<br><br>Get started with OpenLux → <a href="https://www.openlux.ai/register?channel=c_6axb1q5n">https://www.openlux.ai/register?channel=c_6axb1q5n</a></td>
+</tr>
+<tr>
+<td width="180"><a href="https://modelflare.dev/sign-up?utm_source=github&utm_campaign=cliproxyapi"><img src="./assets/modelflare.png" alt="Modelflare" width="150"></a></td>
+<td>Thanks to Modelflare for sponsoring this project! Modelflare: Full strength, stable, nothing watered down. Global SOTA models at a lower cost. Operated by US-based Havenbyte LLC, Modelflare supports GPT, Claude, Gemini, Grok, and other leading models through common compatible protocols, plus 40+ image and video models. Cache compensation is a highlight: selected OpenAI groups (price-first, stable, and premium) guarantee daily cache hit rates of 65%, 75%, or 85%, and if eligible requests fall short, Modelflare refunds the difference, visible on the usage dashboard after settlement. Special offers: a single top-up of US&#36;20 unlocks the GPT discount group at a 0.015x price multiplier, and a single top-up of US&#36;50 unlocks the Claude discount group at a 0.03x multiplier. Register via <a href="https://modelflare.dev/sign-up?utm_source=github&utm_campaign=cliproxyapi">this exclusive link</a> to get started.</td>
 </tr>
 </tbody>
 </table>
@@ -146,17 +150,6 @@ CLIProxyAPI Guides: [https://help.router-for.me/](https://help.router-for.me/)
 
 see [MANAGEMENT_API.md](https://help.router-for.me/management/api)
 
-### Provider Key Tests and Per-Credential Proxies
-
-Provider-key tests made through the management API honor the selected credential's `proxy-url`, including `direct` and `none`, before falling back to the global `proxy-url`. When a test request does not provide an `auth_index`, the API can resolve a credential from its `Authorization: Bearer`, `X-Api-Key`, or `X-Goog-Api-Key` header only if that API key and target base URL identify exactly one configured credential. This prevents a shared API key from applying another provider's proxy configuration.
-
-### OAuth Login and the "Do Not Use Proxy" Toggle (fork feature)
-
-The management UI OAuth page (`/management.html#/oauth`) provides a **"Do Not Use Proxy"** checkbox, **checked by default**. When checked, every OAuth/device-code login (Codex, Anthropic/Claude, Antigravity, Kimi, xAI/Grok) connects directly, bypassing both the configured `proxy-url` and environment proxies. Unchecking it restores the configured proxy behavior for the login flow.
-
-- The choice is sent per login request as `no_proxy=true` on the `{provider}-auth-url` management endpoints (`internal/api/handlers/management/auth_files_provider_oauth.go`, helper `oauthProxyOverride`). Toggling the checkbox takes effect on the next login **without restarting the service**.
-- This is a fork-specific feature (upstream `router-for-me/CLIProxyAPI` does not have it). It is protected against upstream merges by item 8 of [`docs/MERGE-PRESERVATION-fork-fixes.md`](docs/MERGE-PRESERVATION-fork-fixes.md), which documents the required code, files, and post-merge verification steps.
-
 ## Usage Statistics
 
 Since v6.10.0, CLIProxyAPI and [CPAMC](https://github.com/router-for-me/Cli-Proxy-API-Management-Center) no longer ship built-in usage statistics. If you need usage statistics, use:
@@ -167,7 +160,7 @@ Standalone persistence and visualization service for CLIProxyAPI, with periodic 
 
 ### [CPA-Manager-Plus](https://github.com/seakee/CPA-Manager-Plus)
 
-Full CLIProxyAPI management center with request-level monitoring and cost estimates. CPA-Manager tracks collected requests by account, model, channel, latency, status, and token usage; estimates cost with editable model prices and one-click LiteLLM price sync; persists events in SQLite; and provides Codex account-pool operations with batch inspection, quota detection, unhealthy account discovery, cleanup suggestions, and one-click execution for day-to-day multi-account maintenance.
+A self-hosted CLIProxyAPI management console and observability dashboard, available as a lightweight drop-in panel or a full Manager Server with persistent analytics. Manage OAuth credentials, AI providers, client API keys, model aliases, plugins, and CPA settings in one interface. SQLite-backed request history enables live monitoring, failure diagnosis, and token, latency, and estimated-cost breakdowns by model, provider, account, key, and channel. Supports editable model prices and one-click price sync, alongside Codex and xAI quota checks, reset information, account-health inspection, and controlled recovery actions. Deploy via Docker or cross-platform native packages, with data stored locally.
 
 ### [Oh-My-CPA](https://github.com/WizisCool/oh-my-cpa)
 
@@ -179,8 +172,6 @@ Modern Ant Design-based management console for CLIProxyAPI v8+, combining CPAMC-
 - Advanced (executors & translators): [docs/sdk-advanced.md](docs/sdk-advanced.md)
 - Access: [docs/sdk-access.md](docs/sdk-access.md)
 - Watcher: [docs/sdk-watcher.md](docs/sdk-watcher.md)
-- Internals Overview: [docs/internals-overview.md](docs/internals-overview.md)
-- Merge/Integration Notes: [docs/MERGE-2026-08-27-auth-translator-plugins-quota.md](docs/MERGE-2026-08-27-auth-translator-plugins-quota.md) (latest origin/main merge 4b5f1eab) and [docs/MERGE-2026-08-16-main-merge-auth-translator-perf.md](docs/MERGE-2026-08-16-main-merge-auth-translator-perf.md) (8a71d358) and [docs/MERGE-2026-08-15-auth-metadata-mcp-alias.md](docs/MERGE-2026-08-15-auth-metadata-mcp-alias.md) (ea8c8b02)
 - Custom Provider Example: `examples/custom-provider`
 
 ## Contributing
@@ -319,6 +310,10 @@ Cross-platform Electron tray dashboard for CLIProxyAPI. Shows the real OAuth quo
 ### [panel4cliproxyapi](https://github.com/yaanlaan/panel4cliproxyapi)
 
 A modern, responsive web dashboard and management console for CLIProxyAPI built with React and Tailwind CSS. Features multi-provider OAuth login with LAN redirect assistance, visual zero-YAML configuration, real-time traffic analytics charts, client API key management, core version checking & hot-reloading, and a live SSE streaming playground.
+
+### [sub2api](https://github.com/PlaygrndLabs/sub2api)
+
+A Cloudflare-based LLM gateway and proxy server: CLIProxyAPI deployed to Cloudflare Workers + Containers in one click. Logins and config persist in R2, the dashboard sits behind a password, and API calls are refused until a client API key exists.
 
 > [!NOTE]  
 > If you developed a project based on CLIProxyAPI, please open a PR to add it to this list.
