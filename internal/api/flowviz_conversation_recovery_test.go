@@ -323,6 +323,57 @@ func TestSniffFlowModelThreadRecoveryIntegration(t *testing.T) {
 	}
 }
 
+func TestSniffFlowModelPreservesLargeBodyAndRequestedModel(t *testing.T) {
+	stubRegistryFallback(t, "gemma-4-instruct-luminous")
+	hub := newFlowHub()
+	sub := hub.subscribe()
+	defer hub.unsubscribe(sub)
+
+	client := authContext("Bearer sk-large", "")
+	body := `{"model":"kr/claude-sonnet-4.5","messages":[{"role":"user","content":"` + strings.Repeat("x", flowModelSniffCap) + `"}]}`
+	sniffRequest(client, "Bearer sk-large", body)
+	if client.Request.ContentLength <= flowModelSniffCap {
+		t.Fatalf("test body length = %d, want > %d", client.Request.ContentLength, flowModelSniffCap)
+	}
+
+	sniffFlowModel(client, hub)
+	if got, _ := client.Get("flow_model"); got != "kr/claude-sonnet-4.5" {
+		t.Fatalf("large request flow_model = %v, want kr/claude-sonnet-4.5", got)
+	}
+
+	replayed, err := io.ReadAll(client.Request.Body)
+	if err != nil {
+		t.Fatalf("read replayed large body: %v", err)
+	}
+	if string(replayed) != body {
+		t.Fatalf("large request body changed: got %d bytes, want %d", len(replayed), len(body))
+	}
+}
+
+func TestSniffFlowModelDoesNotUseRegistryFallbackForIncompleteLargeBody(t *testing.T) {
+	stubRegistryFallback(t, "gemma-4-instruct-luminous")
+	hub := newFlowHub()
+	sub := hub.subscribe()
+	defer hub.unsubscribe(sub)
+
+	client := authContext("Bearer sk-large-late-model", "")
+	body := `{"input":"` + strings.Repeat("x", flowModelSniffCap) + `","model":"kr/claude-sonnet-4.5"}`
+	sniffRequest(client, "Bearer sk-large-late-model", body)
+
+	sniffFlowModel(client, hub)
+	if got, exists := client.Get("flow_model"); exists && got != "" {
+		t.Fatalf("incomplete large request flow_model = %v, want unresolved", got)
+	}
+
+	replayed, err := io.ReadAll(client.Request.Body)
+	if err != nil {
+		t.Fatalf("read replayed incomplete large body: %v", err)
+	}
+	if string(replayed) != body {
+		t.Fatalf("incomplete large request body changed: got %d bytes, want %d", len(replayed), len(body))
+	}
+}
+
 // wsObserverCtx builds a Gin context whose derived context carries it under the
 // "gin" key, the idiom used by the executor code paths when invoking the
 // FlowObserver hooks.

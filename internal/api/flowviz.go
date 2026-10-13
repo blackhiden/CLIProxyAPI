@@ -216,6 +216,13 @@ var flowRegistryFallbackModel = func(c *gin.Context) string {
 // resolves, a debug log records the miss (warn-level would spam on legitimate
 // model-less turn streams).
 func resolveFlowModel(c *gin.Context, hub *flowHub, sniff []byte, connModel string) string {
+	return resolveFlowModelWithFallback(c, hub, sniff, connModel, true)
+}
+
+// resolveFlowModelWithFallback resolves model metadata while allowing callers
+// that only inspected a body prefix to avoid assigning an unrelated registry
+// default when the request's model may appear beyond that prefix.
+func resolveFlowModelWithFallback(c *gin.Context, hub *flowHub, sniff []byte, connModel string, allowRegistryFallback bool) string {
 	threadKey := flowThreadKey(sniff)
 	convKey := flowConvKey(flowClientSalt(c), threadKey)
 
@@ -248,7 +255,10 @@ func resolveFlowModel(c *gin.Context, hub *flowHub, sniff []byte, connModel stri
 
 	// Last resort: the gateway's default routed model for this API family so
 	// the pulse still lands on a meaningful node rather than the catch-all.
-	if modelStr = flowRegistryFallbackModel(c); modelStr != "" {
+	if allowRegistryFallback {
+		modelStr = flowRegistryFallbackModel(c)
+	}
+	if modelStr != "" {
 		if convKey != "" {
 			hub.rememberConvModel(convKey, modelStr)
 		}
@@ -312,6 +322,20 @@ func (h *flowHub) unsubscribe(ch chan []byte) {
 // bodies never blow up memory here. The body is always restored for the
 // downstream handler regardless of whether a model was found.
 const flowModelSniffCap = 64 * 1024
+const flowModelSniffIncompleteKey = "flow_model_sniff_incomplete"
+
+type flowReplayBody struct {
+	reader io.Reader
+	closer io.Closer
+}
+
+func (b *flowReplayBody) Read(p []byte) (int, error) {
+	return b.reader.Read(p)
+}
+
+func (b *flowReplayBody) Close() error {
+	return b.closer.Close()
+}
 
 // flowThreadKey extracts a stable conversation/thread identifier from a JSON
 // request body across the API families this gateway proxies. Follow-up requests
@@ -376,29 +400,31 @@ func sniffFlowModel(c *gin.Context, hub *flowHub) {
 	if !isJSON {
 		return
 	}
-	// For chunked or unknown-length bodies, attempt to read a small prefix
-	// instead of rejecting outright. This captures models from streaming/
-	// chunked requests where Content-Length is -1 (common for large prompts
-	// or multipart-like payloads). The prefix is small enough to avoid
-	// memory pressure and is always restored.
-	if c.Request.ContentLength > flowModelSniffCap {
-		return
-	}
+	// Inspect at most the configured prefix, but replay it before the unread
+	// remainder so the downstream handler receives the exact original body.
+	// When the prefix is incomplete, never fall back to an unrelated registry
+	// default: unresolved is more accurate than misattributing a large request.
+	originalBody := c.Request.Body
+	contentLength := c.Request.ContentLength
 	limit := int64(flowModelSniffCap)
-	if c.Request.ContentLength > 0 && c.Request.ContentLength < limit {
-		limit = c.Request.ContentLength
+	if contentLength > 0 && contentLength < limit {
+		limit = contentLength
 	}
 
-	body, err := io.ReadAll(io.LimitReader(c.Request.Body, limit))
-	_ = c.Request.Body.Close()
-	c.Request.Body = io.NopCloser(bytes.NewReader(body))
-	c.Request.ContentLength = int64(len(body))
-	c.Request.Header.Del("Content-Length") // let Go recompute on proxy
+	body, err := io.ReadAll(io.LimitReader(originalBody, limit))
+	c.Request.Body = &flowReplayBody{
+		reader: io.MultiReader(bytes.NewReader(body), originalBody),
+		closer: originalBody,
+	}
 	if err != nil || len(body) == 0 {
 		return
 	}
 
-	if modelStr := resolveFlowModel(c, hub, body, ""); modelStr != "" {
+	allowRegistryFallback := contentLength >= 0 && contentLength <= flowModelSniffCap
+	if !allowRegistryFallback {
+		c.Set(flowModelSniffIncompleteKey, true)
+	}
+	if modelStr := resolveFlowModelWithFallback(c, hub, body, "", allowRegistryFallback); modelStr != "" {
 		c.Set("flow_model", modelStr)
 	}
 }
@@ -417,7 +443,8 @@ func flowVizMiddleware(hub *flowHub) gin.HandlerFunc {
 
 		model, _ := c.Get("flow_model")
 		modelStr, _ := model.(string)
-		if modelStr == "" {
+		incomplete, _ := c.Get(flowModelSniffIncompleteKey)
+		if modelStr == "" && incomplete != true {
 			modelStr = flowRegistryFallbackModel(c)
 		}
 

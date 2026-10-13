@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Live Flow lifecycle events (FORK-ONLY)**: Root `/live-flow/ws` now publishes a metadata-only `started` event before an HTTP request or WebSocket turn executes and a matching `completed` event with final status and latency afterwards. WebSocket turn IDs are made unique per connection turn. This lets dashboards show long-running in-flight requests rather than waiting for completion, while preserving the no-prompts/no-bodies/no-credentials contract.
 
+- **Live Flow large-prompt model accuracy (FORK-ONLY)**: The root body sniffer now inspects a bounded leading prefix while replaying the complete original body to the real request handler. A large prompt with an early model such as `kr/claude-sonnet-4.5` therefore retains that requested/routed model in Live Flow instead of being mislabeled with the registry's first OpenAI fallback model.
+
 - **Live Flow feature persistence (FORK-ONLY)**: Made the Live Flow feature merge-resilient by renaming to fork-specific namespace `cpa-fork-liveflow`. Added `CPAForkLiveFlowEnabled` config field, `NormalizeLiveFlowConfig()` for backward compatibility with legacy `flow-visualization-enabled` key, FORK-ONLY markers in all Live Flow files, comprehensive merge preservation documentation in `docs/MERGE-PRESERVATION-fork-fixes.md` (item 10 and section 3.10), and `TestLiveFlowFeaturePersistence` test that fails if the feature is removed by upstream merges.
 
 ### Changed
