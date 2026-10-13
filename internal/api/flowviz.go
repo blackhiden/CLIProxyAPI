@@ -1,3 +1,6 @@
+// FORK-ONLY: This file implements the CPA fork's persistent Live Flow feature.
+// This feature is fork-specific and must not be removed by upstream merges.
+// See docs/MERGE-PRESERVATION-fork-fixes.md for merge policy.
 package api
 
 import (

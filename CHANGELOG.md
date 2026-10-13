@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Live Flow feature persistence (FORK-ONLY)**: Made the Live Flow feature merge-resilient by renaming to fork-specific namespace `cpa-fork-liveflow`. Added `CPAForkLiveFlowEnabled` config field, `NormalizeLiveFlowConfig()` for backward compatibility with legacy `flow-visualization-enabled` key, FORK-ONLY markers in all Live Flow files, comprehensive merge preservation documentation in `docs/MERGE-PRESERVATION-fork-fixes.md` (item 10 and section 3.10), and `TestLiveFlowFeaturePersistence` test that fails if the feature is removed by upstream merges.
+
+### Changed
+
+- **Config keys**: Renamed `flow-visualization-enabled` to `cpa-fork-liveflow-enabled` (legacy key still supported for backward compatibility).
+- **Documentation**: Updated `docs/internals-overview.md`, `frontend/docs/management-api.md`, `config.example.yaml`, and `config.yaml` to reference the new fork-specific config key with FORK-ONLY markers.
+
+---
+
 ## [v7.3.22-arsydoni4326-alt]
 
 ### Fixed

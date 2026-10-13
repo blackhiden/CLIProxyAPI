@@ -108,7 +108,8 @@ type Server struct {
 	exampleAPIKeySafeModeActive  atomic.Bool
 
 	// flowHub fans out per-request flow metadata to live visualization subscribers.
-	// Nil when flow-visualization-enabled is false (zero overhead).
+	// FORK-ONLY: Nil when cpa-fork-liveflow-enabled is false (zero overhead).
+	// See docs/MERGE-PRESERVATION-fork-fixes.md for merge policy.
 	flowHub *flowHub
 }
 
@@ -234,10 +235,11 @@ func NewServer(cfg *config.Config, authManager *auth.Manager, accessManager *sdk
 	}
 	s.localPassword = optionState.localPassword
 
+	// FORK-ONLY: CPA fork's persistent Live Flow feature.
 	// Live flow visualization (opt-in): create the hub and mirror middleware only when
-	// flow-visualization-enabled is true. When disabled there is no hub, no middleware,
+	// cpa-fork-liveflow-enabled is true. When disabled there is no hub, no middleware,
 	// and no endpoint — zero overhead.
-	if cfg.FlowVisualizationEnabled {
+	if cfg.CPAForkLiveFlowEnabled {
 		s.flowHub = newFlowHub()
 		engine.Use(flowVizMiddleware(s.flowHub))
 		// Let sdk websocket handlers mirror per-turn events through the hub; the
