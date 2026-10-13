@@ -114,9 +114,17 @@ type Config struct {
 	// WebsocketAuth enables or disables authentication for the WebSocket API.
 	WebsocketAuth bool `yaml:"ws-auth" json:"ws-auth"`
 
-	// FlowVisualizationEnabled mirrors lightweight per-request metadata (eye: no prompts,
+	// FORK-ONLY: CPA fork's persistent Live Flow feature.
+	// This feature is fork-specific and must not be removed by upstream merges.
+	// See docs/MERGE-PRESERVATION-fork-fixes.md for merge policy.
+	//
+	// CPAForkLiveFlowEnabled mirrors lightweight per-request metadata (eye: no prompts,
 	// bodies, or secrets) to an in-process subscriber for the management center's live
 	// flow view. When false (default), no event objects, goroutines, or endpoints exist.
+	// Legacy key "flow-visualization-enabled" is also supported for backward compatibility.
+	CPAForkLiveFlowEnabled bool `yaml:"cpa-fork-liveflow-enabled" json:"cpa-fork-liveflow-enabled"`
+
+	// Deprecated: use cpa-fork-liveflow-enabled instead. Kept for backward compatibility.
 	FlowVisualizationEnabled bool `yaml:"flow-visualization-enabled" json:"flow-visualization-enabled"`
 
 	// AntigravitySignatureCacheEnabled controls whether signature cache validation is enabled for thinking blocks.

@@ -71,3 +71,4 @@ docker-compose.override.yml
 session.md
 
 # trigger git
+*.md

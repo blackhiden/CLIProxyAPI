@@ -1,8 +1,8 @@
 [submodule "frontend"]
 	path = frontend
 	branch = main
-	url = https://github.com/arsydoni4326-alt/Cli-Proxy-API-Management-Center.git
+	url = https://github.com/blackhiden/Cli-Proxy-API-Management-Center.git
 [submodule "cpauk"]
 	path = cpauk
-	url = https://github.com/arsydoni4326-alt/cpa-usage-keeper.git
+	url = https://github.com/blackhiden/cpa-usage-keeper.git
 	branch = main

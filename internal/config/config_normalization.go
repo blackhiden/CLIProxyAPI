@@ -33,6 +33,20 @@ func (cfg *Config) NormalizePluginsConfig() {
 	}
 }
 
+// NormalizeLiveFlowConfig applies backward compatibility for the renamed live flow config key.
+// FORK-ONLY: CPA fork's persistent Live Flow feature.
+func (cfg *Config) NormalizeLiveFlowConfig() {
+	if cfg == nil {
+		return
+	}
+	// If the new fork-specific key is set, use it directly
+	if cfg.CPAForkLiveFlowEnabled {
+		return
+	}
+	// Otherwise, fall back to the legacy key for backward compatibility
+	cfg.CPAForkLiveFlowEnabled = cfg.FlowVisualizationEnabled
+}
+
 // SanitizeCodexHeaderDefaults trims surrounding whitespace from the
 // configured Codex header fallback values.
 func (cfg *Config) SanitizeCodexHeaderDefaults() {

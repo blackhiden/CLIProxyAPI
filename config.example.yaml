@@ -1247,7 +1247,8 @@ plugins:
 # antigravity-credits moved to oauth.providers.antigravity.antigravity-credits.
 #
 # Fork-specific options without a v8 counterpart remain top-level legacy keys:
-#   flow-visualization-enabled: false   # mirror per-request metadata to /live-flow/ws
+#   cpa-fork-liveflow-enabled: false   # FORK-ONLY: mirror per-request metadata to /live-flow/ws
+#   flow-visualization-enabled: false  # (deprecated, use cpa-fork-liveflow-enabled)
 #   quota-backoff:                      # exponential backoff with jitter for quota violations
 #     enabled: true
 #     base-seconds: 1
