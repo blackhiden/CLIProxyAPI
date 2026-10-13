@@ -368,7 +368,7 @@ func TestFlowWebsocketTurnModelResolutionEndToEnd(t *testing.T) {
 	obs.WSMessageStart(ctxB, "turn-b2", []byte(`{"type":"response.create","conversation_id":"conv-ws","input":"hi"}`))
 	obs.WSMessageComplete(ctxB, "turn-b2", 200)
 
-	want := []string{"gpt-a", "gpt-a", "gpt-b", "gpt-b"}
+	want := []string{"gpt-a", "gpt-a", "gpt-a", "gpt-a", "gpt-b", "gpt-b", "gpt-b", "gpt-b"}
 	for i := range want {
 		select {
 		case raw := <-sub:
@@ -385,6 +385,12 @@ func TestFlowWebsocketTurnModelResolutionEndToEnd(t *testing.T) {
 			if ev.Timestamp == 0 {
 				t.Errorf("event %d missing timestamp", i)
 			}
+			if i%2 == 0 && ev.Event != flowEventStarted {
+				t.Errorf("event %d lifecycle = %q, want started", i, ev.Event)
+			}
+			if i%2 == 1 && ev.Event != flowEventCompleted {
+				t.Errorf("event %d lifecycle = %q, want completed", i, ev.Event)
+			}
 		default:
 			t.Fatalf("event %d not published", i)
 		}
@@ -394,17 +400,19 @@ func TestFlowWebsocketTurnModelResolutionEndToEnd(t *testing.T) {
 	// thread key, no model) recovers the connection's last model.
 	obs.WSMessageStart(ctxA, "turn-a3", []byte(`{"type":"response.append","previous_response_id":"fresh-chain-xyz"}`))
 	obs.WSMessageComplete(ctxA, "turn-a3", 200)
-	select {
-	case raw := <-sub:
-		var ev flowEvent
-		if err := json.Unmarshal(raw, &ev); err != nil {
-			t.Fatalf("chain event unmarshal: %v", err)
+	for i := 0; i < 2; i++ {
+		select {
+		case raw := <-sub:
+			var ev flowEvent
+			if err := json.Unmarshal(raw, &ev); err != nil {
+				t.Fatalf("chain event %d unmarshal: %v", i, err)
+			}
+			if ev.Model != "gpt-a" {
+				t.Errorf("chain turn model = %q; want connection recovery %q", ev.Model, "gpt-a")
+			}
+		default:
+			t.Fatalf("chain event %d not published", i)
 		}
-		if ev.Model != "gpt-a" {
-			t.Errorf("chain turn model = %q; want connection recovery %q", ev.Model, "gpt-a")
-		}
-	default:
-		t.Fatal("chain turn event not published")
 	}
 
 	// The hub must not receive this request itself.
@@ -492,6 +500,9 @@ func TestFlowWebsocketObserverEvictionAtCapacity(t *testing.T) {
 	}
 	if evicted == "" {
 		t.Fatal("no evicted key found; capacity eviction not exercised")
+	}
+	for len(sub) > 0 {
+		_ = readFlowEvent(t, sub)
 	}
 	obs.WSMessageComplete(ctx, evicted, 200)
 	select {

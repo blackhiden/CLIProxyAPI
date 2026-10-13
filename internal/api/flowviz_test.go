@@ -190,7 +190,7 @@ func readFlowEventOptional(ch <-chan []byte, timeout time.Duration) *flowEvent {
 	}
 }
 
-func TestWSObserverPublishesTurnEvent(t *testing.T) {
+func TestWSObserverPublishesTurnLifecycle(t *testing.T) {
 	hub := newFlowHub()
 	ch := hub.subscribe()
 	defer hub.unsubscribe(ch)
@@ -201,27 +201,63 @@ func TestWSObserverPublishesTurnEvent(t *testing.T) {
 
 	payload := []byte(`{"type":"response.create","model":"gpt-5","input":"hi"}`)
 	obs.WSMessageStart(exec, "turn-1", payload)
+	started := readFlowEvent(t, ch)
+	if started.Event != flowEventStarted || started.Method != "WS" || started.Model != "gpt-5" {
+		t.Fatalf("unexpected started event: %+v", started)
+	}
+	if started.Status != 0 || started.LatencyMs != 0 {
+		t.Fatalf("started event must not fabricate completion metadata: %+v", started)
+	}
+
 	time.Sleep(5 * time.Millisecond) // ensure measurable latency
 	obs.WSMessageComplete(exec, "turn-1", http.StatusOK)
+	completed := readFlowEvent(t, ch)
+	if completed.Event != flowEventCompleted || completed.Method != "WS" || completed.Model != "gpt-5" {
+		t.Fatalf("unexpected completed event: %+v", completed)
+	}
+	if completed.Status != http.StatusOK {
+		t.Fatalf("Status = %d, want 200", completed.Status)
+	}
+	if completed.ID != "req-ws-1:turn-1" {
+		t.Fatalf("ID = %q, want req-ws-1:turn-1", completed.ID)
+	}
+	if completed.LatencyMs < 0 || completed.Timestamp <= 0 {
+		t.Fatalf("invalid completed event: %+v", completed)
+	}
+}
 
-	ev := readFlowEvent(t, ch)
-	if ev.Method != "WS" {
-		t.Fatalf("Method = %q, want WS", ev.Method)
+func TestFlowVizMiddlewarePublishesStartBeforeCompletion(t *testing.T) {
+	hub := newFlowHub()
+	ch := hub.subscribe()
+	defer hub.unsubscribe(ch)
+
+	engine := gin.New()
+	release := make(chan struct{})
+	engine.Use(flowVizMiddleware(hub))
+	engine.POST("/v1/chat/completions", func(c *gin.Context) {
+		<-release
+		c.Status(http.StatusOK)
+	})
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		req := httptest.NewRequest(http.MethodPost, "/v1/chat/completions", strings.NewReader(`{"model":"gpt-5"}`))
+		req.Header.Set("Content-Type", "application/json")
+		recorder := httptest.NewRecorder()
+		engine.ServeHTTP(recorder, req)
+	}()
+
+	started := readFlowEvent(t, ch)
+	if started.Event != flowEventStarted || started.Model != "gpt-5" || started.Status != 0 || started.LatencyMs != 0 {
+		t.Fatalf("unexpected HTTP started event: %+v", started)
 	}
-	if ev.Model != "gpt-5" {
-		t.Fatalf("Model = %q, want gpt-5", ev.Model)
-	}
-	if ev.Status != http.StatusOK {
-		t.Fatalf("Status = %d, want 200", ev.Status)
-	}
-	if ev.ID != "req-ws-1" {
-		t.Fatalf("ID = %q, want req-ws-1", ev.ID)
-	}
-	if ev.LatencyMs < 0 {
-		t.Fatalf("LatencyMs = %d, want >= 0", ev.LatencyMs)
-	}
-	if ev.Timestamp <= 0 {
-		t.Fatalf("Timestamp = %d, want > 0", ev.Timestamp)
+	close(release)
+	<-done
+
+	completed := readFlowEvent(t, ch)
+	if completed.Event != flowEventCompleted || completed.Model != "gpt-5" || completed.Status != http.StatusOK {
+		t.Fatalf("unexpected HTTP completed event: %+v", completed)
 	}
 }
 
@@ -237,15 +273,19 @@ func TestWSObserverRecoversModelViaThreadKey(t *testing.T) {
 	obs.WSMessageStart(exec, "turn-1", []byte(`{"type":"response.create","model":"gpt-5-codex","previous_response_id":"resp_9"}`))
 	obs.WSMessageComplete(exec, "turn-1", http.StatusOK)
 	_ = readFlowEvent(t, ch)
+	_ = readFlowEvent(t, ch)
 
 	// Follow-up turn omits the model but carries the continuation key; the
 	// model must be recovered from the hub's conversation mapping.
 	obs.WSMessageStart(exec, "turn-2", []byte(`{"type":"response.append","previous_response_id":"resp_9","input":"next"}`))
+	started := readFlowEvent(t, ch)
 	obs.WSMessageComplete(exec, "turn-2", http.StatusOK)
+	completed := readFlowEvent(t, ch)
 
-	ev := readFlowEvent(t, ch)
-	if ev.Model != "gpt-5-codex" {
-		t.Fatalf("follow-up Model = %q, want recovered gpt-5-codex", ev.Model)
+	for _, ev := range []flowEvent{started, completed} {
+		if ev.Model != "gpt-5-codex" {
+			t.Fatalf("follow-up Model = %q, want recovered gpt-5-codex", ev.Model)
+		}
 	}
 }
 
@@ -370,6 +410,7 @@ func TestWSObserverMapsErrorStatuses(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			obs.WSMessageStart(exec, tc.turn, payload)
+			_ = readFlowEvent(t, ch)
 			obs.WSMessageComplete(exec, tc.turn, tc.status)
 			ev := readFlowEvent(t, ch)
 			if ev.Status != tc.status {

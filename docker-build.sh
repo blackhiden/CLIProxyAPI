@@ -26,6 +26,8 @@ fi
 echo "--- Building from Source and Running ---"
 # Get Version Information
 IMAGE_NAME="${BASE_NAME}:${APP_VERSION}"
+CPAM_COMMIT="$(git -C ./frontend rev-parse --short HEAD)"
+CPAM_VERSION="$(git -C ./frontend describe --tags --abbrev=0)"
 APP_COMMIT="$(git rev-parse --short HEAD)"
 BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
@@ -43,8 +45,8 @@ docker build \
   -t ${IMAGE_NAME} \
   --build-arg CPAM_VERSION="${CPAM_VERSION}" \
   --build-arg CPAM_COMMIT="${CPAM_COMMIT}" \
-  --build-arg CPA_VERSION="${CPA_VERSION}" \
-  --build-arg CPA_COMMIT="${CPA_COMMIT}" \
+  --build-arg CPA_VERSION="${APP_VERSION}" \
+  --build-arg CPA_COMMIT="${APP_COMMIT}" \
   --build-arg BUILD_DATE="${BUILD_DATE}" .
 docker tag ${IMAGE_NAME} "${BASE_NAME}:latest"
 docker push ${IMAGE_NAME}

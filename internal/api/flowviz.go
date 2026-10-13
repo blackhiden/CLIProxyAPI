@@ -30,12 +30,18 @@ import (
 type flowEvent struct {
 	ID        string `json:"id"`
 	Timestamp int64  `json:"ts"`
+	Event     string `json:"event"`
 	Method    string `json:"method"`
 	Path      string `json:"path"`
 	Model     string `json:"model,omitempty"`
 	Status    int    `json:"status"`
 	LatencyMs int64  `json:"latency_ms"`
 }
+
+const (
+	flowEventStarted   = "started"
+	flowEventCompleted = "completed"
+)
 
 // flowHub is an in-process pub-sub fan-out for flow events. It is shared-nothing:
 // publishing is a non-blocking send; slow or absent subscribers cause drops, never
@@ -397,27 +403,20 @@ func sniffFlowModel(c *gin.Context, hub *flowHub) {
 	}
 }
 
-// flowVizMiddleware mirrors per-request metadata into the hub after the handler
-// completes. It does not read the request body, so model is empty unless a
-// handler sets the "flow_model" context key. When the model is still empty after
-// the handler runs, the middleware consults the model registry's default for the
-// request's API family so the pulse still routes to a meaningful node instead
-// of showing no animation. Latency is derived from the trace start time
-// recorded by the trace middleware.
+// flowVizMiddleware mirrors lifecycle metadata into the hub. It emits started
+// before the request handler runs and completed after it returns, allowing live
+// viewers to show in-flight work without reading prompts or request bodies.
 func flowVizMiddleware(hub *flowHub) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request != nil && (strings.EqualFold(c.GetHeader("Upgrade"), "websocket") || c.Request.URL.Path == "/live-flow/ws") {
+			c.Next()
+			return
+		}
 		start := time.Now()
 		sniffFlowModel(c, hub)
-		c.Next()
 
-		status := c.Writer.Status()
 		model, _ := c.Get("flow_model")
 		modelStr, _ := model.(string)
-
-		// Last-resort: when the body sniff + conversation cache both missed,
-		// consult the registry default so the pulse lands on a real model node
-		// rather than the catch-all or nowhere. This is safe here (after c.Next)
-		// because it only reads the path and registry state, not the body.
 		if modelStr == "" {
 			modelStr = flowRegistryFallbackModel(c)
 		}
@@ -425,6 +424,25 @@ func flowVizMiddleware(hub *flowHub) gin.HandlerFunc {
 		hub.publish(flowEvent{
 			ID:        logging.GetGinRequestID(c),
 			Timestamp: start.UnixMilli(),
+			Event:     flowEventStarted,
+			Method:    c.Request.Method,
+			Path:      c.FullPath(),
+			Model:     modelStr,
+		})
+
+		c.Next()
+
+		status := c.Writer.Status()
+		if model, exists := c.Get("flow_model"); exists {
+			if resolved, ok := model.(string); ok && resolved != "" {
+				modelStr = resolved
+			}
+		}
+
+		hub.publish(flowEvent{
+			ID:        logging.GetGinRequestID(c),
+			Timestamp: time.Now().UnixMilli(),
+			Event:     flowEventCompleted,
 			Method:    c.Request.Method,
 			Path:      c.FullPath(),
 			Model:     modelStr,
@@ -548,6 +566,10 @@ func (h *flowHub) hasSubscribers() bool {
 // bodies, plus a per-connection fallback for chained Responses streams), then
 // records it under the request id so the matching completion can publish
 // precise metadata.
+func flowWSTurnEventID(c *gin.Context, turnID string) string {
+	return logging.GetGinRequestID(c) + ":" + turnID
+}
+
 func (o *wsFlowObserver) WSMessageStart(ctx context.Context, requestID string, payload []byte) {
 	hub := o.hub
 	if hub == nil || !hub.hasSubscribers() {
@@ -589,14 +611,22 @@ func (o *wsFlowObserver) WSMessageStart(ctx context.Context, requestID string, p
 			break
 		}
 	}
-	state.turns[requestID] = flowWSTurn{model: modelStr, start: time.Now()}
+	startedAt := time.Now()
+	state.turns[requestID] = flowWSTurn{model: modelStr, start: startedAt}
 	state.mu.Unlock()
+
+	hub.publish(flowEvent{
+		ID:        flowWSTurnEventID(c, requestID),
+		Timestamp: startedAt.UnixMilli(),
+		Event:     flowEventStarted,
+		Method:    "WS",
+		Path:      c.FullPath(),
+		Model:     modelStr,
+	})
 }
 
-// WSMessageComplete implements handlers.FlowObserver: it publishes one event
-// per websocket turn, reusing the route's request id so a turn correlates with
-// its parent connection in the UI. Status comes straight from the turn outcome
-// (200 ok; 4xx/5xx on error). Latency is measured from WSMessageStart.
+// WSMessageComplete implements handlers.FlowObserver. Each WebSocket turn emits
+// a completed event with the same turn-specific ID as its started event.
 func (o *wsFlowObserver) WSMessageComplete(ctx context.Context, requestID string, status int) {
 	hub := o.hub
 	// Short-circuit on an idle hub, mirroring WSMessageStart: turns can only
@@ -623,8 +653,9 @@ func (o *wsFlowObserver) WSMessageComplete(ctx context.Context, requestID string
 	}
 
 	hub.publish(flowEvent{
-		ID:        logging.GetGinRequestID(c),
-		Timestamp: turn.start.UnixMilli(),
+		ID:        flowWSTurnEventID(c, requestID),
+		Timestamp: time.Now().UnixMilli(),
+		Event:     flowEventCompleted,
 		Method:    "WS",
 		Path:      c.FullPath(),
 		Model:     turn.model,
