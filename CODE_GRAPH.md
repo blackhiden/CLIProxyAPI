@@ -132,8 +132,10 @@ graph TD
 - **Role:** Amp integration module providing Amp-style routes and reverse proxy.
 
 ### [internal/api/handlers/management/]
-- **Role:** Management API handlers including provider OAuth flows, config management.
-- **Key Functions/Logic:** OAuth login flows, quota fetching, config CRUD
+- **Role:** Management API handlers including provider OAuth flows, config management, authentication keys.
+- **Key Functions/Logic:** 
+  - OAuth login flows, quota fetching, config CRUD
+  - `GetAuthAPIKeys`: Returns all client authentication API keys (protected by management key)
 - **Note:** Endpoints under `/v0/management` are deprecated
 
 ### [internal/thinking/]

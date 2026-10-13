@@ -98,6 +98,7 @@ retain the corresponding business operation's fields.
 | `/observability/logs/requests/<id>` | GET | Get a request log. |
 | `/observability/usage/api-keys` | GET | Get API-key usage. |
 | `/observability/usage/queue` | GET | Get queued usage events. |
+| `/access/auth-api-keys` | GET | Get all client authentication API keys (returns array of `{"name": "<key>", "key": "<key>"}` objects). |
 | `/credentials` | GET, POST, DELETE | List, upload, or delete credential files. |
 | `/credentials/models` | GET | Get credential models. |
 | `/credentials/download` | GET | Download a credential file. |
@@ -151,6 +152,11 @@ Legacy flat configuration endpoints such as `/debug`, `/request-retry`, and
 `/codex-api-key` exist under `/v0/management` only.
 `/v0/management/api-keys` continues to manage client authentication keys; the v8
 equivalent is `/v8/management/config/access/api-keys`.
+
+`/v0/management/auth-api-keys` and `/v8/management/access/auth-api-keys` return
+all configured client authentication API keys as an array of objects with `name`
+and `key` fields. These endpoints are protected by management key authentication
+and expose the full key values (not masked) for administrative purposes.
 
 Legacy-only configuration files keep their layout until a successful v8
 configuration write. When both layouts specify a field, the new field takes
