@@ -199,7 +199,7 @@ func TestWSObserverPublishesTurnLifecycle(t *testing.T) {
 	logging.SetGinRequestID(c, "req-ws-1")
 	obs := newFlowWSObserver(hub)
 
-	payload := []byte(`{"type":"response.create","model":"gpt-5","input":"hi"}`)
+	payload := []byte(`{"type":"response.create","model":"gpt-5","prompt":"hi"}`)
 	obs.WSMessageStart(exec, "turn-1", payload)
 	started := readFlowEvent(t, ch)
 	if started.Event != flowEventStarted || started.Method != "WS" || started.Model != "gpt-5" {
@@ -261,6 +261,51 @@ func TestFlowVizMiddlewarePublishesStartBeforeCompletion(t *testing.T) {
 	}
 }
 
+func TestFlowVizMiddlewareFiltersNonGenerationTraffic(t *testing.T) {
+	hub := newFlowHub()
+	ch := hub.subscribe()
+	defer hub.unsubscribe(ch)
+
+	engine := gin.New()
+	engine.Use(flowVizMiddleware(hub))
+	for _, route := range []string{"/v1/chat/completions", "/v1/responses", "/v0/management/auth-files", "/oauth/token"} {
+		engine.POST(route, func(c *gin.Context) { c.Status(http.StatusOK) })
+	}
+
+	cases := []struct {
+		name string
+		path string
+		body string
+		want bool
+	}{
+		{"chat completions exception", "/v1/chat/completions", `{"model":"gpt-5"}`, true},
+		{"responses with prompt", "/v1/responses", `{"model":"gpt-5","prompt":"hello"}`, true},
+		{"responses with input", "/v1/responses", `{"model":"gpt-5","input":"hello"}`, true},
+		{"responses without prompt", "/v1/responses", `{"model":"gpt-5","input":[]}`, false},
+		{"management auth files", "/v0/management/auth-files", `{"model":"gpt-5","prompt":"ignored"}`, false},
+		{"token refresh", "/oauth/token", `{"prompt":"ignored"}`, false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			recorder := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodPost, tc.path, strings.NewReader(tc.body))
+			req.Header.Set("Content-Type", "application/json")
+			engine.ServeHTTP(recorder, req)
+			if tc.want {
+				started := readFlowEvent(t, ch)
+				completed := readFlowEvent(t, ch)
+				if started.Event != flowEventStarted || completed.Event != flowEventCompleted {
+					t.Fatalf("unexpected lifecycle: started=%+v completed=%+v", started, completed)
+				}
+				return
+			}
+			if ev := readFlowEventOptional(ch, 100*time.Millisecond); ev != nil {
+				t.Fatalf("unexpected filtered flow event: %+v", *ev)
+			}
+		})
+	}
+}
+
 func TestWSObserverRecoversModelViaThreadKey(t *testing.T) {
 	hub := newFlowHub()
 	ch := hub.subscribe()
@@ -270,14 +315,14 @@ func TestWSObserverRecoversModelViaThreadKey(t *testing.T) {
 	obs := newFlowWSObserver(hub)
 
 	// First turn names its model along with the continuation key.
-	obs.WSMessageStart(exec, "turn-1", []byte(`{"type":"response.create","model":"gpt-5-codex","previous_response_id":"resp_9"}`))
+	obs.WSMessageStart(exec, "turn-1", []byte(`{"type":"response.create","model":"gpt-5-codex","previous_response_id":"resp_9","prompt":"hi"}`))
 	obs.WSMessageComplete(exec, "turn-1", http.StatusOK)
 	_ = readFlowEvent(t, ch)
 	_ = readFlowEvent(t, ch)
 
 	// Follow-up turn omits the model but carries the continuation key; the
 	// model must be recovered from the hub's conversation mapping.
-	obs.WSMessageStart(exec, "turn-2", []byte(`{"type":"response.append","previous_response_id":"resp_9","input":"next"}`))
+	obs.WSMessageStart(exec, "turn-2", []byte(`{"type":"response.append","previous_response_id":"resp_9","prompt":"next"}`))
 	started := readFlowEvent(t, ch)
 	obs.WSMessageComplete(exec, "turn-2", http.StatusOK)
 	completed := readFlowEvent(t, ch)
@@ -302,6 +347,24 @@ func TestWSObserverCompleteWithoutStartSkips(t *testing.T) {
 	obs.WSMessageComplete(exec, "ghost-turn", http.StatusOK)
 	if ev := readFlowEventOptional(ch, 150*time.Millisecond); ev != nil {
 		t.Fatalf("unexpected event for unknown turn: %+v", *ev)
+	}
+}
+
+func TestWSObserverFiltersFramesWithoutPrompt(t *testing.T) {
+	hub := newFlowHub()
+	ch := hub.subscribe()
+	defer hub.unsubscribe(ch)
+
+	c, exec := newWSContext(t, http.MethodGet, "/v1/responses", "/v1/responses")
+	obs := newFlowWSObserver(hub)
+	obs.WSMessageStart(exec, "refresh-turn", []byte(`{"type":"token.refresh","model":"gpt-5"}`))
+	obs.WSMessageComplete(exec, "refresh-turn", http.StatusOK)
+
+	if _, exists := c.Get(flowWSStateKey); exists {
+		t.Fatal("non-prompt frame must not create flow turn state")
+	}
+	if ev := readFlowEventOptional(ch, 100*time.Millisecond); ev != nil {
+		t.Fatalf("non-prompt frame published flow event: %+v", *ev)
 	}
 }
 

@@ -323,6 +323,7 @@ func (h *flowHub) unsubscribe(ch chan []byte) {
 // downstream handler regardless of whether a model was found.
 const flowModelSniffCap = 64 * 1024
 const flowModelSniffIncompleteKey = "flow_model_sniff_incomplete"
+const flowRequestEligibleKey = "flow_request_eligible"
 
 type flowReplayBody struct {
 	reader io.Reader
@@ -335,6 +336,63 @@ func (b *flowReplayBody) Read(p []byte) (int, error) {
 
 func (b *flowReplayBody) Close() error {
 	return b.closer.Close()
+}
+
+func flowRequestPath(c *gin.Context) string {
+	if c == nil {
+		return ""
+	}
+	if c.Request != nil && c.Request.URL != nil {
+		return c.Request.URL.Path
+	}
+	return c.FullPath()
+}
+
+func flowPromptFieldPresent(value gjson.Result) bool {
+	if !value.Exists() || value.Type == gjson.Null {
+		return false
+	}
+	if value.Type == gjson.String {
+		return strings.TrimSpace(value.String()) != ""
+	}
+	if value.IsArray() {
+		return len(value.Array()) > 0
+	}
+	return true
+}
+
+// flowRequestEligible limits Live Flow to generation traffic. Chat Completions
+// is always eligible; other application routes need a prompt-bearing field.
+// Management, OAuth, authentication, and token routes are always excluded.
+// This checks metadata shape only and never retains prompt content.
+func flowRequestEligible(path string, sniff []byte) bool {
+	if strings.Contains(path, "/chat/completions") {
+		return true
+	}
+	if strings.HasPrefix(path, "/v0/management/") ||
+		strings.HasPrefix(path, "/v8/management/") ||
+		strings.HasPrefix(path, "/oauth/") ||
+		strings.HasPrefix(path, "/auth/") ||
+		strings.Contains(path, "/token") {
+		return false
+	}
+	if len(sniff) == 0 || !gjson.ValidBytes(sniff) {
+		return false
+	}
+	root := gjson.ParseBytes(sniff)
+	return flowPromptFieldPresent(root.Get("prompt")) ||
+		flowPromptFieldPresent(root.Get("messages")) ||
+		flowPromptFieldPresent(root.Get("input")) ||
+		flowPromptFieldPresent(root.Get("contents"))
+}
+
+func flowRequestIsEligible(c *gin.Context) bool {
+	if c == nil {
+		return false
+	}
+	eligible, _ := c.Get(flowRequestEligibleKey)
+	value, _ := eligible.(bool)
+	return value
 }
 
 // flowThreadKey extracts a stable conversation/thread identifier from a JSON
@@ -388,6 +446,7 @@ func sniffFlowModel(c *gin.Context, hub *flowHub) {
 	if idle || c == nil || c.Request == nil || c.Request.Body == nil {
 		return
 	}
+	c.Set(flowRequestEligibleKey, flowRequestEligible(flowRequestPath(c), nil))
 	ct := strings.ToLower(c.Request.Header.Get("Content-Type"))
 	// Accept JSON content types: application/json, application/json; charset=utf-8,
 	// text/json, or any type ending with +json (e.g. application/vnd.api+json).
@@ -419,6 +478,7 @@ func sniffFlowModel(c *gin.Context, hub *flowHub) {
 	if err != nil || len(body) == 0 {
 		return
 	}
+	c.Set(flowRequestEligibleKey, flowRequestEligible(flowRequestPath(c), body))
 
 	allowRegistryFallback := contentLength >= 0 && contentLength <= flowModelSniffCap
 	if !allowRegistryFallback {
@@ -439,7 +499,12 @@ func flowVizMiddleware(hub *flowHub) gin.HandlerFunc {
 			return
 		}
 		start := time.Now()
+		c.Set(flowRequestEligibleKey, flowRequestEligible(flowRequestPath(c), nil))
 		sniffFlowModel(c, hub)
+		if !flowRequestIsEligible(c) {
+			c.Next()
+			return
+		}
 
 		model, _ := c.Get("flow_model")
 		modelStr, _ := model.(string)
@@ -614,6 +679,9 @@ func (o *wsFlowObserver) WSMessageStart(ctx context.Context, requestID string, p
 	if len(sniff) > flowModelSniffCap {
 		sniff = sniff[:flowModelSniffCap]
 	}
+	if !flowRequestEligible(flowRequestPath(c), sniff) {
+		return
+	}
 
 	state := getFlowWSState(c)
 
@@ -666,7 +734,11 @@ func (o *wsFlowObserver) WSMessageComplete(ctx context.Context, requestID string
 	if !ok || c.Request == nil {
 		return
 	}
-	state := getFlowWSState(c)
+	stateValue, exists := c.Get(flowWSStateKey)
+	state, stateOK := stateValue.(*flowWSRequestState)
+	if !exists || !stateOK || state == nil {
+		return
+	}
 	state.mu.Lock()
 	turn, exists := state.turns[requestID]
 	if exists {

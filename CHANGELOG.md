@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Live Flow large-prompt model accuracy (FORK-ONLY)**: The root body sniffer now inspects a bounded leading prefix while replaying the complete original body to the real request handler. A large prompt with an early model such as `kr/claude-sonnet-4.5` therefore retains that requested/routed model in Live Flow instead of being mislabeled with the registry's first OpenAI fallback model.
 
+- **Live Flow generation filter (FORK-ONLY)**: Root Live Flow now ignores authentication, token refresh, management, and model-less background traffic. `/chat/completions` remains eligible, while all other HTTP routes and WebSocket turns require prompt-bearing input (`prompt`, `messages`, `input`, or `contents`) before publishing lifecycle metadata.
+
 - **Live Flow feature persistence (FORK-ONLY)**: Made the Live Flow feature merge-resilient by renaming to fork-specific namespace `cpa-fork-liveflow`. Added `CPAForkLiveFlowEnabled` config field, `NormalizeLiveFlowConfig()` for backward compatibility with legacy `flow-visualization-enabled` key, FORK-ONLY markers in all Live Flow files, comprehensive merge preservation documentation in `docs/MERGE-PRESERVATION-fork-fixes.md` (item 10 and section 3.10), and `TestLiveFlowFeaturePersistence` test that fails if the feature is removed by upstream merges.
 
 ### Changed

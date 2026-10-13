@@ -405,18 +405,18 @@ func TestFlowWebsocketTurnModelResolutionEndToEnd(t *testing.T) {
 	// Turn 1 on A names its model. Thread keys are extracted from top-level
 	// fields (flowThreadKey uses flat gjson paths), so conversation_id sits at
 	// the frame root.
-	obs.WSMessageStart(ctxA, "turn-a1", []byte(`{"type":"response.create","conversation_id":"conv-ws","model":"gpt-a"}`))
+	obs.WSMessageStart(ctxA, "turn-a1", []byte(`{"type":"response.create","conversation_id":"conv-ws","model":"gpt-a","prompt":"hi"}`))
 	obs.WSMessageComplete(ctxA, "turn-a1", 200)
 
 	// Turn 2 on A omits the model: recovered from the salted thread cache.
-	obs.WSMessageStart(ctxA, "turn-a2", []byte(`{"type":"response.create","conversation_id":"conv-ws","input":"hi"}`))
+	obs.WSMessageStart(ctxA, "turn-a2", []byte(`{"type":"response.create","conversation_id":"conv-ws","prompt":"hi"}`))
 	obs.WSMessageComplete(ctxA, "turn-a2", 200)
 
 	// Client B reuses the same conversation id but a different model: must
 	// resolve from B's own salted entry, never A's.
-	obs.WSMessageStart(ctxB, "turn-b1", []byte(`{"type":"response.create","conversation_id":"conv-ws","model":"gpt-b"}`))
+	obs.WSMessageStart(ctxB, "turn-b1", []byte(`{"type":"response.create","conversation_id":"conv-ws","model":"gpt-b","prompt":"hi"}`))
 	obs.WSMessageComplete(ctxB, "turn-b1", 200)
-	obs.WSMessageStart(ctxB, "turn-b2", []byte(`{"type":"response.create","conversation_id":"conv-ws","input":"hi"}`))
+	obs.WSMessageStart(ctxB, "turn-b2", []byte(`{"type":"response.create","conversation_id":"conv-ws","prompt":"hi"}`))
 	obs.WSMessageComplete(ctxB, "turn-b2", 200)
 
 	want := []string{"gpt-a", "gpt-a", "gpt-a", "gpt-a", "gpt-b", "gpt-b", "gpt-b", "gpt-b"}
@@ -449,7 +449,7 @@ func TestFlowWebsocketTurnModelResolutionEndToEnd(t *testing.T) {
 
 	// A chained Responses continuation on A (fresh previous_response_id, no
 	// thread key, no model) recovers the connection's last model.
-	obs.WSMessageStart(ctxA, "turn-a3", []byte(`{"type":"response.append","previous_response_id":"fresh-chain-xyz"}`))
+	obs.WSMessageStart(ctxA, "turn-a3", []byte(`{"type":"response.append","previous_response_id":"fresh-chain-xyz","prompt":"next"}`))
 	obs.WSMessageComplete(ctxA, "turn-a3", 200)
 	for i := 0; i < 2; i++ {
 		select {
@@ -530,7 +530,7 @@ func TestFlowWebsocketObserverEvictionAtCapacity(t *testing.T) {
 	for i := 0; i < starts; i++ {
 		key := fmt.Sprintf("evict-%d", i)
 		keys = append(keys, key)
-		obs.WSMessageStart(ctx, key, []byte(`{"model":"gpt-5"}`))
+		obs.WSMessageStart(ctx, key, []byte(`{"model":"gpt-5","prompt":"hi"}`))
 	}
 	state := getFlowWSState(conn)
 	if len(state.turns) != flowWSStatuses {
