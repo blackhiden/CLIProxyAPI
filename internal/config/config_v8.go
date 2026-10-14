@@ -73,7 +73,7 @@ func buildV8Paths() []configPath {
 		{"host", "server.host"}, {"port", "server.port"}, {"max-request-body-bytes", "server.max-request-body-bytes"}, {"trusted-proxies", "server.trusted-proxies"},
 		{"github-token", "server.github-token"},
 		{"tls", "server.tls"}, {"commercial-mode", "server.commercial-mode"}, {"discovery", "server.discovery"},
-		{"remote-management", "management"}, {"api-keys", "access.api-keys"},
+		{"remote-management", "management"}, {"api-keys", "access.api-keys"}, {"api-key-names", "access.api-key-names"},
 		{"credential-concurrency", "credentials.concurrency"}, {"credential-in-flight", "credentials.in-flight"},
 		{"force-model-prefix", "routing.force-model-prefix"},
 		{"request-retry", "routing.retry.request-retry"}, {"max-retry-credentials", "routing.retry.max-retry-credentials"},
@@ -520,6 +520,9 @@ func NormalizeConfigLayout(data []byte, migrate bool) ([]byte, bool, error) {
 		deleteYAMLPath(root, family.old)
 		changed = true
 	}
+	if migrate && pruneV8APIKeyNames(root) {
+		changed = true
+	}
 	if migrate {
 		// Existing unknown fields are ignored by the runtime. Retain their
 		// contents as comments while keeping new v8 writes strictly validated.
@@ -534,6 +537,52 @@ func NormalizeConfigLayout(data []byte, migrate bool) ([]byte, bool, error) {
 	}
 	out, err := yaml.Marshal(&doc)
 	return out, true, err
+}
+
+func pruneV8APIKeyNames(root *yaml.Node) bool {
+	keys := yamlPath(root, "access.api-keys")
+	names := yamlPath(root, "access.api-key-names")
+	if names == nil || names.Kind != yaml.MappingNode {
+		return false
+	}
+
+	configured := make(map[string]struct{})
+	if keys != nil && keys.Kind == yaml.SequenceNode {
+		configured = make(map[string]struct{}, len(keys.Content))
+		for _, key := range keys.Content {
+			if key != nil && key.Kind == yaml.ScalarNode && key.Value != "" {
+				configured[key.Value] = struct{}{}
+			}
+		}
+	}
+
+	changed := false
+	for i := 0; i+1 < len(names.Content); {
+		key, value := names.Content[i], names.Content[i+1]
+		name := ""
+		if value != nil && value.Kind == yaml.ScalarNode {
+			name = strings.TrimSpace(value.Value)
+		}
+		if key == nil || key.Kind != yaml.ScalarNode || name == "" {
+			names.Content = append(names.Content[:i], names.Content[i+2:]...)
+			changed = true
+			continue
+		}
+		if _, exists := configured[key.Value]; !exists {
+			names.Content = append(names.Content[:i], names.Content[i+2:]...)
+			changed = true
+			continue
+		}
+		if value.Value != name {
+			value.Value = name
+			changed = true
+		}
+		i += 2
+	}
+	if len(names.Content) != 0 {
+		return changed
+	}
+	return deleteYAMLPath(root, "access.api-key-names") || changed
 }
 
 // IsV8ConfigLayout identifies a validated document by its version or v8 paths.

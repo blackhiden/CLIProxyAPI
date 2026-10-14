@@ -138,6 +138,20 @@ CLIProxyAPI 用户手册： [https://help.router-for.me/](https://help.router-fo
 
 请参见 [MANAGEMENT_API_CN.md](https://help.router-for.me/cn/management/api)
 
+### 客户端 API 密钥名称
+
+客户端认证密钥仍是字符串列表。可选显示名称保存在 v8 配置的 `access.api-key-names`（旧版配置使用 `api-key-names`）：
+
+```yaml
+access:
+  api-keys:
+    - sk-client-key
+  api-key-names:
+    sk-client-key: "Alice 的笔记本"
+```
+
+名称会由管理 API 返回，不影响认证。保存配置时会移除空名称和不再存在的密钥名称。
+
 ## 使用量统计
 
 自v6.10.0版本以后，CLIProxyAPI及 [CPAMC](https://github.com/router-for-me/Cli-Proxy-API-Management-Center) 项目不再预置数据统计功能，如果有数据统计需求的请使用以下项目：

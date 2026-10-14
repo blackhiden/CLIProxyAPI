@@ -137,6 +137,20 @@ CLIProxyAPIガイド：[https://help.router-for.me/](https://help.router-for.me/
 
 [MANAGEMENT_API.md](https://help.router-for.me/management/api)を参照
 
+### クライアント API キー名
+
+クライアント認証キーは文字列リストのままです。任意の表示名は v8 設定では `access.api-key-names`、従来設定では `api-key-names` に保存します。
+
+```yaml
+access:
+  api-keys:
+    - sk-client-key
+  api-key-names:
+    sk-client-key: "Alice のノート PC"
+```
+
+名前は Management API から返されますが、認証には影響しません。設定を保存すると、空または存在しないキーの名前は削除されます。
+
 ## 使用量統計
 
 v6.10.0以降、CLIProxyAPIおよび [CPAMC](https://github.com/router-for-me/Cli-Proxy-API-Management-Center) プロジェクトには使用量統計機能がプリセットされなくなりました。使用量統計が必要な場合は、次のプロジェクトをご利用ください：

@@ -67,7 +67,11 @@ In the CLI server and `sdk/cliproxy`, this provider is registered automatically 
 api-keys:
   - sk-test-123
   - sk-prod-456
+api-key-names:
+  sk-test-123: "Development laptop"
 ```
+
+`api-key-names` is optional metadata for configured client keys. It affects management displays only; authentication continues to validate the `api-keys` values.
 
 ## Loading Providers from External Go Modules
 

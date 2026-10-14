@@ -12,9 +12,10 @@ import (
 
 func TestGetAuthAPIKeys(t *testing.T) {
 	tests := []struct {
-		name     string
-		apiKeys  []string
-		expected []authAPIKeyItem
+		name        string
+		apiKeys     []string
+		apiKeyNames map[string]string
+		expected    []authAPIKeyItem
 	}{
 		{
 			name:     "empty keys",
@@ -29,12 +30,13 @@ func TestGetAuthAPIKeys(t *testing.T) {
 			},
 		},
 		{
-			name:    "multiple keys",
-			apiKeys: []string{"key-1", "key-2", "key-3"},
+			name:        "multiple keys with persisted names",
+			apiKeys:     []string{"key-1", "key-2", "key-3"},
+			apiKeyNames: map[string]string{"key-1": "Shell", "key-3": "VSCode"},
 			expected: []authAPIKeyItem{
-				{Name: "key-1", Key: "key-1"},
+				{Name: "Shell", Key: "key-1"},
 				{Name: "key-2", Key: "key-2"},
-				{Name: "key-3", Key: "key-3"},
+				{Name: "VSCode", Key: "key-3"},
 			},
 		},
 	}
@@ -43,7 +45,8 @@ func TestGetAuthAPIKeys(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := &config.Config{
 				SDKConfig: config.SDKConfig{
-					APIKeys: tt.apiKeys,
+					APIKeys:     tt.apiKeys,
+					APIKeyNames: tt.apiKeyNames,
 				},
 			}
 			h := &Handler{cfg: cfg}

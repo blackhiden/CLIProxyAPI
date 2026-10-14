@@ -117,11 +117,17 @@ management:
 
 # Client authentication for the proxy API. These are not upstream provider keys.
 access:
-  # API keys for authentication
+  # API keys for authentication.
   api-keys:
     - "your-api-key-1"
     - "your-api-key-2"
     - "your-api-key-3"
+
+  # Optional display names for configured client API keys. Names are returned by
+  # the management API and are not used to authenticate requests.
+  api-key-names:
+    "your-api-key-1": "Alice's laptop"
+    "your-api-key-2": "CI deployment"
 
 # Optional credential concurrency and observation contracts.
 

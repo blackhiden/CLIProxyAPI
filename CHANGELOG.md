@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Persistent client API-key names**: Added optional `api-key-names` metadata for legacy configuration and `access.api-key-names` for v8 configuration. Names are limited to configured client keys, survive reloads and restarts, are returned by the authenticated API-key management endpoints, and do not affect request authentication.
+
 - **Live Flow lifecycle events (FORK-ONLY)**: Root `/live-flow/ws` now publishes a metadata-only `started` event before an HTTP request or WebSocket turn executes and a matching `completed` event with final status and latency afterwards. WebSocket turn IDs are made unique per connection turn. This lets dashboards show long-running in-flight requests rather than waiting for completion, while preserving the no-prompts/no-bodies/no-credentials contract.
 
 - **Live Flow large-prompt model accuracy (FORK-ONLY)**: The root body sniffer now inspects a bounded leading prefix while replaying the complete original body to the real request handler. A large prompt with an early model such as `kr/claude-sonnet-4.5` therefore retains that requested/routed model in Live Flow instead of being mislabeled with the registry's first OpenAI fallback model.

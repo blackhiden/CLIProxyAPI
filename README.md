@@ -150,6 +150,22 @@ CLIProxyAPI Guides: [https://help.router-for.me/](https://help.router-for.me/)
 
 see [MANAGEMENT_API.md](https://help.router-for.me/management/api)
 
+### Client API key names
+
+Client authentication keys remain a string list. Optional display names are stored in
+`access.api-key-names` in v8 configuration (or `api-key-names` in legacy configuration):
+
+```yaml
+access:
+  api-keys:
+    - sk-client-key
+  api-key-names:
+    sk-client-key: "Alice's laptop"
+```
+
+Names are returned by the management API and do not affect authentication. Empty or stale
+entries are removed when configuration is normalized and saved.
+
 ## Usage Statistics
 
 Since v6.10.0, CLIProxyAPI and [CPAMC](https://github.com/router-for-me/Cli-Proxy-API-Management-Center) no longer ship built-in usage statistics. If you need usage statistics, use:

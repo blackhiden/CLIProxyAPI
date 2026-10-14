@@ -37,6 +37,7 @@ the corresponding group value. Legacy field names are rejected by v8 writes.
 | Example path | Value or purpose |
 | --- | --- |
 | `/config/access/api-keys` | Client authentication keys, for example `["client-key"]`. |
+| `/config/access/api-key-names` | Optional `{ "client-key": "Laptop" }` display-name mapping for configured client keys. |
 | `/config/api-keys` | All upstream provider groups. |
 | `/config/api-keys/codex` | Codex upstream groups. |
 | `/config/client/codex/optimize-multi-agent-v2` | Boolean, default `false`; applies to Codex clients across OAuth and API-key routes. |
@@ -155,7 +156,8 @@ equivalent is `/v8/management/config/access/api-keys`.
 
 `/v0/management/auth-api-keys` and `/v8/management/access/auth-api-keys` return
 all configured client authentication API keys as an array of objects with `name`
-and `key` fields. These endpoints are protected by management key authentication
+and `key` fields. `name` comes from `api-key-names` when configured and otherwise
+defaults to the key value. These endpoints are protected by management key authentication
 and expose the full key values (not masked) for administrative purposes.
 
 Legacy-only configuration files keep their layout until a successful v8

@@ -23,8 +23,12 @@ func (h *Handler) GetAuthAPIKeys(c *gin.Context) {
 
 	keys := make([]authAPIKeyItem, 0, len(h.cfg.SDKConfig.APIKeys))
 	for _, key := range h.cfg.SDKConfig.APIKeys {
+		name := h.cfg.SDKConfig.APIKeyNames[key]
+		if name == "" {
+			name = key
+		}
 		keys = append(keys, authAPIKeyItem{
-			Name: key,
+			Name: name,
 			Key:  key,
 		})
 	}

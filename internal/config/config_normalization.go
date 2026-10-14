@@ -33,6 +33,43 @@ func (cfg *Config) NormalizePluginsConfig() {
 	}
 }
 
+// SanitizeAPIKeyNames keeps display names only for configured client API keys.
+func (cfg *Config) SanitizeAPIKeyNames() {
+	if cfg == nil {
+		return
+	}
+	if len(cfg.APIKeyNames) == 0 {
+		cfg.APIKeyNames = nil
+		return
+	}
+
+	configured := make(map[string]struct{}, len(cfg.APIKeys))
+	for _, key := range cfg.APIKeys {
+		if key != "" {
+			configured[key] = struct{}{}
+		}
+	}
+	if len(configured) == 0 {
+		cfg.APIKeyNames = nil
+		return
+	}
+
+	names := make(map[string]string, len(cfg.APIKeyNames))
+	for key, name := range cfg.APIKeyNames {
+		if _, exists := configured[key]; !exists {
+			continue
+		}
+		if name = strings.TrimSpace(name); name != "" {
+			names[key] = name
+		}
+	}
+	if len(names) == 0 {
+		cfg.APIKeyNames = nil
+		return
+	}
+	cfg.APIKeyNames = names
+}
+
 // NormalizeLiveFlowConfig applies backward compatibility for the renamed live flow config key.
 // FORK-ONLY: CPA fork's persistent Live Flow feature.
 func (cfg *Config) NormalizeLiveFlowConfig() {

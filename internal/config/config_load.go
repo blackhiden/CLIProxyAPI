@@ -167,6 +167,8 @@ func LoadConfigOptional(configFile string, optional bool) (*Config, error) {
 	// FORK-ONLY: Normalize Live Flow config for backward compatibility
 	cfg.NormalizeLiveFlowConfig()
 
+	cfg.SanitizeAPIKeyNames()
+
 	// Sanitize Gemini API key configuration and migrate legacy entries.
 	cfg.SanitizeGeminiKeys()
 
