@@ -579,6 +579,11 @@ func v8AllowedRoots() map[string]bool {
 		section, _, _ := strings.Cut(path.current, ".")
 		allowed[section] = true
 	}
+	// FORK-ONLY: Allow fork-specific top-level keys that don't have upstream v8 counterparts.
+	// These remain as legacy keys for backward compatibility and fork feature persistence.
+	allowed["cpa-fork-liveflow-enabled"] = true  // Fork's Live Flow feature (preferred key)
+	allowed["flow-visualization-enabled"] = true // Fork's Live Flow feature (legacy/deprecated key)
+	allowed["quota-backoff"] = true              // Fork's quota backoff configuration
 	return allowed
 }
 
