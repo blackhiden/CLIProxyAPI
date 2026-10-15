@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+---
+
+## [v8.0.31] - 2026-10-16
+
+### Added (from upstream sync)
 
 - **Persistent client API-key names**: Added optional `api-key-names` metadata for legacy configuration and `access.api-key-names` for v8 configuration. Names are limited to configured client keys, survive reloads and restarts, are returned by the authenticated API-key management endpoints, and do not affect request authentication.
 
@@ -18,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Live Flow generation filter (FORK-ONLY)**: Root Live Flow now ignores authentication, token refresh, management, and model-less background traffic. `/chat/completions` remains eligible, while all other HTTP routes and WebSocket turns require prompt-bearing input (`prompt`, `messages`, `input`, or `contents`) before publishing lifecycle metadata.
 
 - **Live Flow feature persistence (FORK-ONLY)**: Made the Live Flow feature merge-resilient by renaming to fork-specific namespace `cpa-fork-liveflow`. Added `CPAForkLiveFlowEnabled` config field, `NormalizeLiveFlowConfig()` for backward compatibility with legacy `flow-visualization-enabled` key, FORK-ONLY markers in all Live Flow files, comprehensive merge preservation documentation in `docs/MERGE-PRESERVATION-fork-fixes.md` (item 10 and section 3.10), and `TestLiveFlowFeaturePersistence` test that fails if the feature is removed by upstream merges.
+
+- **cpauk full own-event request-log persistence (FORK-ONLY)**: API-key viewers retain every request-log section for events they own when cpauk's `CPA_REQUEST_LOG_ACCESS_ENABLED=true`. The cpauk route carries a `FORK-ONLY` invariant, `TestAPIKeyViewerRequestLogFullContentPersistence` checks all returned section titles and content, and both root and submodule merge-preservation guides describe the required ownership and access-gate boundary.
 
 ### Changed
 
