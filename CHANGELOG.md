@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+---
+
+## [v8.0.31] - 2026-10-16
+
+### Added (from upstream sync)
 
 - **Persistent client API-key names**: Added optional `api-key-names` metadata for legacy configuration and `access.api-key-names` for v8 configuration. Names are limited to configured client keys, survive reloads and restarts, are returned by the authenticated API-key management endpoints, and do not affect request authentication.
 
