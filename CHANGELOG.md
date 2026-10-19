@@ -9,6 +9,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v8.0.35] - 2026-10-19
+
+### Added (from upstream sync)
+
+- **Codex web_search_call history reconciliation**: Reconciles replayed web_search_call history with tool declarations to prevent duplicate tool definitions in Codex requests.
+- **Codex direct tool mode**: Advertises direct tool mode and disables responses lite for non-codex routes, improving tool invocation reliability.
+- **xAI image request routing**: Preserves model prefix when routing xAI image requests through OpenAI-compatible endpoints.
+- **Claude Code identity stripping**: Strips Claude Code identity headers on API keys with cloak mode set to never or uncloak.
+- **Vertex partner/open models**: Supports partner and open models via endpoints/openapi route for Vertex AI.
+- **Claude web search caching**: Adds Claude web search result caching and restoration for sessions, reducing redundant searches.
+- **Stream preferences caching**: Caches stream preferences and tool maps per stream in Claude response translator for improved performance.
+- **Antigravity expired credits recovery**: Enables expired Antigravity AI credits negative hint recovery and retry logic.
+- **Plugin scheduler snapshot**: Snapshots plugin scheduler and releases host lock during executor registration for better concurrency.
+- **Codex proactive refresh**: Increases Codex proactive refresh lead to 96 hours and improves rejected token handling.
+- **Gemini request payload pinning**: Pins request payload and resolved tool maps per stream in OpenAI response translators.
+- **Static/plugin model definitions**: Adds support for static and plugin model definitions retrieval by channel in management API.
+- **Credentials write protection**: Protects credentials from unindexed deletion during incomplete or in-place file writes.
+- **Safe auth record modification**: Adds safe Modify method for auth records with epoch validation and locking.
+- **Gemini schema reference inlining**: Inlines local schema references in Gemini cleaners and preserves literal values.
+- **Access log security**: Escapes request path in access log to prevent log injection attacks.
+
+### Fixed
+
+- **Upstream merge conflicts**: Resolved 27 merge conflicts between fork (v7 module path) and upstream (v8 module path). All upstream functional changes incorporated while preserving fork-specific features.
+- **Fork method restoration**: Restored `NormalizeLiveFlowConfig()` and `SanitizeAPIKeyNames()` methods that were lost during conflict resolution.
+- **service_lifecycle.go logic**: Preserved both fork's watcher state callback registration and upstream's mutex locking around `syncPluginModelRuntime`.
+
+### Changed
+
+- **Module path**: Maintained v7 module path (`github.com/router-for-me/CLIProxyAPI/v7`) across all 80+ Go files per fork versioning policy, replacing upstream v8 imports.
+
+---
+
 ## [v8.0.31] - 2026-10-16
 
 ### Added (from upstream sync)
