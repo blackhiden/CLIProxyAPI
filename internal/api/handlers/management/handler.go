@@ -69,6 +69,8 @@ type Handler struct {
 
 	pluginStoreRateLimiter *pluginstore.GitHubRateLimiter
 	pluginReleases         pluginReleaseCache
+	siwcOAuthFactory       func(*config.Config) siwcOAuthService
+	siwcCommitMu           sync.Mutex
 }
 
 type configReloadSnapshot struct {

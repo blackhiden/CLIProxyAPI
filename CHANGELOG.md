@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v8.0.39] - 2026-10-22
+
+### Added (from upstream sync)
+
+- **SIWC OAuth integration**: Sign In With Codex OAuth support for management API, including session management, credential binding, and OAuth mutations.
+- **Codex alpha search**: Use original OAuth credentials for alpha search requests, preserving authenticated search access.
+- **Claude effort preservation**: Preserve standalone Claude effort configuration on Codex requests for proper reasoning level propagation.
+- **Guardian credential inheritance**: Inherit parent credentials for guardian reviews to maintain authentication context.
+- **Antigravity tool call isolation**: Preserve tool call replay continuity and caller isolation across Antigravity reasoning sessions.
+- **Codex/Claude tool caching**: Cache tool metadata per stream in Codex chat and Claude responses to avoid rescanning per tool call.
+- **CLIProxyAPIHome rebalancing**: Cluster balance management, recovery testing, release lifecycle, and cancellation handling for CLIProxyAPIHome integration.
+- **Vertex OpenAPI partner models**: Support for non-Google partner and open models via Vertex AI endpoints/openapi route.
+- **Chenju sponsor**: Added Chenju as project sponsor in README files.
+
+### Fixed
+
+- **Upstream merge conflicts**: Resolved 8 conflicts between fork (v7 module path) and upstream (v8 module path). All upstream functional changes incorporated while preserving fork-specific features.
+- **Module path consistency**: Fixed 37 files with lingering v8 imports, ensuring all imports use v7 module path per fork versioning policy.
+- **Build verification**: Removed unused log import from claude_executor_compaction.go to ensure clean build.
+
+### Changed
+
+- **Module path**: Maintained v7 module path (`github.com/router-for-me/CLIProxyAPI/v7`) across entire codebase, replacing all upstream v8 imports.
+- **Sponsor updates**: Removed Fluxa Baidu AI Cloud logo, added Chenju and Xcode assets.
+
+---
+
 ## [v8.0.35] - 2026-10-19
 
 ### Added (from upstream sync)
