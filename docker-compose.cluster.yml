@@ -2,7 +2,7 @@ services:
   cli-proxy-api:
     # Fork image; see the comment in docker-compose.yml for why the default is not the
     # upstream Docker Hub image.
-    image: ${CLI_PROXY_IMAGE:-ghcr.io/arsydoni4326-alt/cliproxyapi:latest}
+    image: ${CLI_PROXY_IMAGE:-ghcr.io/blackhiden/cliproxyapi:latest}
     pull_policy: always
     build:
       context: .
