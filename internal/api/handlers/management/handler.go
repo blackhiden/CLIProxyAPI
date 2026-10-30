@@ -57,20 +57,18 @@ type Handler struct {
 	postAuthPersistHook     coreauth.PostAuthHook
 	pluginHost              *pluginhost.Host
 	configReloadHook        func(context.Context, *config.Config)
-	pluginStoreRegistryURL  string
-	pluginStoreHTTPClient   pluginstore.HTTPDoer
-	pluginReleaseCacheMu    sync.Mutex
-	pluginReleaseCache      map[string]pluginReleaseCacheEntry
+	pluginStoreRegistryURL string
+	pluginStoreHTTPClient  pluginstore.HTTPDoer
+	pluginStoreRateLimiter *pluginstore.GitHubRateLimiter
+	pluginReleases         pluginReleaseCache
 
 	// statusMu guards status reporting state set at runtime by the server.
 	statusMu     sync.Mutex
 	startedAt    time.Time
 	watcherState func() bool
 
-	pluginStoreRateLimiter *pluginstore.GitHubRateLimiter
-	pluginReleases         pluginReleaseCache
-	siwcOAuthFactory       func(*config.Config) siwcOAuthService
-	siwcCommitMu           sync.Mutex
+	siwcOAuthFactory func(*config.Config) siwcOAuthService
+	siwcCommitMu     sync.Mutex
 }
 
 type configReloadSnapshot struct {
@@ -161,6 +159,36 @@ func (h *Handler) SetConfig(cfg *config.Config) {
 		return
 	}
 	h.cfg = cloned
+}
+
+// configSnapshot reads h.cfg under h.mu, for code that runs outside the request holding it.
+func (h *Handler) configSnapshot() *config.Config {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.cfg
+}
+
+// oauthConfigWithProxy returns a configuration snapshot for an OAuth session.
+// When proxyURL is non-empty, it returns a cloned config with ProxyURL overridden
+// without mutating the shared handler configuration.
+func (h *Handler) oauthConfigWithProxy(proxyURL string) *config.Config {
+	cfg := h.configSnapshot()
+	proxyURL = strings.TrimSpace(proxyURL)
+	if proxyURL == "" {
+		return cfg
+	}
+	if cfg == nil {
+		return &config.Config{
+			SDKConfig: config.SDKConfig{ProxyURL: proxyURL},
+		}
+	}
+	cloned := cfg.CloneForRuntime()
+	if cloned == nil {
+		copied := *cfg
+		cloned = &copied
+	}
+	cloned.ProxyURL = proxyURL
+	return cloned
 }
 
 // isStaleConfigFileSnapshotLocked reports whether cfg was parsed from config file

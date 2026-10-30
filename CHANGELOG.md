@@ -8,6 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ---
+## [v8.0.48] - 2026-10-30
+
+### Added (from upstream sync)
+
+- **Gemini tool search item ID prefix**: Use `tsc_` item ID prefix for Gemini tool search calls.
+- **Raw request body byte-range patching**: Pluginhost supports raw request body byte-range patching.
+- **Pluginhost body delivery opt-out**: Allow frontend auth providers to opt out of request body delivery.
+- **Response compression encoders reuse**: Reuse response compression encoders and bound zstd decompression output and window in request logging.
+- **Web-search support indexing**: Model registry indices web-search support across providers.
+- **WebSocket interrupt & disconnect handling**: Reject late websocket interrupts after terminal events; keep downstream websocket open on upstream Codex disconnect.
+- **Private metadata filtering**: Filter private metadata in OpenAI responses and improve SSE framing recovery.
+- **Vertex functionCall partialArgs**: Support Vertex streaming functionCall partialArgs conversion.
+- **xAI image payload rules**: Apply payload default rules to xAI image endpoints.
+- **Devin patch diagnostics**: Log apply_patch rejection diagnostics and recover complete bare patches.
+- **Bare-Tink Gemini thought signatures**: Recognize Vertex bare-Tink Gemini thought signatures and scope replay.
+- **LAN resolution & discovery**: Align TXT schema with discovery draft, mDNS host resolution and IP binding fallback.
+- **Sponsors & Documentation**: Added Nia Live Demo and Ebb to README files.
+
+### Fixed
+
+- **Upstream merge conflicts**: Resolved conflicts between fork (v7 module path) and upstream (v8 module path), preserving all fork-specific features.
+- **Module path consistency**: Maintained v7 module path (`github.com/router-for-me/CLIProxyAPI/v7`) across entire codebase.
+- **Fork preservation**: Preserved OAuth "Do Not Use Proxy" toggle (`oauthProxyOverride`), TCP keep-alive (`enableAcceptedKeepAlive`), RESP error on disabled management, Live Flow normalization, API key name sanitization, and watcher state callback.
+
+### Changed
+
+- **Go version**: Updated Go version to 1.26.10 in workflows and dependency manifests.
+
+---
+
 
 ## [v8.0.39] - 2026-10-22
 
