@@ -29,6 +29,7 @@ import (
 	"github.com/router-for-me/CLIProxyAPI/v7/internal/redisqueue"
 	sdkaccess "github.com/router-for-me/CLIProxyAPI/v7/sdk/access"
 	"github.com/router-for-me/CLIProxyAPI/v7/sdk/api/handlers"
+	"github.com/router-for-me/CLIProxyAPI/v7/sdk/api/handlers/openai"
 	"github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/http2"
@@ -106,11 +107,6 @@ type Server struct {
 
 	exampleAPIKeySafeModeEnabled bool
 	exampleAPIKeySafeModeActive  atomic.Bool
-
-	// flowHub fans out per-request flow metadata to live visualization subscribers.
-	// FORK-ONLY: Nil when cpa-fork-liveflow-enabled is false (zero overhead).
-	// See docs/MERGE-PRESERVATION-fork-fixes.md for merge policy.
-	flowHub *flowHub
 }
 
 // NewServer creates and initializes a new API server instance.
@@ -201,6 +197,8 @@ func NewServer(cfg *config.Config, authManager *auth.Manager, accessManager *sdk
 	s.loggerToggle = toggle
 
 	engine.Use(corsMiddleware())
+	engine.Use(s.responseCompressionMiddleware())
+	openai.SetResponsesWebsocketCompressionEnabled(cfg.Codex.WebsocketCompressionEnabled())
 	s.wsAuthEnabled.Store(cfg.WebsocketAuth)
 	s.exampleAPIKeySafeModeActive.Store(s.exampleAPIKeySafeModeRequired(cfg))
 	s.handlers.SetPluginHost(optionState.pluginHost)
@@ -222,7 +220,6 @@ func NewServer(cfg *config.Config, authManager *auth.Manager, accessManager *sdk
 	applyClaudeToolSearchConfig(cfg)
 	// Initialize management handler
 	s.mgmt = managementHandlers.NewHandler(cfg, configFilePath, authManager)
-	s.mgmt.SetStartedAt(time.Now())
 	s.mgmt.SetPluginHost(optionState.pluginHost)
 	s.mgmt.SetConfigReloadHook(optionState.configReloadHook)
 	if optionState.localPassword != "" {
@@ -238,18 +235,6 @@ func NewServer(cfg *config.Config, authManager *auth.Manager, accessManager *sdk
 	}
 	s.localPassword = optionState.localPassword
 
-	// FORK-ONLY: CPA fork's persistent Live Flow feature.
-	// Live flow visualization (opt-in): create the hub and mirror middleware only when
-	// cpa-fork-liveflow-enabled is true. When disabled there is no hub, no middleware,
-	// and no endpoint — zero overhead.
-	if cfg.CPAForkLiveFlowEnabled {
-		s.flowHub = newFlowHub()
-		engine.Use(flowVizMiddleware(s.flowHub))
-		// Let sdk websocket handlers mirror per-turn events through the hub; the
-		// sdk cannot import internal/api, so the observer is injected via setter.
-		handlers.SetFlowObserver(newFlowWSObserver(s.flowHub))
-	}
-
 	// Home heartbeat gate: when home is enabled, block all endpoints with 503 until the
 	// subscribe-config heartbeat connection is healthy.
 	engine.Use(s.homeHeartbeatMiddleware())
@@ -257,11 +242,6 @@ func NewServer(cfg *config.Config, authManager *auth.Manager, accessManager *sdk
 
 	// Setup routes
 	s.setupRoutes()
-
-	// Expose the live flow metadata stream over WebSocket only when enabled.
-	if s.flowHub != nil {
-		s.AttachWebsocketRoute("/live-flow/ws", s.flowHub)
-	}
 
 	// Apply additional router configurators from options
 	if optionState.routerConfigurator != nil {
@@ -285,8 +265,9 @@ func NewServer(cfg *config.Config, authManager *auth.Manager, accessManager *sdk
 
 	// Create HTTP server
 	s.server = &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
-		Handler: engine,
+		Addr:              fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		Handler:           wrapUnconsumedRequestBodyHandler(engine),
+		ReadHeaderTimeout: muxSniffDeadline,
 	}
 
 	return s
@@ -478,14 +459,4 @@ func (s *Server) Stop(ctx context.Context) error {
 
 	log.Debug("API server stopped")
 	return nil
-}
-
-// SetWatcherStateCallback installs a callback that reports whether the config watcher is running.
-// The callback is forwarded to the management handler so /v0/management/status can report
-// watcher state without the server package importing the watcher package directly.
-func (s *Server) SetWatcherStateCallback(fn func() bool) {
-	if s == nil || s.mgmt == nil {
-		return
-	}
-	s.mgmt.SetWatcherState(fn)
 }

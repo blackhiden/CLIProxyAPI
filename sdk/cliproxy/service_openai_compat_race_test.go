@@ -13,10 +13,10 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/api"
-	internalregistry "github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	"github.com/router-for-me/CLIProxyAPI/v7/internal/api"
+	internalregistry "github.com/router-for-me/CLIProxyAPI/v7/internal/registry"
+	coreauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
+	"github.com/router-for-me/CLIProxyAPI/v7/sdk/config"
 )
 
 func TestPutOpenAICompatConcurrentWithAuthFieldsPatch_Issue6559(t *testing.T) {

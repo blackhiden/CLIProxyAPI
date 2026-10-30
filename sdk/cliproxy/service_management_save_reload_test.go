@@ -15,9 +15,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/api"
-	internalconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	"github.com/router-for-me/CLIProxyAPI/v7/internal/api"
+	internalconfig "github.com/router-for-me/CLIProxyAPI/v7/internal/config"
+	"github.com/router-for-me/CLIProxyAPI/v7/sdk/config"
 )
 
 const issue6631ManagementKey = "issue-6631-management-key"
