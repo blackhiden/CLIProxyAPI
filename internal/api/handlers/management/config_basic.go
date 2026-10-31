@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	latestReleaseURL       = "https://api.github.com/repos/arsydoni4326-alt/CLIProxyAPI/releases/latest"
-	latestCommitURL        = "https://api.github.com/repos/arsydoni4326-alt/CLIProxyAPI/commits/main"
+	latestReleaseURL       = "https://api.github.com/repos/blackhiden/CLIProxyAPI/releases/latest"
+	latestCommitURL        = "https://api.github.com/repos/blackhiden/CLIProxyAPI/commits/main"
 	latestReleaseUserAgent = "CLIProxyAPI"
 )
 

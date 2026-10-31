@@ -137,6 +137,12 @@ func (s *Server) setupRoutes() {
 		v1beta.GET("/models/*action", s.geminiGetHandler(geminiHandlers))
 	}
 
+	// FORK-ONLY: CPA fork's persistent Live Flow feature.
+	// Register the /live-flow/ws WebSocket endpoint when the feature is enabled.
+	if s.cfg.CPAForkLiveFlowEnabled && s.flowHub != nil {
+		s.engine.GET("/live-flow/ws", s.flowVizWebSocketHandler())
+	}
+
 	// Root endpoint
 	s.engine.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
