@@ -107,6 +107,11 @@ type Server struct {
 
 	exampleAPIKeySafeModeEnabled bool
 	exampleAPIKeySafeModeActive  atomic.Bool
+
+	// FORK-ONLY: CPA fork's persistent Live Flow feature.
+	// flowHub is the in-process pub-sub hub for live flow visualization events.
+	// nil when the feature is disabled (cfg.CPAForkLiveFlowEnabled == false).
+	flowHub *flowHub
 }
 
 // NewServer creates and initializes a new API server instance.
@@ -240,6 +245,14 @@ func NewServer(cfg *config.Config, authManager *auth.Manager, accessManager *sdk
 	engine.Use(s.homeHeartbeatMiddleware())
 	engine.Use(s.exampleAPIKeySafeModeMiddleware())
 
+	// FORK-ONLY: CPA fork's persistent Live Flow feature.
+	// Instantiate the flow hub and attach middleware+observer when enabled.
+	if cfg.CPAForkLiveFlowEnabled {
+		s.flowHub = newFlowHub()
+		engine.Use(flowVizMiddleware(s.flowHub))
+		handlers.SetFlowObserver(newFlowWSObserver(s.flowHub))
+	}
+
 	// Setup routes
 	s.setupRoutes()
 
@@ -280,6 +293,18 @@ func (s *Server) getConfig() *config.Config {
 	s.cfgMu.RLock()
 	defer s.cfgMu.RUnlock()
 	return s.cfg
+}
+
+// flowVizWebSocketHandler returns a Gin handler that upgrades the connection
+// and streams live flow events. FORK-ONLY: CPA fork's persistent Live Flow feature.
+func (s *Server) flowVizWebSocketHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if s.flowHub == nil {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "live flow not enabled"})
+			return
+		}
+		s.flowHub.ServeHTTP(c.Writer, c.Request)
+	}
 }
 
 // Handler returns the HTTP handler used by the server.
