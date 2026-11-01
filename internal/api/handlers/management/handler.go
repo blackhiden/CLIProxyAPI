@@ -57,18 +57,6 @@ type Handler struct {
 	postAuthPersistHook     coreauth.PostAuthHook
 	pluginHost              *pluginhost.Host
 	configReloadHook        func(context.Context, *config.Config)
-	pluginStoreRegistryURL string
-	pluginStoreHTTPClient  pluginstore.HTTPDoer
-	pluginStoreRateLimiter *pluginstore.GitHubRateLimiter
-	pluginReleases         pluginReleaseCache
-
-	// statusMu guards status reporting state set at runtime by the server.
-	statusMu     sync.Mutex
-	startedAt    time.Time
-	watcherState func() bool
-
-	siwcOAuthFactory func(*config.Config) siwcOAuthService
-	siwcCommitMu     sync.Mutex
 }
 
 type configReloadSnapshot struct {

@@ -1,9 +1,6 @@
 package claude
 
 import (
-	. "github.com/router-for-me/CLIProxyAPI/v7/internal/constant"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/interfaces"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/translator/translator"
 )
 
 func init() {
@@ -17,4 +14,9 @@ func init() {
 			TokenCount: ClaudeTokenCount,
 		},
 	)
+	sdktranslator.RegisterRequestEnvelope(sdktranslator.FormatClaude, sdktranslator.FormatCodex,
+		func(ctx context.Context, req sdktranslator.RequestEnvelope) sdktranslator.RequestEnvelope {
+			req.Body, req.Err = ConvertClaudeRequestToCodexContext(ctx, req.Model, req.Body, req.Stream)
+			return req
+		})
 }
