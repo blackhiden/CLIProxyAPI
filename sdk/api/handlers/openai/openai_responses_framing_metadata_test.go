@@ -6,8 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/interfaces"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/interfaces"
+
 )
 
 func TestResponsesSSEFramerFragmentedMetadataDataField(t *testing.T) {
@@ -315,7 +316,7 @@ func TestSSEFrameAccumulatorKeepsEmptyCommentInMultilineData(t *testing.T) {
 		t.Fatalf("frames = %q, want one", frames)
 	}
 	payload, ok := responsesSSEDataPayload(frames[0])
-	if !ok || !json.Valid(payload) || gjson.GetBytes(payload, "type").String() != "response.completed" {
+	if !ok || !json.Valid(payload) || ojson.GetBytesNoCopy(payload, "type").String() != "response.completed" {
 		t.Fatalf("empty comment corrupted image data: %q", frames[0])
 	}
 }

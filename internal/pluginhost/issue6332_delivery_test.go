@@ -11,19 +11,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/cache"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/registry"
-	runtimeexecutor "github.com/router-for-me/CLIProxyAPI/v7/internal/runtime/executor"
-	_ "github.com/router-for-me/CLIProxyAPI/v7/internal/translator"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/api/handlers"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/usage"
-	sdkconfig "github.com/router-for-me/CLIProxyAPI/v7/sdk/config"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/pluginabi"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/pluginapi"
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/cache"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	runtimeexecutor "github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor"
+	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers"
+	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	sdkconfig "github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginabi"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 type issue6332NestedLifecycle struct {
@@ -127,7 +126,7 @@ func TestIssue6332PluginNestedDelivery(t *testing.T) {
 				}
 				var callID string
 				for _, line := range strings.Split(output, "\n") {
-					event := gjson.Parse(strings.TrimSpace(strings.TrimPrefix(line, "data:")))
+					event := ojson.Parse(strings.TrimSpace(strings.TrimPrefix(line, "data:")))
 					for _, item := range event.Get("response.output").Array() {
 						if item.Get("type").String() == "function_call" {
 							callID = item.Get("call_id").String()
@@ -138,8 +137,10 @@ func TestIssue6332PluginNestedDelivery(t *testing.T) {
 					result <- fmt.Errorf("missing function call: %s", output)
 					return
 				}
-				second, _ := sjson.Set(first, "input.-1", map[string]any{"type": "function_call", "call_id": callID, "name": "lookup", "arguments": `{"key":"value"}`})
-				second, _ = sjson.Set(second, "input.-1", map[string]any{"type": "function_call_output", "call_id": callID, "output": "found"})
+				doc := ojson.NewDocString(first)
+				_ = doc.Set("input.-1", map[string]any{"type": "function_call", "call_id": callID, "name": "lookup", "arguments": `{"key":"value"}`})
+				_ = doc.Set("input.-1", map[string]any{"type": "function_call_output", "call_id": callID, "output": "found"})
+				second := doc.String()
 				_, errCall = call(second)
 				result <- errCall
 			}()

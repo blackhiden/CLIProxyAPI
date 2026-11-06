@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/buildinfo"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/buildinfo"
 )
 
 // blockedIPStatus describes a currently-blocked client IP and its remaining ban time.

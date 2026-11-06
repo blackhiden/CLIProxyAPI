@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/clienterror"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/clienterror"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 // A turn that only holds a file the target cannot receive is refused with a named
@@ -34,7 +35,7 @@ func TestByteWrappersKeepAJSONBodyForAnUnsendableFile(t *testing.T) {
 		for _, compat := range []bool{false, true} {
 			original, working := TranslateRequestPairWithAPIKeyModelCompatibility(context.Background(), nil, nil, sdktranslator.FormatClaude, to, "m", payload, payload, false, compat)
 			for _, body := range [][]byte{original, working} {
-				if !gjson.ValidBytes(body) || len(body) < 2 {
+				if !ojson.ValidBytes(body) || len(body) < 2 {
 					t.Fatalf("to=%s compat=%v: body = %q", to, compat, body)
 				}
 			}

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/clienterror"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/clienterror"
 )
 
 // RefreshAuthFiles triggers active refresh for a single auth file or all auth files.
@@ -66,6 +66,21 @@ func (h *Handler) RefreshAuthFiles(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
+		})
+		return
+	}
+
+	if c.GetBool(ConfigV8ContextKey) {
+		h.mu.Lock()
+		host := h.pluginHost
+		h.mu.Unlock()
+		quota := authFileQuotaContext{v8: true}
+		if host != nil {
+			quota.pluginIDs = host.QuotaProviderPluginIDs(ctx)
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"ok":   true,
+			"auth": h.buildAuthFileEntry(refreshed, quota),
 		})
 		return
 	}

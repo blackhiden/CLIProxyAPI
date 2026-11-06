@@ -5,9 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v7/internal/translator/common"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 const userTurnUpload = `{"type":"container_upload","file_id":"file-1"}`
@@ -49,7 +50,7 @@ func TestConvertClaudeRequestToAntigravity_RefusesAnyEmptiedUserTurn(t *testing.
 			if got, want := err.Error(), "unsupported content part: "+tc.wantType; got != want {
 				t.Fatalf("error text = %q, want %q", got, want)
 			}
-			if !gjson.ValidBytes(body) {
+			if !ojson.ValidBytes(body) {
 				t.Fatalf("body is not JSON: %q", body)
 			}
 		})
@@ -62,7 +63,7 @@ func TestConvertClaudeRequestToAntigravity_KeepsTurnWithTextBesideAttachment(t *
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	if got := gjson.GetBytes(body, "request.contents.2.parts.0.text").String(); got != "keep me" {
+	if got := ojson.GetBytesNoCopy(body, "request.contents.2.parts.0.text").String(); got != "keep me" {
 		t.Fatalf("text was lost: %s", body)
 	}
 }
@@ -73,7 +74,7 @@ func TestConvertClaudeRequestToAntigravity_Base64DocumentBecomesInlineData(t *te
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	inlineData := gjson.GetBytes(body, "request.contents.2.parts.0.inlineData")
+	inlineData := ojson.GetBytesNoCopy(body, "request.contents.2.parts.0.inlineData")
 	if inlineData.Get("mimeType").String() != "application/pdf" || inlineData.Get("data").String() != "JVBERi0xLjQK" {
 		t.Fatalf("inlineData = %s, body = %s", inlineData.Raw, body)
 	}
@@ -81,7 +82,7 @@ func TestConvertClaudeRequestToAntigravity_Base64DocumentBecomesInlineData(t *te
 
 func TestConvertClaudeRequestToAntigravity_ExportedWrapperKeepsAJSONBody(t *testing.T) {
 	input := []byte(`{"model":"m","messages":[{"role":"user","content":[` + userTurnUpload + `]}]}`)
-	if body, _ := ConvertClaudeRequestToAntigravity("m", input, false); !gjson.ValidBytes(body) {
+	if body, _ := ConvertClaudeRequestToAntigravity("m", input, false); !ojson.ValidBytes(body) {
 		t.Fatalf("body is not JSON: %q", body)
 	}
 }
@@ -139,7 +140,7 @@ func TestClaudeToAntigravityUnrepresentableImageBesideTextStillSucceeds(t *testi
 		if envelope.Err != nil {
 			t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 		}
-		parts := gjson.GetBytes(envelope.Body, "request.contents.2.parts").Array()
+		parts := ojson.GetBytesNoCopy(envelope.Body, "request.contents.2.parts").Array()
 		if len(parts) != 1 || parts[0].Get("text").String() != "keep me" {
 			t.Fatalf("text was lost or an image leaked: %s", envelope.Body)
 		}
@@ -155,7 +156,7 @@ func TestClaudeToAntigravityBase64ImageOnlyTurnStaysInlineData(t *testing.T) {
 	if envelope.Err != nil {
 		t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 	}
-	inlineData := gjson.GetBytes(envelope.Body, "request.contents.2.parts.0.inlineData")
+	inlineData := ojson.GetBytesNoCopy(envelope.Body, "request.contents.2.parts.0.inlineData")
 	if inlineData.Get("mimeType").String() != "image/png" || inlineData.Get("data").String() != "aGVsbG8=" {
 		t.Fatalf("inlineData = %s, body = %s", inlineData.Raw, envelope.Body)
 	}
@@ -174,7 +175,7 @@ func TestClaudeToAntigravityRealTextBesideWhitespaceAndAnImageStillSucceeds(t *t
 		t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 	}
 	found := false
-	for _, part := range gjson.GetBytes(envelope.Body, "request.contents.2.parts").Array() {
+	for _, part := range ojson.GetBytesNoCopy(envelope.Body, "request.contents.2.parts").Array() {
 		if part.Get("text").String() == "keep me" {
 			found = true
 		}

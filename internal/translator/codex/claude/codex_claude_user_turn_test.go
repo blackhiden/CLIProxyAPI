@@ -5,9 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v7/internal/translator/common"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 const userTurnUpload = `{"type":"container_upload","file_id":"file-1"}`
@@ -49,7 +50,7 @@ func TestConvertClaudeRequestToCodex_RefusesAnyEmptiedUserTurn(t *testing.T) {
 			if got, want := err.Error(), "unsupported content part: "+tc.wantType; got != want {
 				t.Fatalf("error text = %q, want %q", got, want)
 			}
-			if !gjson.ValidBytes(body) {
+			if !ojson.ValidBytes(body) {
 				t.Fatalf("body is not JSON: %q", body)
 			}
 		})
@@ -62,7 +63,7 @@ func TestConvertClaudeRequestToCodex_KeepsTurnWithTextBesideAttachment(t *testin
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	if got := gjson.GetBytes(body, "input.2.content.0.text").String(); got != "keep me" {
+	if got := ojson.GetBytesNoCopy(body, "input.2.content.0.text").String(); got != "keep me" {
 		t.Fatalf("text was lost: %s", body)
 	}
 }
@@ -73,7 +74,7 @@ func TestConvertClaudeRequestToCodex_Base64DocumentAfterHistoryStaysAFile(t *tes
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	part := gjson.GetBytes(body, "input.2.content.0")
+	part := ojson.GetBytesNoCopy(body, "input.2.content.0")
 	if part.Get("type").String() != "input_file" || part.Get("file_data").String() != "data:application/pdf;base64,JVBERi0xLjQK" {
 		t.Fatalf("part = %s, body = %s", part.Raw, body)
 	}
@@ -91,7 +92,7 @@ func TestConvertClaudeRequestToCodex_EmptyTextDoesNotHideAnEmptiedUserTurn(t *te
 			if !errors.As(err, &unsupported) || unsupported.Type != "container_upload" || unsupported.StatusCode() != 400 {
 				t.Fatalf("err = %v, want unsupported content part: container_upload; body = %s", err, body)
 			}
-			if !gjson.ValidBytes(body) {
+			if !ojson.ValidBytes(body) {
 				t.Fatalf("body is not JSON: %q", body)
 			}
 		})
@@ -104,7 +105,7 @@ func TestConvertClaudeRequestToCodex_NonEmptyTextBesideAttachmentStillSucceeds(t
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	if got := gjson.GetBytes(body, "input.0.content.1.text").String(); got != "keep me" {
+	if got := ojson.GetBytesNoCopy(body, "input.0.content.1.text").String(); got != "keep me" {
 		t.Fatalf("text was lost: %s", body)
 	}
 }
@@ -152,7 +153,7 @@ func TestClaudeToCodexImageOnlyTurnKeepsTheImage(t *testing.T) {
 			if envelope.Err != nil {
 				t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 			}
-			part := gjson.GetBytes(envelope.Body, "input.2.content.0")
+			part := ojson.GetBytesNoCopy(envelope.Body, "input.2.content.0")
 			if part.Get("type").String() != "input_image" || part.Get(tc.field).String() != tc.want {
 				t.Fatalf("part = %s, body = %s", part.Raw, envelope.Body)
 			}
@@ -187,7 +188,7 @@ func TestClaudeToCodexUnrepresentableImageBesideTextStillSucceeds(t *testing.T) 
 	if envelope.Err != nil {
 		t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 	}
-	if got := gjson.GetBytes(envelope.Body, "input.2.content.0.text").String(); got != "keep me" {
+	if got := ojson.GetBytesNoCopy(envelope.Body, "input.2.content.0.text").String(); got != "keep me" {
 		t.Fatalf("text was lost: %s", envelope.Body)
 	}
 }

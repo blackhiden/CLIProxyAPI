@@ -8,12 +8,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	_ "github.com/router-for-me/CLIProxyAPI/v7/internal/translator"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	coreusage "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/usage"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
+	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	coreusage "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 func TestCodexExecutorExecutePublishesMainUsageBeforeImageUsage(t *testing.T) {
@@ -141,7 +142,7 @@ func TestCodexExecutorExecuteRecordsFinalizedPayloadOverrideReasoningEffort(t *t
 		t.Fatal("Execute returned an empty response")
 	}
 
-	if effort := gjson.GetBytes(upstreamBody, "reasoning.effort").String(); effort != "high" {
+	if effort := ojson.GetBytes(upstreamBody, "reasoning.effort").String(); effort != "high" {
 		t.Fatalf("upstream payload reasoning.effort = %q, want %q", effort, "high")
 	}
 
@@ -198,7 +199,7 @@ func TestCodexExecutorExecuteStreamRecordsFinalizedPayloadOverrideReasoningEffor
 	for range streamRes.Chunks {
 	}
 
-	if effort := gjson.GetBytes(upstreamBody, "reasoning.effort").String(); effort != "high" {
+	if effort := ojson.GetBytes(upstreamBody, "reasoning.effort").String(); effort != "high" {
 		t.Fatalf("upstream payload reasoning.effort = %q, want %q", effort, "high")
 	}
 
@@ -256,7 +257,7 @@ func TestCodexExecutorExecuteCompactRecordsFinalizedPayloadOverrideReasoningEffo
 		t.Fatal("Execute returned an empty response")
 	}
 
-	if effort := gjson.GetBytes(upstreamBody, "reasoning.effort").String(); effort != "high" {
+	if effort := ojson.GetBytes(upstreamBody, "reasoning.effort").String(); effort != "high" {
 		t.Fatalf("upstream payload reasoning.effort = %q, want %q", effort, "high")
 	}
 

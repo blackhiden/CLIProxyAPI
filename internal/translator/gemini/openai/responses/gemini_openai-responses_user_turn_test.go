@@ -6,9 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v7/internal/translator/common"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 const (
@@ -71,7 +72,7 @@ func TestConvertOpenAIResponsesRequestToGemini_RefusesAnyEmptiedUserTurn(t *test
 			if got, want := err.Error(), "unsupported content part: input_file"; got != want {
 				t.Fatalf("error text = %q, want %q", got, want)
 			}
-			if !gjson.ValidBytes(body) {
+			if !ojson.ValidBytes(body) {
 				t.Fatalf("body is not JSON: %q", body)
 			}
 
@@ -90,7 +91,7 @@ func TestConvertOpenAIResponsesRequestToGemini_KeepsTurnWithTextBesideFileID(t *
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	if got := gjson.GetBytes(body, "contents.2.parts.0.text").String(); got != "keep me" {
+	if got := ojson.GetBytesNoCopy(body, "contents.2.parts.0.text").String(); got != "keep me" {
 		t.Fatalf("text was lost: %s", body)
 	}
 }
@@ -111,7 +112,7 @@ func TestConvertOpenAIResponsesRequestToGemini_InlineAndRemoteFilesStayParts(t *
 			if err != nil {
 				t.Fatalf("err = %v", err)
 			}
-			if got := gjson.GetBytes(body, tc.path).String(); got != tc.want {
+			if got := ojson.GetBytesNoCopy(body, tc.path).String(); got != tc.want {
 				t.Fatalf("%s = %q, want %q; body = %s", tc.path, got, tc.want, body)
 			}
 		})
@@ -120,7 +121,7 @@ func TestConvertOpenAIResponsesRequestToGemini_InlineAndRemoteFilesStayParts(t *
 
 func TestConvertOpenAIResponsesRequestToGemini_ExportedWrapperKeepsAJSONBody(t *testing.T) {
 	input := geminiTurnPayload("", geminiUserTurn(geminiTurnFileID))
-	if body, _ := ConvertOpenAIResponsesRequestToGemini("gemini-3-pro", input, false); !gjson.ValidBytes(body) {
+	if body, _ := ConvertOpenAIResponsesRequestToGemini("gemini-3-pro", input, false); !ojson.ValidBytes(body) {
 		t.Fatalf("body is not JSON: %q", body)
 	}
 }

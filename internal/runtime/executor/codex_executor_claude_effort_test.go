@@ -8,10 +8,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 func TestCodexExecutorClaudeStandaloneEffortFinalPayload(t *testing.T) {
@@ -72,7 +73,7 @@ func TestCodexExecutorClaudeStandaloneEffortFinalPayload(t *testing.T) {
 					t.Fatalf("Execute: %v", errExecute)
 				}
 				body := <-bodies
-				effort := gjson.GetBytes(body, "reasoning.effort")
+				effort := ojson.GetBytes(body, "reasoning.effort")
 				if effort.String() != tt.wantEffort || (tt.wantEffort == "" && effort.Exists()) {
 					t.Fatalf("upstream reasoning.effort = %s, want %q; body=%s", effort.Raw, tt.wantEffort, body)
 				}

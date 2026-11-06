@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/clienterror"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v7/internal/translator/common"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/clienterror"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 const (
@@ -60,7 +61,7 @@ func TestPairTranslationReportsOnlyTheWorkingError(t *testing.T) {
 
 	for name, pair := range routes {
 		t.Run(name, func(t *testing.T) {
-			if _, working, err := pair(file, text); err != nil || !gjson.ValidBytes(working) {
+			if _, working, err := pair(file, text); err != nil || !ojson.ValidBytes(working) {
 				t.Fatalf("failing baseline rejected a working payload that translated: err = %v, working = %s", err, working)
 			}
 			if _, _, err := pair(text, file); err == nil {
@@ -89,7 +90,7 @@ func TestEnvelopePairKeepsTheWorkingPayloadWhenTheBaselineIsRefused(t *testing.T
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	if got := gjson.GetBytes(working, "request.contents.0.parts.0.text").String(); got != "keep me" {
+	if got := ojson.GetBytes(working, "request.contents.0.parts.0.text").String(); got != "keep me" {
 		t.Fatalf("working = %s", working)
 	}
 }
@@ -118,7 +119,7 @@ func TestResponsesAudioAndTextBesideFileIDOnCompatPath(t *testing.T) {
 	if err != nil {
 		t.Fatalf("text beside a file id was refused: %v", err)
 	}
-	if got := gjson.GetBytes(body, "messages.0.content").String(); got != "keep me" {
+	if got := ojson.GetBytes(body, "messages.0.content").String(); got != "keep me" {
 		t.Fatalf("text was lost: %s", body)
 	}
 }

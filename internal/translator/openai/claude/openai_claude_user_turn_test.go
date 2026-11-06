@@ -5,9 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v7/internal/translator/common"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 const userTurnUpload = `{"type":"container_upload","file_id":"file-1"}`
@@ -49,7 +50,7 @@ func TestConvertClaudeRequestToOpenAI_RefusesAnyEmptiedUserTurn(t *testing.T) {
 			if got, want := err.Error(), "unsupported content part: "+tc.wantType; got != want {
 				t.Fatalf("error text = %q, want %q", got, want)
 			}
-			if !gjson.ValidBytes(body) {
+			if !ojson.ValidBytes(body) {
 				t.Fatalf("body is not JSON: %q", body)
 			}
 		})
@@ -62,7 +63,7 @@ func TestConvertClaudeRequestToOpenAI_KeepsTurnWithTextBesideAttachment(t *testi
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	if got := gjson.GetBytes(body, "messages.2.content.0.text").String(); got != "keep me" {
+	if got := ojson.GetBytesNoCopy(body, "messages.2.content.0.text").String(); got != "keep me" {
 		t.Fatalf("text was lost: %s", body)
 	}
 }
@@ -73,7 +74,7 @@ func TestConvertClaudeRequestToOpenAI_Base64DocumentAfterHistoryStaysAFilePart(t
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	part := gjson.GetBytes(body, "messages.2.content.0")
+	part := ojson.GetBytesNoCopy(body, "messages.2.content.0")
 	if part.Get("type").String() != "file" || part.Get("file.file_data").String() != "data:application/pdf;base64,JVBERi0xLjQK" {
 		t.Fatalf("part = %s, body = %s", part.Raw, body)
 	}
@@ -123,7 +124,7 @@ func TestClaudeToOpenAIImageOnlyTurnKeepsTheImage(t *testing.T) {
 			if envelope.Err != nil {
 				t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 			}
-			part := gjson.GetBytes(envelope.Body, "messages.2.content.0")
+			part := ojson.GetBytesNoCopy(envelope.Body, "messages.2.content.0")
 			if part.Get("type").String() != "image_url" || part.Get("image_url.url").String() != tc.want {
 				t.Fatalf("part = %s, body = %s", part.Raw, envelope.Body)
 			}
@@ -140,7 +141,7 @@ func TestClaudeToOpenAIFileImageBesideTextStillSucceeds(t *testing.T) {
 	if envelope.Err != nil {
 		t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 	}
-	parts := gjson.GetBytes(envelope.Body, "messages.2.content").Array()
+	parts := ojson.GetBytesNoCopy(envelope.Body, "messages.2.content").Array()
 	if len(parts) != 1 || parts[0].Get("text").String() != "keep me" {
 		t.Fatalf("text was lost or an image leaked: %s", envelope.Body)
 	}

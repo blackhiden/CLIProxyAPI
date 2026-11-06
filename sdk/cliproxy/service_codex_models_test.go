@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	internalconfig "github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	internalregistry "github.com/router-for-me/CLIProxyAPI/v7/internal/registry"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/config"
+	internalconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	internalregistry "github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
 )
 
 func TestRegisterModelsForAuthCodexConfigurationUpdate(t *testing.T) {
@@ -121,7 +121,7 @@ func TestRegisterModelsForAuthCodexAPIKeyModels(t *testing.T) {
 			name:        "defaults without explicit models",
 			entry:       config.CodexKey{APIKey: "default-key"},
 			wantIDs:     codexModelIDSet(defaultModels),
-			wantPresent: []string{"gpt-image-1.5", "gpt-image-2", "gpt-image-2.5-flare", "gpt-image-2.5-sunburst", "gpt-image-2.5"},
+			wantPresent: []string{"gpt-image-1.5", "gpt-image-2", "gpt-image-2.5-flare", "gpt-image-2.5-sunburst", "gpt-image-2.5", "gpt-image-2.6-flare", "gpt-image-2.6-sunburst", "gpt-image-2.6"},
 		},
 		{
 			name: "only explicitly configured models",
@@ -132,7 +132,7 @@ func TestRegisterModelsForAuthCodexAPIKeyModels(t *testing.T) {
 				}},
 			},
 			wantIDs:    map[string]struct{}{"configured-codex": {}},
-			wantAbsent: []string{"gpt-image-1.5", "gpt-image-2", "gpt-image-2.5-flare", "gpt-image-2.5-sunburst", "gpt-image-2.5"},
+			wantAbsent: []string{"gpt-image-1.5", "gpt-image-2", "gpt-image-2.5-flare", "gpt-image-2.5-sunburst", "gpt-image-2.5", "gpt-image-2.6-flare", "gpt-image-2.6-sunburst", "gpt-image-2.6"},
 		},
 		{
 			name: "exclusions apply to defaults",
@@ -337,7 +337,7 @@ func TestRegisterConfigAPIKeyAuthsCodexModelModes(t *testing.T) {
 					t.Errorf("missing registered model %q", modelID)
 				}
 			}
-			for _, modelID := range []string{"gpt-image-1.5", "gpt-image-2", "gpt-image-2.5-flare", "gpt-image-2.5-sunburst", "gpt-image-2.5"} {
+			for _, modelID := range []string{"gpt-image-1.5", "gpt-image-2", "gpt-image-2.5-flare", "gpt-image-2.5-sunburst", "gpt-image-2.5", "gpt-image-2.6-flare", "gpt-image-2.6-sunburst", "gpt-image-2.6"} {
 				_, registered := registeredIDs[modelID]
 				if registered != testCase.wantImages {
 					t.Errorf("registered model %q = %t, want %t", modelID, registered, testCase.wantImages)

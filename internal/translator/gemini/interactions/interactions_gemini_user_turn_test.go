@@ -5,9 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v7/internal/translator/common"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 // geminiTurnToInteractions translates two history turns followed by a final user
@@ -30,7 +31,7 @@ func requireFileDataRefusal(t *testing.T, envelope sdktranslator.RequestEnvelope
 	if got, want := envelope.Err.Error(), "unsupported content part: fileData"; got != want {
 		t.Fatalf("error text = %q, want %q", got, want)
 	}
-	if !gjson.ValidBytes(envelope.Body) {
+	if !ojson.ValidBytes(envelope.Body) {
 		t.Fatalf("body is not JSON: %q", envelope.Body)
 	}
 }
@@ -77,10 +78,10 @@ func TestGeminiToInteractionsFileDataOnlyTurnKeepsTheFile(t *testing.T) {
 			if envelope.Err != nil {
 				t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 			}
-			if got := gjson.GetBytes(envelope.Body, "input.#").Int(); got != 3 {
+			if got := ojson.GetBytesNoCopy(envelope.Body, "input.#").Int(); got != 3 {
 				t.Fatalf("input has %d steps, want 3: %s", got, envelope.Body)
 			}
-			part := gjson.GetBytes(envelope.Body, "input.2.content.0")
+			part := ojson.GetBytesNoCopy(envelope.Body, "input.2.content.0")
 			if part.Get("type").String() != tc.wantType || part.Get("uri").String() != tc.wantURI || part.Get("mime_type").String() != tc.wantMIME {
 				t.Fatalf("part = %s, body = %s", part.Raw, envelope.Body)
 			}
@@ -129,10 +130,10 @@ func TestGeminiToInteractionsFileDataWithoutURIBesideTextStillSucceeds(t *testin
 	if envelope.Err != nil {
 		t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 	}
-	if got := gjson.GetBytes(envelope.Body, "input.2.content.0.text").String(); got != "keep me" {
+	if got := ojson.GetBytesNoCopy(envelope.Body, "input.2.content.0.text").String(); got != "keep me" {
 		t.Fatalf("text was lost: %s", envelope.Body)
 	}
-	if got := gjson.GetBytes(envelope.Body, "input.#").Int(); got != 3 {
+	if got := ojson.GetBytesNoCopy(envelope.Body, "input.#").Int(); got != 3 {
 		t.Fatalf("input has %d steps, want 3: %s", got, envelope.Body)
 	}
 }
@@ -142,7 +143,7 @@ func TestGeminiToInteractionsInlineDataOnlyTurnStillConverts(t *testing.T) {
 	if envelope.Err != nil {
 		t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 	}
-	part := gjson.GetBytes(envelope.Body, "input.2.content.0")
+	part := ojson.GetBytesNoCopy(envelope.Body, "input.2.content.0")
 	if part.Get("type").String() != "document" || part.Get("mime_type").String() != "application/pdf" || part.Get("data").String() != "JVBERi0xLjQK" {
 		t.Fatalf("part = %s, body = %s", part.Raw, envelope.Body)
 	}
@@ -162,7 +163,7 @@ func TestGeminiToInteractionsModelFileDataWithoutURIIsNotARefusal(t *testing.T) 
 
 func TestGeminiToInteractionsExportedWrapperKeepsAJSONBody(t *testing.T) {
 	input := []byte(`{"model":"m","contents":[{"role":"user","parts":[{"fileData":{"mimeType":"application/pdf"}}]}]}`)
-	if body, _ := ConvertGeminiRequestToInteractions("m", input, false); !gjson.ValidBytes(body) {
+	if body, _ := ConvertGeminiRequestToInteractions("m", input, false); !ojson.ValidBytes(body) {
 		t.Fatalf("body is not JSON: %q", body)
 	}
 }

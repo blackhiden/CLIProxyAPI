@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 const (
@@ -83,7 +84,7 @@ func TestTranslateRequestReturningErrorRefusesEmptiedAttachmentTurns(t *testing.
 			t.Run(name, func(t *testing.T) {
 				body, err := TranslateRequestReturningError(ctx, nil, &config.Config{}, route.from, route.to, "m", []byte(route.refused), false, compat)
 				requireUnsupportedPart(t, "single", err, route.wantType)
-				if !gjson.ValidBytes(body) {
+				if !ojson.ValidBytes(body) {
 					t.Fatalf("single: body is not JSON: %q", body)
 				}
 

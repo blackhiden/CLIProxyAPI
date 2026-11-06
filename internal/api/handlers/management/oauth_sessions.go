@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/proxyutil"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/proxyutil"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -44,6 +44,7 @@ type oauthRecoveryTarget struct {
 	Provider         string
 	Email            string
 	AccountID        string
+	OrganizationID   string
 	VerifyAfterLogin bool
 	VerifyModel      string
 }

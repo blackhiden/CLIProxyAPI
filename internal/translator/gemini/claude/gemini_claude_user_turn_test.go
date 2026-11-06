@@ -5,9 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v7/internal/translator/common"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 const userTurnUpload = `{"type":"container_upload","file_id":"file-1"}`
@@ -49,7 +50,7 @@ func TestConvertClaudeRequestToGemini_RefusesAnyEmptiedUserTurn(t *testing.T) {
 			if got, want := err.Error(), "unsupported content part: "+tc.wantType; got != want {
 				t.Fatalf("error text = %q, want %q", got, want)
 			}
-			if !gjson.ValidBytes(body) {
+			if !ojson.ValidBytes(body) {
 				t.Fatalf("body is not JSON: %q", body)
 			}
 		})
@@ -62,7 +63,7 @@ func TestConvertClaudeRequestToGemini_KeepsTurnWithTextBesideAttachment(t *testi
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	if got := gjson.GetBytes(body, "contents.2.parts.0.text").String(); got != "keep me" {
+	if got := ojson.GetBytesNoCopy(body, "contents.2.parts.0.text").String(); got != "keep me" {
 		t.Fatalf("text was lost: %s", body)
 	}
 }
@@ -73,7 +74,7 @@ func TestConvertClaudeRequestToGemini_Base64DocumentAfterHistoryStaysInlineData(
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
-	part := gjson.GetBytes(body, "contents.2.parts.0.inline_data")
+	part := ojson.GetBytesNoCopy(body, "contents.2.parts.0.inline_data")
 	if part.Get("mime_type").String() != "application/pdf" || part.Get("data").String() != "JVBERi0xLjQK" {
 		t.Fatalf("part = %s, body = %s", part.Raw, body)
 	}
@@ -119,7 +120,7 @@ func TestClaudeToGeminiUnrepresentableImageBesideTextStillSucceeds(t *testing.T)
 		if envelope.Err != nil {
 			t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 		}
-		parts := gjson.GetBytes(envelope.Body, "contents.2.parts").Array()
+		parts := ojson.GetBytesNoCopy(envelope.Body, "contents.2.parts").Array()
 		if len(parts) != 1 || parts[0].Get("text").String() != "keep me" {
 			t.Fatalf("text was lost or an image leaked: %s", envelope.Body)
 		}
@@ -135,7 +136,7 @@ func TestClaudeToGeminiBase64ImageOnlyTurnStaysInlineData(t *testing.T) {
 	if envelope.Err != nil {
 		t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 	}
-	inlineData := gjson.GetBytes(envelope.Body, "contents.2.parts.0.inline_data")
+	inlineData := ojson.GetBytesNoCopy(envelope.Body, "contents.2.parts.0.inline_data")
 	if inlineData.Get("mime_type").String() != "image/png" || inlineData.Get("data").String() != "aGVsbG8=" {
 		t.Fatalf("inlineData = %s, body = %s", inlineData.Raw, envelope.Body)
 	}
@@ -154,7 +155,7 @@ func TestClaudeToGeminiRealTextBesideWhitespaceAndAnImageStillSucceeds(t *testin
 		t.Fatalf("envelope.Err = %v, body = %s", envelope.Err, envelope.Body)
 	}
 	found := false
-	for _, part := range gjson.GetBytes(envelope.Body, "contents.2.parts").Array() {
+	for _, part := range ojson.GetBytesNoCopy(envelope.Body, "contents.2.parts").Array() {
 		if part.Get("text").String() == "keep me" {
 			found = true
 		}

@@ -8,12 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/usage"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 type antigravityUsageCapture struct {
@@ -90,7 +91,7 @@ func TestAntigravityStreamFinalizesSplitTerminalUsageOnce(t *testing.T) {
 		if chunk.Err != nil {
 			t.Fatalf("unexpected stream error: %v", chunk.Err)
 		}
-		if reason := gjson.GetBytes(chunk.Payload, "choices.0.finish_reason").String(); reason != "" {
+		if reason := ojson.GetBytes(chunk.Payload, "choices.0.finish_reason").String(); reason != "" {
 			if finishIndex >= 0 {
 				t.Fatalf("more than one terminal chunk: %s", chunk.Payload)
 			}
@@ -109,10 +110,10 @@ func TestAntigravityStreamFinalizesSplitTerminalUsageOnce(t *testing.T) {
 		t.Fatalf("terminal chunk at index %d of %d chunks, want the last one", finishIndex, len(chunks))
 	}
 	terminal := chunks[finishIndex]
-	if got := gjson.GetBytes(terminal, "usage.total_tokens").Int(); got != 33 {
+	if got := ojson.GetBytes(terminal, "usage.total_tokens").Int(); got != 33 {
 		t.Fatalf("terminal total_tokens = %d, want 33", got)
 	}
-	if got := gjson.GetBytes(terminal, "usage.prompt_tokens").Int(); got != 11 {
+	if got := ojson.GetBytes(terminal, "usage.prompt_tokens").Int(); got != 11 {
 		t.Fatalf("terminal prompt_tokens = %d, want 11", got)
 	}
 }
