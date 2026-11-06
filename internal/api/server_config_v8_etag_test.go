@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	proxyconfig "github.com/router-for-me/CLIProxyAPI/v7/internal/config"
+	proxyconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
 )
 
 // TestConfigV8ETagExposedForCORS covers issue #6666 through the real server:

@@ -1,7 +1,6 @@
 package pluginstore
 
 import (
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -9,7 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/githubauth"
+	"github.com/MoeForge/moego/base64"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/githubauth"
 )
 
 const (

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	applypatch "github.com/router-for-me/CLIProxyAPI/v7/internal/client/codex/apply-patch"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/logging"
+	applypatch "github.com/router-for-me/CLIProxyAPI/v8/internal/client/codex/apply-patch"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/logging"
 )
 
 const (

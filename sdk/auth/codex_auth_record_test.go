@@ -1,12 +1,12 @@
 package auth
 
 import (
-	"encoding/base64"
 	"encoding/json"
+	"github.com/MoeForge/moego/base64"
 	"strings"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/auth/codex"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/codex"
 )
 
 func makeTestCodexJWT(planType, accountID string) string {

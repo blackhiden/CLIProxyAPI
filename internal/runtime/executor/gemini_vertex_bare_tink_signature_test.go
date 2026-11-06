@@ -3,18 +3,19 @@ package executor
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
+	"github.com/MoeForge/moego/base64"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	internalsignature "github.com/router-for-me/CLIProxyAPI/v7/internal/signature"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	internalsignature "github.com/router-for-me/CLIProxyAPI/v8/internal/signature"
+	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 // testVertexBareTinkSignature mirrors the Vertex AI serve-path shape: a TINK
@@ -59,7 +60,7 @@ func TestGeminiExecutorReplacesVertexBareTinkSignature(t *testing.T) {
 		t.Fatalf("Execute() error = %v", err)
 	}
 
-	contents := gjson.GetBytes(upstreamBody, "contents").Array()
+	contents := ojson.GetBytes(upstreamBody, "contents").Array()
 	found := false
 	for _, content := range contents {
 		for _, part := range content.Get("parts").Array() {
@@ -114,7 +115,7 @@ func TestAntigravityExecutorReplacesVertexBareTinkSignature(t *testing.T) {
 func TestGeminiVertexSanitizePreservesBareTinkSignature(t *testing.T) {
 	sig := testVertexBareTinkSignature()
 	out := internalsignature.SanitizeGeminiRequestThoughtSignatures(vertexBareTinkGeminiHistory(sig), "contents")
-	if got := gjson.GetBytes(out, "contents.1.parts.0.thoughtSignature").String(); got != sig {
+	if got := ojson.GetBytes(out, "contents.1.parts.0.thoughtSignature").String(); got != sig {
 		t.Fatalf("Vertex path signature = %q, want original bare-Tink value", got)
 	}
 }

@@ -8,11 +8,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 func TestIssue5190StatelessTwoToolRounds(t *testing.T) {
@@ -85,29 +86,29 @@ func testIssue5190ToolRounds(t *testing.T, rule string) {
 					}
 				}
 				body := <-requests
-				if i > 0 && rule == "explicit" && gjson.GetBytes(body, "previous_interaction_id").String() != "explicit" {
+				if i > 0 && rule == "explicit" && ojson.GetBytes(body, "previous_interaction_id").String() != "explicit" {
 					t.Errorf("explicit continuation lost: %s", body)
 				}
 				if i > 0 && rule == "override" {
-					if gjson.GetBytes(body, "previous_interaction_id").String() != "configured" || gjson.GetBytes(body, "environment_id").String() != "configured-env" || gjson.GetBytes(body, "input.0.content").String() != "configured-input" {
+					if ojson.GetBytes(body, "previous_interaction_id").String() != "configured" || ojson.GetBytes(body, "environment_id").String() != "configured-env" || ojson.GetBytes(body, "input.0.content").String() != "configured-input" {
 						t.Errorf("payload override lost: %s", body)
 					}
 				}
 				if i > 0 && rule == "filter" {
 					for _, path := range []string{"previous_interaction_id", "environment_id", "input"} {
-						if gjson.GetBytes(body, path).Exists() {
+						if ojson.GetBytes(body, path).Exists() {
 							t.Errorf("filtered %s restored: %s", path, body)
 						}
 					}
 				}
 				if i > 0 && rule == "baseline" {
-					if got := gjson.GetBytes(body, "previous_interaction_id").String(); got != fmt.Sprintf("interaction_%d", i) {
+					if got := ojson.GetBytes(body, "previous_interaction_id").String(); got != fmt.Sprintf("interaction_%d", i) {
 						t.Errorf("round %d continuation=%q body=%s", i, got, body)
 					}
-					if got := gjson.GetBytes(body, "environment_id").String(); got != "env_1" {
+					if got := ojson.GetBytes(body, "environment_id").String(); got != "env_1" {
 						t.Errorf("round %d environment=%q", i, got)
 					}
-					if got := gjson.GetBytes(body, "input.#").Int(); got != 1 {
+					if got := ojson.GetBytes(body, "input.#").Int(); got != 1 {
 						t.Errorf("round %d replayed history: %s", i, body)
 					}
 				}

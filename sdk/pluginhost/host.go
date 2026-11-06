@@ -3,11 +3,11 @@ package pluginhost
 import (
 	"context"
 
-	internalconfig "github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	internalpluginhost "github.com/router-for-me/CLIProxyAPI/v7/internal/pluginhost"
-	internalregistry "github.com/router-for-me/CLIProxyAPI/v7/internal/registry"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/pluginapi"
+	internalconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	internalpluginhost "github.com/router-for-me/CLIProxyAPI/v8/internal/pluginhost"
+	internalregistry "github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
 	"gopkg.in/yaml.v3"
 )
 
@@ -57,6 +57,9 @@ type RegisteredPluginInfo = internalpluginhost.RegisteredPluginInfo
 
 // RegisteredPluginMenu describes a plugin-owned resource menu entry.
 type RegisteredPluginMenu = internalpluginhost.RegisteredPluginMenu
+
+// AuthProviderEntry describes user-facing display metadata for one OAuth login entry.
+type AuthProviderEntry = pluginapi.AuthProviderEntry
 
 // Host wraps the internal plugin host behind a public SDK surface.
 type Host struct {

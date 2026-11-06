@@ -21,7 +21,7 @@ import (
 	"os"
 	"strings"
 
-	sdkaccess "github.com/router-for-me/CLIProxyAPI/v7/sdk/access"
+	sdkaccess "github.com/router-for-me/CLIProxyAPI/v8/sdk/access"
 )
 
 // customToken validates the X-Custom header.

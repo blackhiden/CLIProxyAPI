@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/registry"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 type codexTokenSchemaHooks struct {
@@ -68,7 +69,7 @@ func TestCodexExecutorCountTokensPreservesToolNumberSchemas(t *testing.T) {
 				}
 				// Token counts alone can miss a schema rewrite: number and integer
 				// may have the same token length. Inspect the translated schema too.
-				if got := gjson.GetBytes(hooks.body, "tools.0.parameters.properties.yield_time_ms.type").String(); got != "number" {
+				if got := ojson.GetBytes(hooks.body, "tools.0.parameters.properties.yield_time_ms.type").String(); got != "number" {
 					t.Fatalf("yield_time_ms.type = %q, want number; body=%s", got, hooks.body)
 				}
 				if len(resp.Payload) == 0 {

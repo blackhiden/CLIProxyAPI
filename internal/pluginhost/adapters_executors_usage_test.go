@@ -8,14 +8,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/logging"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/registry"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/runtime/executor/helps"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	coreexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	coreusage "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/usage"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/pluginapi"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/logging"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
+	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	coreexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	coreusage "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
 )
 
 type testUsageCapturePlugin struct {
@@ -386,6 +386,76 @@ func TestExecutorAdapterExecuteStreamPublishesUsage(t *testing.T) {
 	}
 	if rec.Detail.InputTokens != 15 || rec.Detail.OutputTokens != 25 || rec.Detail.TotalTokens != 40 {
 		t.Errorf("got usage %+v, want prompt=15 completion=25 total=40", rec.Detail)
+	}
+}
+
+// TestExecutorAdapterExecuteStreamSameFormatStripsSSEFraming pins the contract
+// that same-format plugin executor streams are normalized like built-in
+// executor streams: SSE-framed chunks ("data: {...}\n\n") must reach callers
+// as bare JSON payloads without the "[DONE]" marker, because the HTTP handlers
+// add their own "data:" prefix and terminal marker. Forwarding the framed
+// chunks unchanged produced a doubled "data: data:" prefix on the wire.
+func TestExecutorAdapterExecuteStreamSameFormatStripsSSEFraming(t *testing.T) {
+	executorRecord := normalizeTestCapabilityRecord(capabilityRecord{id: "executor-plugin-stream-framing"})
+	host := newHostWithRecords(executorRecord)
+
+	streamChunks := make(chan pluginapi.ExecutorStreamChunk, 4)
+	streamChunks <- pluginapi.ExecutorStreamChunk{Payload: []byte("data: {\"choices\":[{\"delta\":{\"content\":\"Hello\"}}]}\n\n")}
+	streamChunks <- pluginapi.ExecutorStreamChunk{Payload: []byte("data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\n")}
+	streamChunks <- pluginapi.ExecutorStreamChunk{Payload: []byte("data: [DONE]\n\n")}
+	close(streamChunks)
+
+	exec := &fakeExecutor{
+		identifier: "plugin-provider-stream-framing",
+		executeStream: func(ctx context.Context, req pluginapi.ExecutorRequest) (pluginapi.ExecutorStreamResponse, error) {
+			return pluginapi.ExecutorStreamResponse{Chunks: streamChunks}, nil
+		},
+	}
+
+	adapter := newExecutorAdapterForRecordForTest(host, executorRecord, exec,
+		[]sdktranslator.Format{sdktranslator.FormatOpenAI},
+		[]sdktranslator.Format{sdktranslator.FormatOpenAI},
+	)
+	adapter.provider = "plugin-provider-stream-framing"
+
+	auth := &coreauth.Auth{ID: "auth-stream-framing-1", Provider: "plugin-provider-stream-framing"}
+	req := coreexecutor.Request{
+		Model:   "test-model",
+		Payload: []byte(`{"model":"test-model","stream":true}`),
+	}
+	opts := coreexecutor.Options{
+		SourceFormat:   sdktranslator.FormatOpenAI,
+		ResponseFormat: sdktranslator.FormatOpenAI,
+		Stream:         true,
+	}
+
+	streamRes, errStream := adapter.ExecuteStream(context.Background(), auth, req, opts)
+	if errStream != nil {
+		t.Fatalf("ExecuteStream returned unexpected error: %v", errStream)
+	}
+
+	var received []string
+	for chunk := range streamRes.Chunks {
+		if chunk.Err != nil {
+			t.Fatalf("unexpected chunk error: %v", chunk.Err)
+		}
+		received = append(received, string(chunk.Payload))
+	}
+
+	want := []string{
+		`{"choices":[{"delta":{"content":"Hello"}}]}`,
+		`{"choices":[{"delta":{},"finish_reason":"stop"}]}`,
+	}
+	if len(received) != len(want) {
+		t.Fatalf("received %d chunks %q, want %d %q", len(received), received, len(want), want)
+	}
+	for i := range want {
+		if received[i] != want[i] {
+			t.Errorf("chunk %d = %q, want %q", i, received[i], want[i])
+		}
+		if strings.HasPrefix(received[i], "data:") {
+			t.Errorf("chunk %d still carries SSE framing: %q", i, received[i])
+		}
 	}
 }
 

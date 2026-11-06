@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/clienterror"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/interfaces"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/clienterror"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/interfaces"
+	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
 	"golang.org/x/net/context"
 )
 
@@ -201,17 +201,22 @@ func writeDirectErrorResponse(c *gin.Context, status int, msg *interfaces.ErrorM
 }
 
 func (h *BaseAPIHandler) LoggingAPIResponseError(ctx context.Context, err *interfaces.ErrorMessage) {
-	if cfg := h.CurrentConfig(); cfg != nil && cfg.RequestLog {
-		if ginContext, ok := ctx.Value("gin").(*gin.Context); ok {
-			if apiResponseErrors, isExist := ginContext.Get("API_RESPONSE_ERROR"); isExist {
-				if slicesAPIResponseError, isOk := apiResponseErrors.([]*interfaces.ErrorMessage); isOk {
-					slicesAPIResponseError = append(slicesAPIResponseError, err)
-					ginContext.Set("API_RESPONSE_ERROR", slicesAPIResponseError)
-				}
-			} else {
-				// Create new response data entry
-				ginContext.Set("API_RESPONSE_ERROR", []*interfaces.ErrorMessage{err})
+	if h == nil || err == nil || ctx == nil {
+		return
+	}
+	ginContext, ok := ctx.(*gin.Context)
+	if !ok || ginContext == nil {
+		ginContext, ok = ctx.Value("gin").(*gin.Context)
+	}
+	if ok && ginContext != nil {
+		if apiResponseErrors, isExist := ginContext.Get("API_RESPONSE_ERROR"); isExist {
+			if slicesAPIResponseError, isOk := apiResponseErrors.([]*interfaces.ErrorMessage); isOk {
+				slicesAPIResponseError = append(slicesAPIResponseError, err)
+				ginContext.Set("API_RESPONSE_ERROR", slicesAPIResponseError)
 			}
+		} else {
+			// Create new response data entry
+			ginContext.Set("API_RESPONSE_ERROR", []*interfaces.ErrorMessage{err})
 		}
 	}
 }

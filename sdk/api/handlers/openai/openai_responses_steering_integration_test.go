@@ -10,9 +10,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/MoeForge/moego/ojson"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/tidwall/gjson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/logging"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	runtimeexecutor "github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers"
+	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+
 )
 
 // Exercise the actual downstream handler, auth manager and Codex executor.
@@ -46,7 +54,7 @@ func TestResponsesSteeringFullDuplexIntegration(t *testing.T) {
 						t.Errorf("upstream write: %v", err)
 					}
 				}
-				if gjson.GetBytes(read(), "type").String() != "response.create" {
+				if ojson.GetBytesNoCopy(read(), "type").String() != "response.create" {
 					t.Error("missing initial create")
 				}
 				write(`{"type":"response.created","response":{"id":"r1"}}`)
@@ -68,7 +76,7 @@ func TestResponsesSteeringFullDuplexIntegration(t *testing.T) {
 						return
 					}
 					b := read()
-					if gjson.GetBytes(b, "type").String() != "response.create" || gjson.GetBytes(b, "input.0.call_id").String() != "call1" {
+					if ojson.GetBytesNoCopy(b, "type").String() != "response.create" || ojson.GetBytesNoCopy(b, "input.0.call_id").String() != "call1" {
 						t.Errorf("required input lost: %s", b)
 					}
 				} else {
@@ -131,14 +139,14 @@ func TestResponsesSteeringFullDuplexIntegration(t *testing.T) {
 				if err != nil {
 					t.Fatalf("downstream read before expected terminal event: %v", err)
 				}
-				kind := gjson.GetBytes(b, "type").String()
+				kind := ojson.GetBytesNoCopy(b, "type").String()
 				if kind == "error" {
-					if !strings.HasPrefix(scenario, "disconnect_") || gjson.GetBytes(b, "error.code").String() != "upstream_websocket_lost" {
+					if !strings.HasPrefix(scenario, "disconnect_") || ojson.GetBytesNoCopy(b, "error.code").String() != "upstream_websocket_lost" {
 						t.Fatalf("unexpected downstream error: %s", b)
 					}
 					break
 				}
-				if kind == "response.created" && gjson.GetBytes(b, "response.id").String() == "r1" {
+				if kind == "response.created" && ojson.GetBytesNoCopy(b, "response.id").String() == "r1" {
 					send(control1)
 					send(control2)
 				}
@@ -151,11 +159,11 @@ func TestResponsesSteeringFullDuplexIntegration(t *testing.T) {
 				if kind == "response.steer.pending" && scenario == "tool_pending" {
 					send([]byte(`{"type":"response.create","previous_response_id":"r1","input":[{"type":"function_call_output","call_id":"call1","output":"found"}]}`))
 				}
-				if kind == "response.completed" && gjson.GetBytes(b, "response.id").String() == "r2" {
+				if kind == "response.completed" && ojson.GetBytesNoCopy(b, "response.id").String() == "r2" {
 					if strings.HasPrefix(scenario, "disconnect_") {
 						t.Fatal("successor completed instead of reporting upstream disconnect")
 					}
-					completed = gjson.GetBytes(b, "response.output.0.content.0.text").String() == "STEER_OK"
+					completed = ojson.GetBytesNoCopy(b, "response.output.0.content.0.text").String() == "STEER_OK"
 					_ = c.Close()
 					break
 				}

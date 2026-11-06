@@ -8,12 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/usage"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 // TestAntigravityStream_ClientDisconnectAfterTerminalChunkDoesNotReportFailure
@@ -86,7 +87,7 @@ func TestAntigravityStream_ClientDisconnectAfterTerminalChunkDoesNotReportFailur
 		if chunk.Err != nil {
 			break
 		}
-		if gjson.GetBytes(chunk.Payload, "type").String() == "response.completed" {
+		if ojson.GetBytes(chunk.Payload, "type").String() == "response.completed" {
 			terminalReceived = true
 			// Client received completed response and terminates connection
 			finishDelivery(context.Canceled)
@@ -176,7 +177,7 @@ func TestAntigravityStream_ClientDisconnectPlainContextAfterTerminalChunkDoesNot
 		if chunk.Err != nil {
 			break
 		}
-		if gjson.GetBytes(chunk.Payload, "type").String() == "response.completed" {
+		if ojson.GetBytes(chunk.Payload, "type").String() == "response.completed" {
 			terminalReceived = true
 			cancel()
 			break
@@ -264,7 +265,7 @@ func TestAntigravityStream_OpenAIChatCompletions_ClientDisconnectAfterStopChunkD
 		if chunk.Err != nil {
 			break
 		}
-		if gjson.GetBytes(chunk.Payload, "choices.0.finish_reason").String() != "" {
+		if ojson.GetBytes(chunk.Payload, "choices.0.finish_reason").String() != "" {
 			terminalReceived = true
 			cancel()
 			break

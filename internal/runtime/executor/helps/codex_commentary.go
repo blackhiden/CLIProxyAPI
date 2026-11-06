@@ -3,8 +3,8 @@ package helps
 import (
 	"context"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v7/internal/translator/common"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
 )
 
 // WithCodexCommentaryPolicy keeps an in-flight stream's policy stable across

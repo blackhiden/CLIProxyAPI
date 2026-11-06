@@ -20,30 +20,30 @@ import (
 	"testing"
 	"time"
 
+	"github.com/MoeForge/moego/ojson"
 	gin "github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	managementHandlers "github.com/router-for-me/CLIProxyAPI/v7/internal/api/handlers/management"
-	claudemodels "github.com/router-for-me/CLIProxyAPI/v7/internal/client/claude/models"
-	codexmodels "github.com/router-for-me/CLIProxyAPI/v7/internal/client/codex/models"
-	proxyconfig "github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/home"
-	internallogging "github.com/router-for-me/CLIProxyAPI/v7/internal/logging"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/pluginhost"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/redisqueue"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/registry"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/runtime/executor"
-	runtimehelps "github.com/router-for-me/CLIProxyAPI/v7/internal/runtime/executor/helps"
-	sdkaccess "github.com/router-for-me/CLIProxyAPI/v7/sdk/access"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executionregistry"
-	coreexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	coreusage "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/usage"
-	sdkconfig "github.com/router-for-me/CLIProxyAPI/v7/sdk/config"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/pluginapi"
+	managementHandlers "github.com/router-for-me/CLIProxyAPI/v8/internal/api/handlers/management"
+	claudemodels "github.com/router-for-me/CLIProxyAPI/v8/internal/client/claude/models"
+	codexmodels "github.com/router-for-me/CLIProxyAPI/v8/internal/client/codex/models"
+	proxyconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/home"
+	internallogging "github.com/router-for-me/CLIProxyAPI/v8/internal/logging"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/pluginhost"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/redisqueue"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor"
+	runtimehelps "github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
+	sdkaccess "github.com/router-for-me/CLIProxyAPI/v8/sdk/access"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executionregistry"
+	coreexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	coreusage "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	sdkconfig "github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
 	log "github.com/sirupsen/logrus"
 	logtest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/tidwall/gjson"
 	"gopkg.in/yaml.v3"
 )
 
@@ -2159,6 +2159,9 @@ func TestModelsWithClientVersionReturnsCodexCatalog(t *testing.T) {
 		{ID: "gpt-image-2.5-flare", Object: "model", OwnedBy: "openai", Type: "openai"},
 		{ID: "gpt-image-2.5-sunburst", Object: "model", OwnedBy: "openai", Type: "openai"},
 		{ID: "gpt-image-2.5", Object: "model", OwnedBy: "openai", Type: "openai"},
+		{ID: "gpt-image-2.6-flare", Object: "model", OwnedBy: "openai", Type: "openai"},
+		{ID: "gpt-image-2.6-sunburst", Object: "model", OwnedBy: "openai", Type: "openai"},
+		{ID: "gpt-image-2.6", Object: "model", OwnedBy: "openai", Type: "openai"},
 		{ID: "grok-imagine-image", Object: "model", OwnedBy: "xai", Type: "openai"},
 		{ID: "grok-imagine-image-2.0", Object: "model", OwnedBy: "xai", Type: "openai"},
 		{ID: "grok-imagine-video", Object: "model", OwnedBy: "xai", Type: "openai"},
@@ -2275,6 +2278,9 @@ func TestModelsWithClientVersionReturnsCodexCatalog(t *testing.T) {
 		"gpt-image-2.5-flare":            false,
 		"gpt-image-2.5-sunburst":         false,
 		"gpt-image-2.5":                  false,
+		"gpt-image-2.6-flare":            false,
+		"gpt-image-2.6-sunburst":         false,
+		"gpt-image-2.6":                  false,
 		"grok-imagine-image":             false,
 		"grok-imagine-image-2.0":         false,
 		"grok-imagine-video":             false,
@@ -3940,7 +3946,7 @@ func TestServerResponsesWebsocketReauthorizesEachTurn(t *testing.T) {
 	if errRead1 != nil {
 		t.Fatalf("read turn 1: %v", errRead1)
 	}
-	if got := gjson.GetBytes(msg1, "type").String(); got != "response.completed" {
+	if got := ojson.GetBytesNoCopy(msg1, "type").String(); got != "response.completed" {
 		t.Fatalf("turn 1 event type = %q, want response.completed (%s)", got, msg1)
 	}
 
@@ -3972,10 +3978,10 @@ func TestServerResponsesWebsocketReauthorizesEachTurn(t *testing.T) {
 	if errRead2 != nil {
 		t.Fatalf("read turn 2: %v", errRead2)
 	}
-	if got := gjson.GetBytes(msg2, "type").String(); got != "error" {
+	if got := ojson.GetBytesNoCopy(msg2, "type").String(); got != "error" {
 		t.Fatalf("turn 2 event type = %q, want error (%s)", got, msg2)
 	}
-	if got := int(gjson.GetBytes(msg2, "status").Int()); got != http.StatusUnauthorized {
+	if got := int(ojson.GetBytesNoCopy(msg2, "status").Int()); got != http.StatusUnauthorized {
 		t.Fatalf("turn 2 error status = %d, want %d (%s)", got, http.StatusUnauthorized, msg2)
 	}
 	if gotCalls := wsExec.calls.Load(); gotCalls != 1 {

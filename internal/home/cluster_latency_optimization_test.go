@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
 )
 
 func TestRedisOptionsSnapshotPreservesTLSAndTimeouts(t *testing.T) {

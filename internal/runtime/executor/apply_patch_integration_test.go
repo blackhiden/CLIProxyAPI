@@ -11,20 +11,21 @@ import (
 	"testing"
 	"time"
 
+	"github.com/MoeForge/moego/ojson"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/registry"
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/runtime/executor/helps"
-	chatresponses "github.com/router-for-me/CLIProxyAPI/v7/internal/translator/openai/openai/responses"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/api/handlers"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/api/handlers/openai"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	"github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/usage"
-	sdkconfig "github.com/router-for-me/CLIProxyAPI/v7/sdk/config"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
+	chatresponses "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/openai/openai/responses"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers/openai"
+	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	sdkconfig "github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 	"google.golang.org/protobuf/encoding/protowire"
 )
 
@@ -122,7 +123,7 @@ func assertTask6FailedStream(t *testing.T, chunks <-chan cliproxyexecutor.Stream
 	for chunk := range chunks {
 		output = append(output, chunk.Payload...)
 		for _, line := range bytes.Split(chunk.Payload, []byte("\n")) {
-			if bytes.HasPrefix(line, []byte("data:")) && gjson.GetBytes(bytes.TrimSpace(line[5:]), "type").String() == "response.failed" {
+			if bytes.HasPrefix(line, []byte("data:")) && ojson.GetBytes(bytes.TrimSpace(line[5:]), "type").String() == "response.failed" {
 				failed++
 			}
 		}
@@ -148,7 +149,7 @@ func TestApplyPatchActualProviderErrorAndEOF(t *testing.T) {
 					}
 					name := "apply_patch"
 					if strings.HasPrefix(provider, "claude") {
-						name = gjson.GetBytes(body, "tools.0.name").String()
+						name = ojson.GetBytes(body, "tools.0.name").String()
 					}
 					if mode != "nonstream" {
 						w.Header().Set("Content-Type", "text/event-stream")
@@ -448,7 +449,7 @@ func TestApplyPatchHTTPGatewayErrorMatrix(t *testing.T) {
 					name := "apply_patch"
 					actualMode := mode
 					if strings.HasPrefix(provider, "claude") {
-						name = gjson.GetBytes(body, "tools.0.name").String()
+						name = ojson.GetBytes(body, "tools.0.name").String()
 						if mode == "nonstream" {
 							actualMode = "stream"
 						}
@@ -582,7 +583,7 @@ func TestApplyPatchFailureStopsConsumptionAndNextAttemptIsFresh(t *testing.T) {
 		t.Fatal("failed attempt kept consuming the upstream")
 	}
 	response, errExecute := exec.Execute(t.Context(), auth, req, opts)
-	if errExecute != nil || gjson.GetBytes(response.Payload, "output.0.input").String() != "valid patch" {
+	if errExecute != nil || ojson.GetBytes(response.Payload, "output.0.input").String() != "valid patch" {
 		t.Fatalf("next attempt reused failed state: %s %v", response.Payload, errExecute)
 	}
 }
@@ -636,10 +637,10 @@ func TestApplyPatchXAIWebsocketFailureMatrix(t *testing.T) {
 						errors++
 						assertTask6PatchError(t, chunk.Err)
 					}
-					if gjson.GetBytes(chunk.Payload, "type").String() == "response.failed" {
+					if ojson.GetBytes(chunk.Payload, "type").String() == "response.failed" {
 						failed++
 					}
-					if bytes.Contains(chunk.Payload, []byte("RAW_SECRET")) || gjson.GetBytes(chunk.Payload, "type").String() == "response.completed" {
+					if bytes.Contains(chunk.Payload, []byte("RAW_SECRET")) || ojson.GetBytes(chunk.Payload, "type").String() == "response.completed" {
 						t.Fatal("raw WS failure leaked or completed")
 					}
 				}
@@ -700,7 +701,7 @@ func TestApplyPatchDevinLegacyOtherToolsPreserved(t *testing.T) {
 			if custom {
 				key, expectedType = "input", "custom_tool_call"
 			}
-			item := gjson.GetBytes(response.Payload, "output.0")
+			item := ojson.GetBytes(response.Payload, "output.0")
 			if item.Get("type").String() != expectedType || item.Get(key).String() != input {
 				t.Fatalf("legacy provenance changed: %s", response.Payload)
 			}

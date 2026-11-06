@@ -11,11 +11,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v7/internal/config"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
-	"github.com/tidwall/gjson"
+	"github.com/MoeForge/moego/ojson"
+	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+
 )
 
 const (
@@ -92,7 +93,7 @@ func issue6630VertexContents(t *testing.T, cfg *config.Config, authMode string, 
 	} else if _, errExecute := exec.Execute(ctx, auth, req, opts); errExecute != nil {
 		t.Fatalf("Execute() error = %v", errExecute)
 	}
-	return gjson.GetBytes(<-captured, "contents").Raw
+	return ojson.GetBytes(<-captured, "contents").Raw
 }
 
 // issue6630AssertContents compares upstream contents with a hand-written JSON
