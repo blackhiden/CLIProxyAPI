@@ -72,4 +72,5 @@ session.md
 
 # trigger git
 *.md
+!docs/MERGE-PRESERVATION.md
 cpauk-*

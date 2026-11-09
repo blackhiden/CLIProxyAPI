@@ -2,7 +2,7 @@ services:
   cli-proxy-api:
     # Default to this fork's own image: it is built from ./Dockerfile on every push to
     # main and carries the fork-specific fixes listed in
-    # docs/MERGE-PRESERVATION-fork-fixes.md — including the graceful RESP error that
+    # docs/MERGE-PRESERVATION.md — including the graceful RESP error that
     # stops cpa-usage-keeper from reporting "connection reset by peer".
     # Set CLI_PROXY_IMAGE=eceasy/cli-proxy-api:latest to run the upstream image instead,
     # or run `docker compose up --build` to build ./Dockerfile locally.

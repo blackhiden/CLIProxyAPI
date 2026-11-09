@@ -975,3 +975,52 @@ api-keys:
 		}
 	}
 }
+
+func TestConfigV8SaveAPIKeyNames(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	file := filepath.Join(t.TempDir(), "config.yaml")
+	raw := `config-version: 8
+access:
+  api-keys:
+    - client-one
+    - client-two
+  api-key-names:
+    client-one: "Alice's laptop"
+    client-two: "Bob's desktop"
+`
+	if errWrite := os.WriteFile(file, []byte(raw), 0o600); errWrite != nil {
+		t.Fatal(errWrite)
+	}
+	cfg, errLoad := config.LoadConfig(file)
+	if errLoad != nil {
+		t.Fatal(errLoad)
+	}
+	h := &Handler{cfg: cfg, configFilePath: file}
+	router := gin.New()
+	router.PUT("/v8/management/config.yaml", h.ConfigV8)
+
+	update := `config-version: 8
+access:
+  api-keys:
+    - client-one
+    - client-two
+  api-key-names:
+    client-one: "Alice Updated"
+    client-two: "Bob's desktop"
+`
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPut, "/v8/management/config.yaml", strings.NewReader(update))
+	req.Header.Set("Content-Type", "application/yaml")
+	router.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("PUT /v8/management/config.yaml status=%d body=%s", w.Code, w.Body.String())
+	}
+
+	saved, errRead := os.ReadFile(file)
+	if errRead != nil {
+		t.Fatal(errRead)
+	}
+	if !strings.Contains(string(saved), "Alice Updated") {
+		t.Fatalf("saved config missing updated name: %s", string(saved))
+	}
+}

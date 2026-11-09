@@ -35,6 +35,7 @@
 | 9 | OAuth results shown as a manually-dismissed modal (not toasts) | `frontend/src/components/common/OAuthResultModal.tsx`, `frontend/src/pages/OAuthPage.tsx`, `frontend/src/styles/components.scss`, `frontend/tests/oauthResultModal.test.ts` | Submodule content | conflict resolution restores `showNotification(...)` calls; submodule pointer overwrite; stale upstream bundle replaces the modal |
 | 10 | **Live Flow feature (persistent)** | `internal/api/flowviz.go`, `internal/api/flowviz_test.go`, `internal/api/flowviz_bench_test.go`, `internal/api/flowviz_conversation_recovery_test.go`, `internal/api/server.go`, `internal/config/config.go`, `internal/config/config_normalization.go`, `internal/config/config_load.go`, `config.yaml`, `config.example.yaml` | Go source + Config | conflict resolution removes feature; upstream removes flowviz files; config key renamed/removed |
 | 11 | **cpauk full own-event request logs (persistent)** | `cpauk/internal/api/key_viewer_request_events.go`, `cpauk/internal/api/test/key_viewer_request_events_test.go`, `cpauk/docs/MERGE-PRESERVATION.md`, `cpauk/docs/{SPECIFICATION,CONFIGURATION}.md` | Submodule code + tests + docs | submodule pointer update or upstream merge restores request-log redaction |
+| 12 | **Client API-key names (`access.api-key-names`) persistence across v8 configuration** | `internal/config/config_v8.go`, `internal/config/api_key_names_test.go` | Go source + test | upstream merge drops `{"api-key-names", "access.api-key-names"}` from `buildV8Paths()` or drops `pruneV8APIKeyNames`; config validation rejects access section with `field access not found in type config.legacyConfig` |
 
 ---
 
@@ -510,7 +511,7 @@ flow-visualization-enabled: false # Legacy key (deprecated, backward compat only
 ```go
 // FORK-ONLY: CPA fork's persistent Live Flow feature.
 // This feature is fork-specific and must not be removed by upstream merges.
-// See docs/MERGE-PRESERVATION-fork-fixes.md for merge policy.
+// See docs/MERGE-PRESERVATION.md for merge policy.
 //
 // CPAForkLiveFlowEnabled mirrors lightweight per-request metadata...
 CPAForkLiveFlowEnabled bool `yaml:"cpa-fork-liveflow-enabled" json:"cpa-fork-liveflow-enabled"`
@@ -605,6 +606,93 @@ section. If a main OAuth result call interpolates an error string (the
 shown above. If the bundle grep fails, rebuild the frontend (see §3.6) after restoring
 the submodule sources.
 
+### 3.12 Client API-key names (item 12) — PERSISTENT CONFIGURATION
+
+**Purpose:** Client API key display names persist at `access.api-key-names` in v8 configuration (and `api-key-names` in legacy configuration). When saving configuration from the management UI or API, `ValidateV8Config` and `NormalizeConfigLayout` must recognize `access.api-key-names` as a valid v8 path and flatten it cleanly to `legacyConfig.APIKeyNames`.
+
+**Loss mode:** During upstream merges, changes to `buildV8Paths()` in `internal/config/config_v8.go` (e.g. upstream adding `kv-store` or other server settings) can drop `{"api-key-names", "access.api-key-names"}`. If dropped:
+1. `flattenV8` does not remap `access.api-key-names` to `api-key-names`.
+2. `deleteYAMLPath(flat, container)` leaves `access` in the flattened node tree because `access` is not empty.
+3. `ValidateV8Config` attempts to decode the tree into `legacyConfig` with known fields enforced, throwing:
+   `yaml: unmarshal errors: line 7: field access not found in type config.legacyConfig`
+4. The management center displays:
+   `Error:The precise save did not finish; some changes may already be applied. Your draft is retained. Save again to review the remaining server differences.: yaml: unmarshal errors: line 7: field access not found in type config.legacyConfig`
+5. `commentUnknownV8Sections` comments out `access.api-key-names` as an unrecognized section.
+
+**Required code in `internal/config/config_v8.go`:**
+
+1. In `buildV8Paths()`:
+```go
+{"remote-management", "management"}, {"api-keys", "access.api-keys"}, {"api-key-names", "access.api-key-names"},
+```
+
+2. In `NormalizeConfigLayout()`:
+```go
+if migrate && pruneV8APIKeyNames(root) {
+    changed = true
+}
+```
+
+3. `pruneV8APIKeyNames` helper:
+```go
+func pruneV8APIKeyNames(root *yaml.Node) bool {
+    keys := yamlPath(root, "access.api-keys")
+    names := yamlPath(root, "access.api-key-names")
+    if names == nil || names.Kind != yaml.MappingNode {
+        return false
+    }
+
+    configured := make(map[string]struct{})
+    if keys != nil && keys.Kind == yaml.SequenceNode {
+        configured = make(map[string]struct{}, len(keys.Content))
+        for _, key := range keys.Content {
+            if key != nil && key.Kind == yaml.ScalarNode && key.Value != "" {
+                configured[key.Value] = struct{}{}
+            }
+        }
+    }
+
+    changed := false
+    for i := 0; i+1 < len(names.Content); {
+        key, value := names.Content[i], names.Content[i+1]
+        name := ""
+        if value != nil && value.Kind == yaml.ScalarNode {
+            name = strings.TrimSpace(value.Value)
+        }
+        if key == nil || key.Kind != yaml.ScalarNode || name == "" {
+            names.Content = append(names.Content[:i], names.Content[i+2:]...)
+            changed = true
+            continue
+        }
+        if _, exists := configured[key.Value]; !exists {
+            names.Content = append(names.Content[:i], names.Content[i+2:]...)
+            changed = true
+            continue
+        }
+        if value.Value != name {
+            value.Value = name
+            changed = true
+        }
+        i += 2
+    }
+    if len(names.Content) != 0 {
+        return changed
+    }
+    return deleteYAMLPath(root, "access.api-key-names") || changed
+}
+```
+
+**Verify after merge:**
+
+```bash
+grep -n '"access.api-key-names"' internal/config/config_v8.go    # expect >= 1
+grep -n 'pruneV8APIKeyNames' internal/config/config_v8.go        # expect >= 2
+go test -v -run TestAPIKeyNamesPersistInLegacyAndV8Layouts ./internal/config
+go test -v -run TestValidateV8ConfigWithAPIKeyNames ./internal/config
+go test -v -run TestConfigV8SaveAPIKeyNames ./internal/api/handlers/management
+```
+
+
 ---
 
 ## 4. Post-merge verification checklist
@@ -617,6 +705,8 @@ grep -n 'ERR remote management disabled' internal/api/redis_queue_protocol.go
 grep -n 'enableAcceptedKeepAlive' internal/api/protocol_multiplexer.go        # comment + helper + call
 grep -n 'http.Client{Timeout: 30' internal/api/handlers/management/config_basic.go
 grep -n 'oauthProxyOverride' internal/api/handlers/management/auth_files_provider_oauth.go  # helper + 5 handler call sites (item 8)
+grep -n '"access.api-key-names"' internal/config/config_v8.go                                # v8 path mapping (item 12)
+grep -n 'pruneV8APIKeyNames' internal/config/config_v8.go                                    # v8 prune helper (item 12)
 
 # 2. Build & tests
 gofmt -l internal/api/ | wc -l                                # expect 0

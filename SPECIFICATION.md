@@ -12,7 +12,7 @@ CLIProxyAPI is a proxy server that provides OpenAI (including Responses), Gemini
 
 ## Constraints
 
-- Fork-specific fixes are protected across upstream merges; see `docs/MERGE-PRESERVATION-fork-fixes.md` before resolving any merge conflict.
+- Fork-specific fixes are protected across upstream merges; see `docs/MERGE-PRESERVATION.md` before resolving any merge conflict.
 - Timeouts are only allowed during credential acquisition (see `AGENTS.md` for the exhaustive exception list).
 - Never log or persist secrets/tokens in plaintext logs.
 

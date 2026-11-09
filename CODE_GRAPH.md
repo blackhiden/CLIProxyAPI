@@ -233,7 +233,7 @@ graph TD
 
 ### Fragile Dependencies
 
-- **Fork-Specific Fixes:** Must be preserved during upstream merges (see `docs/MERGE-PRESERVATION-fork-fixes.md`)
+- **Fork-Specific Fixes:** Must be preserved during upstream merges (see `docs/MERGE-PRESERVATION.md`)
 - **Executor Helpers:** Place under `internal/runtime/executor/helps/`, not in root
 - **Credential Rotation:** Works for HTTP; WebSocket requires client replay on failure
 
