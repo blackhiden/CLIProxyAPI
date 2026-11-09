@@ -36,4 +36,4 @@ go test -v -run TestName ./path/to/pkg       # Run a single test
 ## Pull Requests
 
 - Update any documentation affected by your change (`README*`, `docs/`, `config.example.yaml`, `CHANGELOG.md`) in the same PR and note the docs touched in the PR description.
-- Keep the merge-preservation rules in `docs/MERGE-PRESERVATION-fork-fixes.md` intact when resolving upstream merges.
+- Keep the merge-preservation rules in `docs/MERGE-PRESERVATION.md` intact when resolving upstream merges.

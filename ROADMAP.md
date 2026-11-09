@@ -4,7 +4,7 @@ This roadmap tracks the project direction at a high level. Completed work is rec
 
 ## Current Focus
 
-- Upstream synchronization: regularly merge `upstream/main` while preserving fork-specific fixes (see `docs/MERGE-PRESERVATION-fork-fixes.md`).
+- Upstream synchronization: regularly merge `upstream/main` while preserving fork-specific fixes (see `docs/MERGE-PRESERVATION.md`).
 - Devin provider support: OAuth login flow, quota fetching, model registry, and executor hardening.
 
 ## Near Term

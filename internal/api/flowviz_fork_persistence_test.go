@@ -1,6 +1,6 @@
 // FORK-ONLY: This test ensures the CPA fork's persistent Live Flow feature
 // is not accidentally removed by upstream merges.
-// See docs/MERGE-PRESERVATION-fork-fixes.md for merge policy.
+// See docs/MERGE-PRESERVATION.md for merge policy.
 package api
 
 import (
@@ -27,7 +27,7 @@ func TestLiveFlowFeaturePersistence(t *testing.T) {
 	for _, file := range requiredFiles {
 		path := filepath.Join(projectRoot, file)
 		if _, err := os.Stat(path); os.IsNotExist(err) {
-			t.Errorf("FORK-ONLY Live Flow file missing: %s\nThis file is required for the fork's persistent Live Flow feature.\nSee docs/MERGE-PRESERVATION-fork-fixes.md for restoration instructions.", file)
+			t.Errorf("FORK-ONLY Live Flow file missing: %s\nThis file is required for the fork's persistent Live Flow feature.\nSee docs/MERGE-PRESERVATION.md for restoration instructions.", file)
 		}
 	}
 
@@ -45,10 +45,10 @@ func TestLiveFlowFeaturePersistence(t *testing.T) {
 	if data, err := os.ReadFile(configPath); err == nil {
 		content := string(data)
 		if !strings.Contains(content, "CPAForkLiveFlowEnabled") {
-			t.Error("config.go is missing the CPAForkLiveFlowEnabled field.\nThis field is required for the fork's Live Flow feature.\nSee docs/MERGE-PRESERVATION-fork-fixes.md for the required code.")
+			t.Error("config.go is missing the CPAForkLiveFlowEnabled field.\nThis field is required for the fork's Live Flow feature.\nSee docs/MERGE-PRESERVATION.md for the required code.")
 		}
 		if !strings.Contains(content, "cpa-fork-liveflow-enabled") {
-			t.Error("config.go is missing the 'cpa-fork-liveflow-enabled' yaml tag.\nThis tag is required for config file parsing.\nSee docs/MERGE-PRESERVATION-fork-fixes.md for the required code.")
+			t.Error("config.go is missing the 'cpa-fork-liveflow-enabled' yaml tag.\nThis tag is required for config file parsing.\nSee docs/MERGE-PRESERVATION.md for the required code.")
 		}
 	}
 
@@ -57,7 +57,7 @@ func TestLiveFlowFeaturePersistence(t *testing.T) {
 	if data, err := os.ReadFile(normPath); err == nil {
 		content := string(data)
 		if !strings.Contains(content, "NormalizeLiveFlowConfig") {
-			t.Error("config_normalization.go is missing the NormalizeLiveFlowConfig function.\nThis function provides backward compatibility for the legacy config key.\nSee docs/MERGE-PRESERVATION-fork-fixes.md for the required code.")
+			t.Error("config_normalization.go is missing the NormalizeLiveFlowConfig function.\nThis function provides backward compatibility for the legacy config key.\nSee docs/MERGE-PRESERVATION.md for the required code.")
 		}
 	}
 
@@ -66,10 +66,10 @@ func TestLiveFlowFeaturePersistence(t *testing.T) {
 	if data, err := os.ReadFile(serverPath); err == nil {
 		content := string(data)
 		if !strings.Contains(content, "CPAForkLiveFlowEnabled") {
-			t.Error("server.go is not checking cfg.CPAForkLiveFlowEnabled.\nThe server must check the fork-specific config key, not the legacy key.\nSee docs/MERGE-PRESERVATION-fork-fixes.md for the required code.")
+			t.Error("server.go is not checking cfg.CPAForkLiveFlowEnabled.\nThe server must check the fork-specific config key, not the legacy key.\nSee docs/MERGE-PRESERVATION.md for the required code.")
 		}
 		if !strings.Contains(content, "newFlowHub()") {
-			t.Error("server.go is not creating the flow hub.\nThe Live Flow feature requires hub instantiation when enabled.\nSee docs/MERGE-PRESERVATION-fork-fixes.md for the required code.")
+			t.Error("server.go is not creating the flow hub.\nThe Live Flow feature requires hub instantiation when enabled.\nSee docs/MERGE-PRESERVATION.md for the required code.")
 		}
 	}
 }

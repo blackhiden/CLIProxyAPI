@@ -142,3 +142,18 @@ access:
 		})
 	}
 }
+
+func TestValidateV8ConfigWithAPIKeyNames(t *testing.T) {
+	raw := []byte(`config-version: 8
+access:
+  api-keys:
+    - client-one
+    - client-two
+  api-key-names:
+    client-one: "Alice's laptop"
+    client-two: "Bob's desktop"
+`)
+	if err := ValidateV8Config(raw); err != nil {
+		t.Fatalf("ValidateV8Config() failed with api-key-names: %v", err)
+	}
+}
