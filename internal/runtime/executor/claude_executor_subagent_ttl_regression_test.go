@@ -56,7 +56,7 @@ func TestClaudeExecutor_SubagentPreserves1hTTLAndExtendedCacheBetaWhenRequested(
 		}]
 	}`)
 	incomingHeaders := http.Header{}
-	incomingHeaders.Set("User-Agent", "claude-cli/2.1.281 (external, cli)")
+	incomingHeaders.Set("User-Agent", "claude-cli/2.1.322 (external, cli)")
 	incomingHeaders.Set("X-Claude-Code-Agent-Id", "agent-sub-123")
 	incomingHeaders.Set("Anthropic-Beta", "claude-code-20250219,oauth-2025-04-20,extended-cache-ttl-2025-04-11")
 
@@ -133,7 +133,7 @@ func TestClaudeExecutor_SubagentPreserves1hTTLAndExtendedCacheBetaWhenRequested_
 		}]
 	}`)
 	incomingHeaders := http.Header{}
-	incomingHeaders.Set("User-Agent", "claude-cli/2.1.281 (external, cli)")
+	incomingHeaders.Set("User-Agent", "claude-cli/2.1.322 (external, cli)")
 	incomingHeaders.Set("X-Claude-Code-Agent-Id", "agent-sub-stream-456")
 	incomingHeaders.Set("Anthropic-Beta", "claude-code-20250219,oauth-2025-04-20,extended-cache-ttl-2025-04-11")
 
@@ -203,7 +203,7 @@ func TestClaudeExecutor_SubagentWithout1hKeepsDefault5m(t *testing.T) {
 		}]
 	}`)
 	incomingHeaders := http.Header{}
-	incomingHeaders.Set("User-Agent", "claude-cli/2.1.281 (external, cli)")
+	incomingHeaders.Set("User-Agent", "claude-cli/2.1.322 (external, cli)")
 	incomingHeaders.Set("X-Claude-Code-Agent-Id", "agent-sub-default-789")
 	incomingHeaders.Set("Anthropic-Beta", "claude-code-20250219,oauth-2025-04-20")
 
@@ -269,7 +269,7 @@ func TestClaudeExecutor_APIKeySubagentPreserves1hTTLAndInjectsBeta(t *testing.T)
 		}]
 	}`)
 	incomingHeaders := http.Header{}
-	incomingHeaders.Set("User-Agent", "claude-cli/2.1.281 (external, cli)")
+	incomingHeaders.Set("User-Agent", "claude-cli/2.1.322 (external, cli)")
 	incomingHeaders.Set("X-Claude-Code-Agent-Id", "agent-sub-apikey-101")
 	incomingHeaders.Set("Anthropic-Beta", "claude-code-20250219") // Note: NO extended-cache-ttl beta in incoming header
 
@@ -335,7 +335,7 @@ func TestClaudeExecutor_APIKeySubagentPreserves1hTTLAndInjectsBeta_Stream(t *tes
 		}]
 	}`)
 	incomingHeaders := http.Header{}
-	incomingHeaders.Set("User-Agent", "claude-cli/2.1.281 (external, cli)")
+	incomingHeaders.Set("User-Agent", "claude-cli/2.1.322 (external, cli)")
 	incomingHeaders.Set("X-Claude-Code-Agent-Id", "agent-sub-apikey-stream-202")
 	incomingHeaders.Set("Anthropic-Beta", "claude-code-20250219") // Note: NO extended-cache-ttl beta in incoming header
 
