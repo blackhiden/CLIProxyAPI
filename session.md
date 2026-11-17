@@ -71,3 +71,12 @@ into local `main`; no remote push was performed.
 - No remote push was performed. Feature branches and their worktrees remain
   intact. The uncommitted `cpauk` worktree mismatch is preserved and excluded
   from all commits.
+
+## Git Flow release
+
+- Release preparation started from local `dev` using Git Flow release branch
+  `release/8.0.79`.
+- The latest numeric release tag was `v8.0.78`; the calculated next tag is
+  `v8.0.79`.
+- No files were staged before release preparation. The unrelated `cpauk`
+  submodule checkout mismatch remains preserved and excluded.
