@@ -1,7 +1,7 @@
 # Session: Test Credential Models Feature
 
 **Date:** 2026-11-17
-**Status:** Implemented in isolated feature branches; awaiting merge approval
+**Status:** Merged into local `main`; feature worktrees retained
 
 ## Objective and work split
 
@@ -44,5 +44,11 @@ merged.
 - Root asset/preservation checks pass. The docs branch has an uncommitted,
   pre-existing `cpauk` submodule checkout mismatch from initialization; it was
   not staged or changed.
-- Inspect both branches and present hashes.
-- Wait for explicit user approval before merging or cleaning worktrees.
+- The frontend and documentation feature branches were merged in a temporary
+  integration worktree from shared base `3b1c7a688222fefbd51c6099f35ffed1b7d34fd0`.
+  Local `main` was fast-forwarded to `961b94af25429c0e39ad33cb87aebd5ebad314ca`.
+- Integration reruns passed: frontend API contract tests (14), frontend type
+  check and build, root server build, and generated-asset/preservation checks.
+- No remote push was performed. Feature branches and their worktrees remain
+  intact. The uncommitted `cpauk` worktree mismatch is preserved and excluded
+  from all commits.
