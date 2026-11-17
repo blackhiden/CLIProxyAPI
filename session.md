@@ -33,11 +33,16 @@ merged.
 - `bun run type-check`: pass.
 - `bun run lint`: exit 0; four existing warnings in unrelated tests.
 - `bun run build`: pass; the built single-file artifact includes Test Model UI.
-- Backend verifier behavior was unchanged; backend targeted test and server
-  build remain part of integration validation.
+- `bun run verify`: the focused feature tests, lint, type-check, and build pass;
+  the full suite has 2388 pass, 1 todo, and 18 pre-existing failures in locale
+  completeness, LoginRevealVeil, and visual-config rebase suites.
+- Backend targeted tests pass: `internal/api/handlers/management` and
+  `sdk/cliproxy/auth`. The required server build also passes.
 
 ## Pending
 
-- Complete backend Go package tests/build and root asset/preservation checks.
-- Commit documentation/assets, inspect both branches, and present hashes.
+- Root asset/preservation checks pass. The docs branch has an uncommitted,
+  pre-existing `cpauk` submodule checkout mismatch from initialization; it was
+  not staged or changed.
+- Inspect both branches and present hashes.
 - Wait for explicit user approval before merging or cleaning worktrees.
