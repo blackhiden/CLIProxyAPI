@@ -10,8 +10,8 @@ credential-pinned verifier. Frontend work is on
 `feature/test-credential-models-frontend`; documentation, merge preservation,
 and the generated root management asset are on
 `feature/test-credential-models-docs`. Both root branches originate from
-`main` commit `3b1c7a688222fefbd51c6099f35ffed1b7d34fd0`. No branch has been
-merged.
+`main` commit `3b1c7a688222fefbd51c6099f35ffed1b7d34fd0`. Both are integrated
+into local `main`; no remote push was performed.
 
 ## Decisions and discoveries
 
@@ -39,7 +39,7 @@ merged.
 - Backend targeted tests pass: `internal/api/handlers/management` and
   `sdk/cliproxy/auth`. The required server build also passes.
 
-## Pending
+## Integration result
 
 - Root asset/preservation checks pass. The docs branch has an uncommitted,
   pre-existing `cpauk` submodule checkout mismatch from initialization; it was
@@ -47,6 +47,8 @@ merged.
 - The frontend and documentation feature branches were merged in a temporary
   integration worktree from shared base `3b1c7a688222fefbd51c6099f35ffed1b7d34fd0`.
   Local `main` was fast-forwarded to `961b94af25429c0e39ad33cb87aebd5ebad314ca`.
+- A final continuity update was committed on local `main` as
+  `f8eee9dd31f3d104d1b8eed308c5ab06aa3daa8d`.
 - Integration reruns passed: frontend API contract tests (14), frontend type
   check and build, root server build, and generated-asset/preservation checks.
 - No remote push was performed. Feature branches and their worktrees remain
