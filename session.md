@@ -1,7 +1,24 @@
 # Session: Test Credential Models Feature
 
 **Date:** 2026-11-17
-**Status:** Merged into local `main`; feature worktrees retained
+**Status:** Original feature merged; Antigravity verification budget fix validated
+
+## Follow-up: Antigravity Claude verification budget
+
+- The reported incomplete verification is limited to Antigravity Claude 4.6
+  thinking models, whose static model metadata requires at least 1,024 thinking
+  tokens while VerifyInference only reserved 16 total output tokens.
+- The isolated fix branch derives Antigravity verification output allowance
+  from the model's minimum thinking budget plus a small reply allowance, capped
+  by the model's maximum completion tokens. Other providers retain the 16-token
+  floor.
+- Regression coverage checks both reported model IDs, an end-to-end manager
+  verification request, and unchanged Codex/generic budgets.
+- `go test ./sdk/cliproxy/auth -count=1` passes.
+- `go test ./internal/runtime/executor ./internal/thinking/... -run 'TestAntigravity|Test.*Thinking' -count=1` passes.
+- `go build -o /tmp/cliproxyapi-antigravity-verify ./cmd/server` passes.
+- `git diff --check` passes. Root dev's pre-existing Dockerfile and cpauk changes
+  remain untouched.
 
 ## Objective and work split
 
@@ -54,3 +71,12 @@ into local `main`; no remote push was performed.
 - No remote push was performed. Feature branches and their worktrees remain
   intact. The uncommitted `cpauk` worktree mismatch is preserved and excluded
   from all commits.
+
+## Git Flow release
+
+- Release preparation started from local `dev` using Git Flow release branch
+  `release/8.0.79`.
+- The latest numeric release tag was `v8.0.78`; the calculated next tag is
+  `v8.0.79`.
+- No files were staged before release preparation. The unrelated `cpauk`
+  submodule checkout mismatch remains preserved and excluded.

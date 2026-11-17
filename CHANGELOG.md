@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Antigravity Claude model verification budget**: Allocate the model's minimum
+  thinking budget plus a small response allowance when verifying Antigravity
+  models, preventing false incomplete-response failures on Claude thinking models.
+
 ---
 ## [v8.0.48] - 2026-10-30
 
