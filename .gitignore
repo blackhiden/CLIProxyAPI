@@ -77,3 +77,4 @@ session.md
 *.md
 !docs/MERGE-PRESERVATION.md
 cpauk-*
+merge-worktrees.sh
