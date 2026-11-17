@@ -39,12 +39,13 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=bind,source=go.mod,target=go.mod \
     --mount=type=bind,source=go.sum,target=go.sum \
+    set -eux; \
     go mod download
 COPY . .
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
         set -eux; \
-        CGO_ENABLED=1 GOOS=linux go build \
+        CGO_ENABLED=1 GOOS=linux \
         go build \
             -buildvcs=false \
             -ldflags="-s -w -X 'main.Version=${CPA_VERSION}' -X 'main.Commit=${CPA_COMMIT}' -X 'main.BuildDate=${BUILD_DATE}'" \
