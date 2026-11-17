@@ -5,7 +5,7 @@ ARG CPAM_VERSION=v0.0.0
 ARG CPAM_COMMIT=unknown
 ARG BUILD_DATE=2025-09-09
 COPY frontend/package.json frontend/bun.lock ./
-RUN bun install --frozen-lockfile
+RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile
 COPY frontend/. .
 RUN VERSION="${CPAM_VERSION}" bun run build && \ 
  cp dist/index.html /app/management.html
@@ -35,11 +35,16 @@ RUN set -eux;   \
     apt autoclean;     \
     rm -rf /var/lib/apt/lists/*
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=bind,source=go.mod,target=go.mod \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    go mod download
 COPY . .
-RUN set -eux;   \
-    CGO_ENABLED=1 \
-        GOOS=linux \
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+        set -eux; \
+        CGO_ENABLED=1 GOOS=linux go build \
         go build \
             -buildvcs=false \
             -ldflags="-s -w -X 'main.Version=${CPA_VERSION}' -X 'main.Commit=${CPA_COMMIT}' -X 'main.BuildDate=${BUILD_DATE}'" \
