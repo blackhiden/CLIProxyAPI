@@ -2722,8 +2722,10 @@ func (m *Manager) VerifyInference(ctx context.Context, id, model string) (*Auth,
 
 	sessionID := fmt.Sprintf("verify-%s-%d", auth.ID, time.Now().UTC().UnixNano())
 	// Codex upstreams reject integer max_output_tokens below 16, so the minimal
-	// verification budget must sit at that floor.
-	payload := []byte(fmt.Sprintf(`{"model":%q,"input":[{"type":"message","role":"user","content":[{"type":"input_text","text":"ping"}]}],"max_output_tokens":16,"store":false}`, verifyModel))
+	// verification budget must sit at that floor. Antigravity thinking models
+	// additionally need room for their minimum reasoning budget and a short reply.
+	maxOutputTokens := verificationMaxOutputTokens(provider, registry.LookupModelInfo(verifyModel, provider))
+	payload := []byte(fmt.Sprintf(`{"model":%q,"input":[{"type":"message","role":"user","content":[{"type":"input_text","text":"ping"}]}],"max_output_tokens":%d,"store":false}`, verifyModel, maxOutputTokens))
 	req := cliproxyexecutor.Request{
 		Model:   verifyModel,
 		Payload: payload,
@@ -2898,4 +2900,19 @@ func (m *Manager) VerifyInference(ctx context.Context, id, model string) (*Auth,
 		return updated, &Error{Code: "credential_superseded", Message: "credential was replaced during verification; re-run verification for the new credential", HTTPStatus: http.StatusConflict}
 	}
 	return updated, nil
+}
+
+func verificationMaxOutputTokens(provider string, modelInfo *registry.ModelInfo) int {
+	const minimumOutputTokens = 16
+	if !strings.EqualFold(strings.TrimSpace(provider), "antigravity") || modelInfo == nil || modelInfo.Thinking == nil || modelInfo.Thinking.Min <= 0 {
+		return minimumOutputTokens
+	}
+
+	// Leave room for a small verification reply after the model's minimum
+	// reasoning allocation. Respect the model's advertised output ceiling.
+	outputTokens := modelInfo.Thinking.Min + minimumOutputTokens
+	if modelInfo.MaxCompletionTokens > 0 && outputTokens > modelInfo.MaxCompletionTokens {
+		return modelInfo.MaxCompletionTokens
+	}
+	return outputTokens
 }

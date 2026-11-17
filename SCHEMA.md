@@ -12,9 +12,11 @@ object storage.
   models through `/credentials/models`.
 - Credential model verification is a non-persistent operator action using
   `POST /credentials/verify` with a credential `name` and exact `model`
-  identifier. It executes a minimal, credential-pinned inference through
-  `Manager.VerifyInference`; it is not a passive metadata check and may consume
-  upstream quota.
+  `Manager.VerifyInference`; Antigravity Claude models receive an output budget
+  that accounts for the registry's minimum thinking allowance. Verification is
+  not a passive metadata check and may consume upstream quota.
+  accounts for declared minimum thinking budgets. It is not a passive metadata
+  check and may consume upstream quota.
 - Verification results are transient frontend state and are not stored in a database.
 
 ## Persistence
