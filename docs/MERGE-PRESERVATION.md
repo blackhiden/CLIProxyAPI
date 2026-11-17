@@ -36,6 +36,44 @@
 | 10 | **Live Flow feature (persistent)** | `internal/api/flowviz.go`, `internal/api/flowviz_test.go`, `internal/api/flowviz_bench_test.go`, `internal/api/flowviz_conversation_recovery_test.go`, `internal/api/server.go`, `internal/config/config.go`, `internal/config/config_normalization.go`, `internal/config/config_load.go`, `config.yaml`, `config.example.yaml` | Go source + Config | conflict resolution removes feature; upstream removes flowviz files; config key renamed/removed |
 | 11 | **cpauk full own-event request logs (persistent)** | `cpauk/internal/api/key_viewer_request_events.go`, `cpauk/internal/api/test/key_viewer_request_events_test.go`, `cpauk/docs/MERGE-PRESERVATION.md`, `cpauk/docs/{SPECIFICATION,CONFIGURATION}.md` | Submodule code + tests + docs | submodule pointer update or upstream merge restores request-log redaction |
 | 12 | **Client API-key names (`access.api-key-names`) persistence across v8 configuration** | `internal/config/config_v8.go`, `internal/config/api_key_names_test.go` | Go source + test | upstream merge drops `{"api-key-names", "access.api-key-names"}` from `buildV8Paths()` or drops `pruneV8APIKeyNames`; config validation rejects access section with `field access not found in type config.legacyConfig` |
+| 13 | **Per-model credential verification in the auth-files models modal** | `frontend/src/features/authFiles/{AuthFilesPage.tsx,components/AuthFileModelsModal.tsx,components/AuthFileModelsModal.module.scss,hooks/useAuthFilesModels.ts}`, `frontend/src/services/api/authFiles.ts`, `frontend/src/i18n/locales/{en,zh-CN,zh-TW,ru,vi,ko,tr}.json`, `frontend/tests/managementV8Api.test.ts`, `static/management.html` | Frontend submodule + generated artifact | frontend pointer overwritten, modal/client changes lost in submodule merge, or stale `static/management.html` deployed |
+
+---
+
+### 3.13 Per-model credential verification (item 13)
+
+The auth-files Models modal has a **Test Model** action for each model. The
+frontend calls the existing `POST /v8/management/credentials/verify` endpoint
+with the selected credential filename and the row's exact model ID. The
+backend runs an isolated minimal inference pinned to that credential; this is a
+live upstream request and can consume quota. Results are transient modal state.
+
+**Files to preserve:**
+
+- Frontend sources and seven locale catalogs listed in item 13 inside the
+  `frontend/` submodule.
+- `static/management.html`, rebuilt from the corresponding frontend revision.
+- Root `docs/MERGE-PRESERVATION.md` entry and the frontend API contract test.
+
+**Loss modes:** A merge may reset the `frontend/` gitlink, resolve an upstream
+submodule conflict to a revision without the modal action, or take an old
+generated `static/management.html`. Any can remove the UI while the v8 endpoint
+continues to exist.
+
+**Verify after merge:**
+
+```bash
+git -C frontend grep -n 'model_test_action' -- src/features/authFiles src/i18n/locales
+grep -o 'Test Model' static/management.html | head
+cd frontend && bun test tests/managementV8Api.test.ts && bun run type-check && bun run build
+cd .. && go test ./internal/api/handlers/management ./sdk/cliproxy/auth
+```
+
+Confirm the modal sends `{ "name": "<selected credential filename>",
+"model": "<exact displayed model id>" }`, that clicking Test Model does not
+copy the row's model ID, and that success/failure badges and the sanitized
+failure detail are present. Do not replace the v8 verifier with load-balanced
+inference or add a v0 endpoint. No verification result is persisted.
 
 ---
 

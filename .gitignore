@@ -32,6 +32,7 @@ auths/*
 # Documentation
 docs/*
 !docs/management-api-v8.md
+!docs/parallel-feature-worktrees.md
 !docs/websocket-tunnel.md
 !docs/websocket-tunnel_CN.md
 AGENTS.md
