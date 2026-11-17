@@ -459,7 +459,7 @@ func TestWSObserverMapsErrorStatuses(t *testing.T) {
 
 	_, exec := newWSContext(t, http.MethodGet, "/v1/responses", "/v1/responses")
 	obs := newFlowWSObserver(hub)
-	payload := []byte(`{"type":"response.create","model":"gpt-5"}`)
+	payload := []byte(`{"type":"response.create","model":"gpt-5","input":"hello"}`)
 
 	cases := []struct {
 		name   string

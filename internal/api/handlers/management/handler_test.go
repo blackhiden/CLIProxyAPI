@@ -245,7 +245,7 @@ func TestAuthenticateManagementKey_ReusesVerifiedSecretWithinOneHourTTL(t *testi
 		},
 	}
 
-	if allowed, statusCode, errMsg := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
+	if allowed, statusCode, errMsg, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
 		t.Fatalf("initial auth failed: status=%d msg=%q", statusCode, errMsg)
 	}
 	if got := compareCalls.Load(); got != 1 {
@@ -253,7 +253,7 @@ func TestAuthenticateManagementKey_ReusesVerifiedSecretWithinOneHourTTL(t *testi
 	}
 
 	for i := 0; i < 10; i++ {
-		if allowed, statusCode, errMsg := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
+		if allowed, statusCode, errMsg, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
 			t.Fatalf("cached auth %d failed: status=%d msg=%q", i+1, statusCode, errMsg)
 		}
 	}
@@ -264,7 +264,7 @@ func TestAuthenticateManagementKey_ReusesVerifiedSecretWithinOneHourTTL(t *testi
 	nowMu.Lock()
 	now = now.Add(time.Hour - time.Second)
 	nowMu.Unlock()
-	if allowed, statusCode, errMsg := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
+	if allowed, statusCode, errMsg, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
 		t.Fatalf("auth just before 1h expiry failed: status=%d msg=%q", statusCode, errMsg)
 	}
 	if got := compareCalls.Load(); got != 1 {
@@ -274,14 +274,14 @@ func TestAuthenticateManagementKey_ReusesVerifiedSecretWithinOneHourTTL(t *testi
 	nowMu.Lock()
 	now = now.Add(time.Second)
 	nowMu.Unlock()
-	if allowed, statusCode, errMsg := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
+	if allowed, statusCode, errMsg, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
 		t.Fatalf("auth at 1h expiry failed: status=%d msg=%q", statusCode, errMsg)
 	}
 	if got := compareCalls.Load(); got != 2 {
 		t.Fatalf("bcrypt calls at 1h expiry = %d, want 2", got)
 	}
 
-	if allowed, statusCode, errMsg := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
+	if allowed, statusCode, errMsg, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
 		t.Fatalf("auth after re-verification failed: status=%d msg=%q", statusCode, errMsg)
 	}
 	if got := compareCalls.Load(); got != 2 {
@@ -310,7 +310,7 @@ func TestAuthenticateManagementKey_NeverCachesFailuresAndPreservesIPBan(t *testi
 		},
 	}
 
-	if allowed, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
+	if allowed, _, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
 		t.Fatal("expected valid secret to succeed")
 	}
 	if got := compareCalls.Load(); got != 1 {
@@ -319,7 +319,7 @@ func TestAuthenticateManagementKey_NeverCachesFailuresAndPreservesIPBan(t *testi
 
 	// Four wrong attempts must each invoke bcrypt (never negative-cached) and not ban yet.
 	for i := 0; i < 4; i++ {
-		allowed, statusCode, errMsg := h.AuthenticateManagementKey("127.0.0.1", true, "wrong-secret")
+		allowed, statusCode, errMsg, _ := h.AuthenticateManagementKey("127.0.0.1", true, "wrong-secret")
 		if allowed || statusCode != http.StatusUnauthorized || errMsg != "invalid management key" {
 			t.Fatalf("wrong attempt %d = (%v, %d, %q), want (false, 401, invalid management key)", i+1, allowed, statusCode, errMsg)
 		}
@@ -329,7 +329,7 @@ func TestAuthenticateManagementKey_NeverCachesFailuresAndPreservesIPBan(t *testi
 	}
 
 	// A cached hit must reset the failed-attempt counter.
-	if allowed, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
+	if allowed, _, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
 		t.Fatal("expected cached valid secret to succeed and reset attempts")
 	}
 	if got := compareCalls.Load(); got != 5 {
@@ -338,7 +338,7 @@ func TestAuthenticateManagementKey_NeverCachesFailuresAndPreservesIPBan(t *testi
 
 	// Five consecutive failures after reset trigger the 30-minute IP ban.
 	for i := 0; i < 5; i++ {
-		allowed, statusCode, _ := h.AuthenticateManagementKey("127.0.0.1", true, "wrong-secret")
+		allowed, statusCode, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "wrong-secret")
 		if allowed || statusCode != http.StatusUnauthorized {
 			t.Fatalf("post-reset failure %d = (%v, %d), want (false, 401)", i+1, allowed, statusCode)
 		}
@@ -348,7 +348,7 @@ func TestAuthenticateManagementKey_NeverCachesFailuresAndPreservesIPBan(t *testi
 	}
 
 	// Even with the valid secret already cached, the banned IP must still receive 403.
-	allowed, statusCode, errMsg := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret")
+	allowed, statusCode, errMsg, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret")
 	if allowed || statusCode != http.StatusForbidden || !strings.HasPrefix(errMsg, "IP banned due to too many failed attempts. Try again in") {
 		t.Fatalf("banned auth with cached key = (%v, %d, %q), want (false, 403, IP banned...)", allowed, statusCode, errMsg)
 	}
@@ -382,10 +382,10 @@ func TestAuthenticateManagementKey_InvalidatesCacheOnSecretChangeAndRemoval(t *t
 		},
 	}
 
-	if allowed, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-one"); !allowed {
+	if allowed, _, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-one"); !allowed {
 		t.Fatal("expected secret-one to succeed")
 	}
-	if allowed, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-one"); !allowed {
+	if allowed, _, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-one"); !allowed {
 		t.Fatal("expected cached secret-one to succeed")
 	}
 	if got := compareCalls.Load(); got != 1 {
@@ -398,13 +398,13 @@ func TestAuthenticateManagementKey_InvalidatesCacheOnSecretChangeAndRemoval(t *t
 			SecretKey: string(hash2),
 		},
 	})
-	if allowed, statusCode, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-one"); allowed || statusCode != http.StatusUnauthorized {
+	if allowed, statusCode, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-one"); allowed || statusCode != http.StatusUnauthorized {
 		t.Fatalf("stale secret-one after SetConfig = (%v, %d), want (false, 401)", allowed, statusCode)
 	}
-	if allowed, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-two"); !allowed {
+	if allowed, _, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-two"); !allowed {
 		t.Fatal("expected secret-two to succeed after rotation")
 	}
-	if allowed, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-two"); !allowed {
+	if allowed, _, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-two"); !allowed {
 		t.Fatal("expected cached secret-two to succeed")
 	}
 	if got := compareCalls.Load(); got != 3 {
@@ -417,7 +417,7 @@ func TestAuthenticateManagementKey_InvalidatesCacheOnSecretChangeAndRemoval(t *t
 			SecretKey: string(hash1),
 		},
 	})
-	if allowed, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-one"); !allowed {
+	if allowed, _, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-one"); !allowed {
 		t.Fatal("expected secret-one to succeed after rotating back")
 	}
 	if got := compareCalls.Load(); got != 4 {
@@ -432,13 +432,13 @@ func TestAuthenticateManagementKey_InvalidatesCacheOnSecretChangeAndRemoval(t *t
 		},
 	}
 	h.mu.Unlock()
-	if allowed, statusCode, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-one"); allowed || statusCode != http.StatusUnauthorized {
+	if allowed, statusCode, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-one"); allowed || statusCode != http.StatusUnauthorized {
 		t.Fatalf("stale secret-one after direct cfg swap = (%v, %d), want (false, 401)", allowed, statusCode)
 	}
 
 	// Clearing secret-key denies further requests immediately.
 	h.SetConfig(&config.Config{})
-	allowed, statusCode, errMsg := h.AuthenticateManagementKey("127.0.0.1", true, "secret-two")
+	allowed, statusCode, errMsg, _ := h.AuthenticateManagementKey("127.0.0.1", true, "secret-two")
 	if allowed || statusCode != http.StatusForbidden || errMsg != "remote management key not set" {
 		t.Fatalf("auth after secret removal = (%v, %d, %q), want (false, 403, remote management key not set)", allowed, statusCode, errMsg)
 	}
@@ -481,14 +481,14 @@ func TestAuthenticateManagementKey_CoalescesConcurrentColdCacheLookups(t *testin
 		wg.Add(1)
 		go func(idx int) {
 			defer wg.Done()
-			allowed, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret")
+			allowed, _, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret")
 			results[idx] = allowed
 		}(i)
 	}
 
 	<-started
 	// A different/wrong secret runs independently without blocking on or succeeding from the valid lookup.
-	wrongAllowed, wrongStatus, _ := h.AuthenticateManagementKey("127.0.0.2", true, "wrong-secret")
+	wrongAllowed, wrongStatus, _, _ := h.AuthenticateManagementKey("127.0.0.2", true, "wrong-secret")
 	if wrongAllowed || wrongStatus != http.StatusUnauthorized {
 		t.Fatalf("concurrent wrong secret = (%v, %d), want (false, 401)", wrongAllowed, wrongStatus)
 	}
@@ -600,12 +600,12 @@ func BenchmarkAuthenticateManagementKey_Cached(b *testing.B) {
 		},
 		failedAttempts: make(map[string]*attemptInfo),
 	}
-	if allowed, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
+	if allowed, _, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
 		b.Fatal("warmup auth failed")
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if allowed, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
+		if allowed, _, _, _ := h.AuthenticateManagementKey("127.0.0.1", true, "test-secret"); !allowed {
 			b.Fatal("cached auth failed")
 		}
 	}
