@@ -7,11 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [v8.0.80] - 2026-11-18
+
+### Added (from upstream sync)
+
+- **Payload replace regex and path targets**: Payload replace rules accept regular
+  expressions and path targets, and now cover `system` and `developer` roles.
+- **Plugin executor usage attribution**: Plugins can optionally attribute usage to a
+  specific executor, and pluginhost exposes cache write TTL token counts in
+  `usage.handle`.
+- **GPT-6.2 Codex models**: Codex client catalog and OAuth model aliases updated for
+  the GPT-6.2 model family and the matching CLI version.
+- **Claude/Gemini tool result media relay**: Request translators now relay Gemini tool
+  result media, convert Claude text/content/URL document blocks, extract PDF documents
+  and media from Claude `tool_result` blocks, and infer PDF media types in Responses
+  translators.
+- **Nested `input_audio` for Codex**: OpenAI Chat to Codex translation emits nested
+  `input_audio` content parts.
+
 ### Fixed
 
 - **Antigravity Claude model verification budget**: Allocate the model's minimum
   thinking budget plus a small response allowance when verifying Antigravity
   models, preventing false incomplete-response failures on Claude thinking models.
+- **Local vs upstream error logging**: Request logging separates local errors from
+  upstream response bodies.
+- **Upstream merge conflicts**: Resolved conflicts in
+  `internal/runtime/executor/helps/usage_helpers.go` and its test by keeping
+  upstream's `sdk/pluginapi` import required by plugin executor usage attribution.
+
+### Preserved (fork-specific)
+
+- OAuth "Do Not Use Proxy" toggle, OAuth result modal, Live Flow feature, RESP error
+  on disabled management, TCP keep-alive on accepted connections, 30s version-check
+  timeout, `access.api-key-names` v8 mapping, and the fork compose image default.
 
 ---
 ## [v8.0.48] - 2026-10-30

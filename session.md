@@ -1,82 +1,74 @@
-# Session: Test Credential Models Feature
+# Session: Upstream Sync and v8.0.80 Release
 
-**Date:** 2026-11-17
-**Status:** Original feature merged; Antigravity verification budget fix validated
+**Date:** 2026-11-18
+**Status:** `upstream/main` merged into `dev`; Git Flow release `8.0.80` prepared
 
-## Follow-up: Antigravity Claude verification budget
+## Objective
 
-- The reported incomplete verification is limited to Antigravity Claude 4.6
-  thinking models, whose static model metadata requires at least 1,024 thinking
-  tokens while VerifyInference only reserved 16 total output tokens.
-- The isolated fix branch derives Antigravity verification output allowance
-  from the model's minimum thinking budget plus a small reply allowance, capped
-  by the model's maximum completion tokens. Other providers retain the 16-token
-  floor.
-- Regression coverage checks both reported model IDs, an end-to-end manager
-  verification request, and unchanged Codex/generic budgets.
-- `go test ./sdk/cliproxy/auth -count=1` passes.
-- `go test ./internal/runtime/executor ./internal/thinking/... -run 'TestAntigravity|Test.*Thinking' -count=1` passes.
-- `go build -o /tmp/cliproxyapi-antigravity-verify ./cmd/server` passes.
-- `git diff --check` passes. Root dev's pre-existing Dockerfile and cpauk changes
-  remain untouched.
+Synchronize `upstream/main` (`router-for-me/CLIProxyAPI`) into the fork's `dev`
+branch, preserve all fork-specific features, then finalize a Git Flow release
+into `main` per `docs/merge-upstream.md`.
 
-## Objective and work split
+## Upstream reference
 
-Implement per-model auth-file credential verification through the existing v8
-credential-pinned verifier. Frontend work is on
-`feature/test-credential-models-frontend`; documentation, merge preservation,
-and the generated root management asset are on
-`feature/test-credential-models-docs`. Both root branches originate from
-`main` commit `3b1c7a688222fefbd51c6099f35ffed1b7d34fd0`. Both are integrated
-into local `main`; no remote push was performed.
+- `upstream/main` = `a5e8f69e56309e1ef6d6872e667da81fdfbce2ce`
+  (`feat(codex): add GPT-6.2 models and update CLI version`).
+- 17 upstream commits merged; 105 files changed (+9182 / -838).
 
-## Decisions and discoveries
+## Merge result
 
-- The backend already exposes `POST /v8/management/credentials/verify` and
-  applies `SanitizeRenewalMessage`; no backend implementation change was needed.
-- The frontend sends selected credential filename and exact model ID. Results
-  are modal-local, per-model state and clear when credentials switch or the
-  modal closes. The button stops row click propagation to preserve copy.
-- Verification performs a real minimal inference and can consume upstream
-  quota; the UI makes no claim that this is a passive or zero-cost probe.
-- Local roadmap planning files are ignored by Git and absent from `main`;
-  they were left untouched. The feature has been documented in tracked
-  `docs/MERGE-PRESERVATION.md` and this session file.
-- The required root `SCHEMA.md` was absent and is now added.
+- Merge commit `9cfc242baca0b68b0a4f6b9b6812fd16235830ce` on `dev`.
+- Conflicts (2, both trivial import conflicts):
+  - `internal/runtime/executor/helps/usage_helpers.go`
+  - `internal/runtime/executor/helps/usage_helpers_test.go`
+  - Resolution: kept upstream's `sdk/pluginapi` import, required by the new
+    `ApplyPluginExecutorAttribution` path. No fork behavior was involved.
+- No submodule pointer, `static/management.html`, compose, or `config.yaml`
+  changes were introduced by the merge.
+
+## Preservation verification (all pass)
+
+- RESP error before close: 2 hits in `internal/api/redis_queue_protocol.go`.
+- TCP keep-alive: 3 hits in `internal/api/protocol_multiplexer.go`.
+- Version-check timeout 30s: present in `config_basic.go`.
+- `oauthProxyOverride`: helper present; the active v8 path uses it through
+  `oauthSessionProxyURLFromContext` (`auth_files_v8.go`). The legacy
+  `/v0/management` handlers remain single-argument, unchanged before and after
+  the merge (deprecated endpoints).
+- `access.api-key-names` v8 mapping + `pruneV8APIKeyNames`: present.
+- Live Flow: 5 `internal/api/flowviz*.go` files, `CPAForkLiveFlowEnabled` in
+  config and `server.go`.
+- Fork compose image `ghcr.io/blackhiden/cliproxyapi:latest` in both compose files.
+- Served bundle contains `Management Center Info`, `do_not_use_proxy`, and
+  `oauth-result-modal`.
 
 ## Validation
 
-- `bun test tests/managementV8Api.test.ts`: 14 pass.
-- `bun run type-check`: pass.
-- `bun run lint`: exit 0; four existing warnings in unrelated tests.
-- `bun run build`: pass; the built single-file artifact includes Test Model UI.
-- `bun run verify`: the focused feature tests, lint, type-check, and build pass;
-  the full suite has 2388 pass, 1 todo, and 18 pre-existing failures in locale
-  completeness, LoginRevealVeil, and visual-config rebase suites.
-- Backend targeted tests pass: `internal/api/handlers/management` and
-  `sdk/cliproxy/auth`. The required server build also passes.
+- `go build -o /tmp/cpa-merge-build ./cmd/server`: pass.
+- `go test ./... -count=1`: 103 packages ok, 2 failures:
+  - `TestModelsWithClientVersionReturnsCodexCatalog` (`internal/api`) — reproduced
+    identically on a pristine `upstream/main` worktree, so it is an upstream
+    regression (catalog ships empty `service_tiers` for `gpt-5.5` while the test
+    expects one priority tier). Not caused by this merge; left untouched.
+  - `TestHubExchange_ManyToManyFullDuplexMultiplexing` (`internal/wstunnel`) —
+    flaky timing assertion; passes on rerun and on repeated package runs.
+    `internal/wstunnel` was not touched by upstream.
+- Fork-specific tests pass: flowviz/redis-protocol/oauth-proxy (`internal/api`),
+  v8 API-key-name and Live Flow normalization (`internal/config`), and
+  `TestOAuthProxyOverride`/`TestConfigV8SaveAPIKeyNames` (management handlers).
+- `gofmt -l` reports 321 pre-existing files (trailing blank lines before closing
+  parens/braces) that predate this merge; the two resolved files are clean.
+  Repo-wide reformatting was intentionally not performed (scope discipline).
 
-## Integration result
+## Release
 
-- Root asset/preservation checks pass. The docs branch has an uncommitted,
-  pre-existing `cpauk` submodule checkout mismatch from initialization; it was
-  not staged or changed.
-- The frontend and documentation feature branches were merged in a temporary
-  integration worktree from shared base `3b1c7a688222fefbd51c6099f35ffed1b7d34fd0`.
-  Local `main` was fast-forwarded to `961b94af25429c0e39ad33cb87aebd5ebad314ca`.
-- A final continuity update was committed on local `main` as
-  `f8eee9dd31f3d104d1b8eed308c5ab06aa3daa8d`.
-- Integration reruns passed: frontend API contract tests (14), frontend type
-  check and build, root server build, and generated-asset/preservation checks.
-- No remote push was performed. Feature branches and their worktrees remain
-  intact. The uncommitted `cpauk` worktree mismatch is preserved and excluded
-  from all commits.
+- Previous latest tag: `v8.0.79`; next version derived automatically: `8.0.80`
+  (git-flow `versiontag` prefix `v` produces tag `v8.0.80`).
+- Release branch: `release/8.0.80`, started from `dev`.
+- `CHANGELOG.md` gained a `[v8.0.80]` section; `[Unreleased]` is now empty.
 
-## Git Flow release
+## Known issues
 
-- Release preparation started from local `dev` using Git Flow release branch
-  `release/8.0.79`.
-- The latest numeric release tag was `v8.0.78`; the calculated next tag is
-  `v8.0.79`.
-- No files were staged before release preparation. The unrelated `cpauk`
-  submodule checkout mismatch remains preserved and excluded.
+- Upstream `TestModelsWithClientVersionReturnsCodexCatalog` failure (see above)
+  will also affect `main` after the release; it is an upstream defect.
+- `internal/wstunnel` hub-exchange test is timing-flaky under load.
