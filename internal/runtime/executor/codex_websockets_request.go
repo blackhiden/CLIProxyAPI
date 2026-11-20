@@ -19,6 +19,18 @@ import (
 
 )
 
+func (e *CodexWebsocketsExecutor) prepareSessionInstructions(ctx context.Context, doc *ojson.Doc, auth *cliproxyauth.Auth, req cliproxyexecutor.Request, opts cliproxyexecutor.Options, sess *codexWebsocketSession, wsURL string, useSIWC bool) (helps.CodexInstructionTurn, error) {
+	if sess == nil || opts.SourceFormat != sdktranslator.FormatOpenAIResponse {
+		return helps.PrepareCodexSessionInstructions(ctx, doc, req, opts, nil, nil, false)
+	}
+	authID := ""
+	if auth != nil {
+		authID = auth.ID
+	}
+	conn, _ := existingWebsocketSessionConn(sess, authID, wsURL, executionProxyURL(ctx, sess.effectiveConfig(authID, e.cfg), auth), useSIWC)
+	return helps.PrepareCodexSessionInstructions(ctx, doc, req, opts, &sess.sessionInstructions, conn, false)
+}
+
 func applyCodexPromptCacheHeaders(from sdktranslator.Format, req cliproxyexecutor.Request, rawJSON []byte) ([]byte, http.Header) {
 	body, headers, _ := applyCodexPromptCacheHeadersWithContext(context.Background(), from, req, rawJSON)
 	return body, headers
