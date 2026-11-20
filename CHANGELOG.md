@@ -9,6 +9,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v8.0.81] - 2026-11-20
+
+### Added (from upstream sync)
+
+- **Codex session instructions**: Manage session instructions across requests and
+  convert Interactions system instructions to developer messages.
+- **Home-backed Codex continuity**: Enable Home-backed Codex continuity through
+  the scheduler and conductor integration.
+- **Gemini 4 Neon XHigh**: Add the model registry entry for Gemini 4 Neon XHigh.
+- **Configurable Claude OAuth scope**: Add `oauth-include-create-api-key` to
+  control the `org:create_api_key` scope during Claude OAuth logins.
+- **Plugin response intercept kind**: Add an explicit `Kind` field to
+  `ResponseInterceptRequest` and update plugin API usage types.
+- **Antigravity maintenance**: Update Hub changelists to 2.33.0, pin unmapped
+  versions, and enforce HTTP/1.1 without ALPN in model probes.
+
+### Fixed
+
+- **Codex tool schemas**: Strip the `uniqueItems` keyword from tool parameter
+  schemas.
+- **Interactions translation**: Reassemble streamed function arguments, preserve
+  complete Interactions calls in Gemini streams, and preserve non-string type
+  schemas when converting Gemini tools to Claude.
+- **Claude OAuth refresh**: Defer OAuth token refresh during macOS maintenance
+  wakes.
+- **v8 configuration migration**: Emit migration warnings only when the migrated
+  configuration is persisted.
+- **Pluginhost tests**: Move reload test constructors out of the cgo preamble.
+
+### Upstream merge conflicts
+
+- `internal/config/config_v8.go`: combined the fork's `pruneV8APIKeyNames`
+  preservation with upstream's `commented` archived-section tracking.
+- `internal/runtime/executor/codex_websockets_executor.go`: kept upstream's
+  `sdktranslator` import required by session-instruction marker handling.
+
+### Preserved (fork-specific)
+
+- OAuth "Do Not Use Proxy" toggle, OAuth result modal, Live Flow feature, RESP
+  error on disabled management, TCP keep-alive on accepted connections, 30s
+  version-check timeout, `access.api-key-names` v8 mapping, and the fork compose
+  image default. The local `cpauk` submodule pointer change was left untouched
+  and is not part of this release.
+
+---
+
 ## [v8.0.80] - 2026-11-18
 
 ### Added (from upstream sync)
