@@ -39,6 +39,55 @@ func TestIsV8ConfigLayout(t *testing.T) {
 	}
 }
 
+func TestV8SavePreservesRequestTimeoutPaths(t *testing.T) {
+	file := filepath.Join(t.TempDir(), "config.yaml")
+	raw := "config-version: 8\n" +
+		"requests:\n" +
+		"  request-timeout: \"10m\"\n" +
+		"  hard-request-deadline: \"30s\"\n" +
+		"upstream:\n" +
+		"  codex:\n" +
+		"    request-timeout: \"2m\"\n" +
+		"  claude:\n" +
+		"    hard-request-deadline: \"45s\"\n"
+	if err := os.WriteFile(file, []byte(raw), 0600); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := LoadConfig(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.RequestTimeout != "10m" || cfg.HardRequestDeadline != "30s" || cfg.CodexRequestTimeout != "2m" || cfg.ClaudeHardRequestDeadline != "45s" {
+		t.Fatalf("unexpected parsed values: %+v", cfg.SDKConfig)
+	}
+	if err = SaveConfigPreserveComments(file, cfg); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = ValidateV8Config(data); err != nil {
+		t.Fatalf("v8 save produced invalid layout: %v", err)
+	}
+	var doc yaml.Node
+	if err = yaml.Unmarshal(data, &doc); err != nil {
+		t.Fatal(err)
+	}
+	root := doc.Content[0]
+	for _, path := range []string{
+		"requests.request-timeout",
+		"requests.hard-request-deadline",
+		"upstream.codex.request-timeout",
+		"upstream.claude.hard-request-deadline",
+	} {
+		node := yamlPath(root, path)
+		if node == nil {
+			t.Fatalf("saved config lost %s", path)
+		}
+	}
+}
+
 func TestV0SaveUpgradesHistoricalV8Layout(t *testing.T) {
 	for _, version := range []string{"", "config-version: 8\n"} {
 		t.Run(version, func(t *testing.T) {

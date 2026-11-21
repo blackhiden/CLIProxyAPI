@@ -103,6 +103,32 @@ func BuildConfigChangeDetails(oldCfg, newCfg *config.Config) []string {
 	if oldCfg.NonStreamKeepAliveInterval != newCfg.NonStreamKeepAliveInterval {
 		changes = append(changes, fmt.Sprintf("nonstream-keepalive-interval: %d -> %d", oldCfg.NonStreamKeepAliveInterval, newCfg.NonStreamKeepAliveInterval))
 	}
+	if strings.TrimSpace(oldCfg.RequestTimeout) != strings.TrimSpace(newCfg.RequestTimeout) {
+		changes = append(changes, fmt.Sprintf("request-timeout: %s -> %s", displayOptionalValue(oldCfg.RequestTimeout), displayOptionalValue(newCfg.RequestTimeout)))
+	}
+	if strings.TrimSpace(oldCfg.HardRequestDeadline) != strings.TrimSpace(newCfg.HardRequestDeadline) {
+		changes = append(changes, fmt.Sprintf("hard-request-deadline: %s -> %s", displayOptionalValue(oldCfg.HardRequestDeadline), displayOptionalValue(newCfg.HardRequestDeadline)))
+	}
+	for _, override := range []struct {
+		name string
+		old  string
+		new  string
+	}{
+		{"codex.request-timeout", oldCfg.CodexRequestTimeout, newCfg.CodexRequestTimeout},
+		{"codex.hard-request-deadline", oldCfg.CodexHardRequestDeadline, newCfg.CodexHardRequestDeadline},
+		{"claude.request-timeout", oldCfg.ClaudeRequestTimeout, newCfg.ClaudeRequestTimeout},
+		{"claude.hard-request-deadline", oldCfg.ClaudeHardRequestDeadline, newCfg.ClaudeHardRequestDeadline},
+		{"xai.request-timeout", oldCfg.XAIRequestTimeout, newCfg.XAIRequestTimeout},
+		{"xai.hard-request-deadline", oldCfg.XAIHardRequestDeadline, newCfg.XAIHardRequestDeadline},
+		{"antigravity.request-timeout", oldCfg.AntigravityRequestTimeout, newCfg.AntigravityRequestTimeout},
+		{"antigravity.hard-request-deadline", oldCfg.AntigravityHardRequestDeadline, newCfg.AntigravityHardRequestDeadline},
+		{"devin.request-timeout", oldCfg.DevinRequestTimeout, newCfg.DevinRequestTimeout},
+		{"devin.hard-request-deadline", oldCfg.DevinHardRequestDeadline, newCfg.DevinHardRequestDeadline},
+	} {
+		if strings.TrimSpace(override.old) != strings.TrimSpace(override.new) {
+			changes = append(changes, fmt.Sprintf("%s: %s -> %s", override.name, displayOptionalValue(override.old), displayOptionalValue(override.new)))
+		}
+	}
 
 	// Quota-exceeded behavior
 	if oldCfg.QuotaExceeded.SwitchProject != newCfg.QuotaExceeded.SwitchProject {

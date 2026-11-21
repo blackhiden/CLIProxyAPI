@@ -153,6 +153,38 @@ func TestBuildConfigChangeDetails(t *testing.T) {
 	expectContains(t, details, "  provider updated: compat-a (models 1 -> 2)")
 }
 
+func TestBuildConfigChangeDetailsRequestTimeout(t *testing.T) {
+	oldCfg := &config.Config{}
+	newCfg := &config.Config{}
+	newCfg.RequestTimeout = "10m"
+	newCfg.HardRequestDeadline = "30s"
+	newCfg.CodexRequestTimeout = "2m"
+	newCfg.ClaudeHardRequestDeadline = "45s"
+
+	changes := BuildConfigChangeDetails(oldCfg, newCfg)
+	want := []string{
+		"request-timeout: <none> -> 10m",
+		"hard-request-deadline: <none> -> 30s",
+		"codex.request-timeout: <none> -> 2m",
+		"claude.hard-request-deadline: <none> -> 45s",
+	}
+	for _, item := range want {
+		found := false
+		for _, change := range changes {
+			if change == item {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("changes = %v, want to contain %q", changes, item)
+		}
+	}
+	if unchanged := BuildConfigChangeDetails(newCfg, newCfg); len(unchanged) != 0 {
+		t.Fatalf("unchanged request timeout produced changes: %v", unchanged)
+	}
+}
+
 func TestBuildConfigChangeDetails_NoChanges(t *testing.T) {
 	cfg := &config.Config{
 		Port: 8080,
