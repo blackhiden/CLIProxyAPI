@@ -1,3 +1,87 @@
+# Session: Upstream Sync and v8.1.1 Release
+
+**Date:** 2026-11-22
+**Status:** Git Flow release `8.1.1` finalized
+
+## Objective
+
+Synchronize `upstream/main` into the fork's `dev` branch, preserve all local features, and finalize
+a Git Flow release into `main` per `docs/merge-upstream.md`.
+
+## Upstream reference
+
+- `upstream/main` = `6960763455c4ac3d4828fb1736aa5de2183ccecf` (`v8.1.0`,
+  `feat(management): persist server identity and expose it to authenticated clients`).
+- 47 upstream commits; 728 files changed (+45,163 / -13,029) between the pre-merge `dev` head and
+  the upstream head.
+
+## Merge results
+
+- `upstream/main` → `dev`: merge commit `edc1cc22a`, parents `457620047` (pre-merge `dev`) and
+  `696076345` (upstream). Nine conflicts were resolved by combining both sides.
+- `main` → `dev`: merge commit `24b918844`. This extra merge was required because the local
+  request-timeout feature existed only on `main`; releasing from `dev` without it would leave `dev`
+  inconsistent with `main`. Three conflicts were resolved.
+- Follow-up commit `fced4c1d9` adapted the adversarial WebRTC test to upstream's `newMediaRelay`
+  constructor after the upstream removal of `newPionMediaRelay`.
+
+## Conflict resolutions
+
+- `.github/workflows/pr-test-build.yml`: kept both the fork's govulncheck step and upstream's
+  Solaris cross-build step.
+- `go.sum`: kept both testify versions and the fork's tidwall checksums.
+- `config_basic.go`: kept the fork's 30s timeout, fork release/commit URLs, and tolerant
+  version+commit response. Upstream's new error-response branch was not adopted because it
+  conflicts with the fork's intentional tolerant response; no tests depend on it.
+- `handler.go`: combined upstream's server-identity snapshot with the fork's actor audit log and
+  configurable `max-failed-attempts`/`ban-duration` settings.
+- `config_load.go`: adopted upstream's `sanitizeStartupConfig()` refactor and added
+  `NormalizeLiveFlowConfig()` there so the fork-only Live Flow compatibility survives all load
+  paths.
+- `config_v8.go`: kept both `pruneV8APIKeyNames()` and upstream's
+  `removeConflictingConfigPaths()`.
+- `config_yaml.go`: kept upstream's locked save path and restored `SanitizeAPIKeyNames()` before
+  rendering.
+- Import-only conflicts: kept upstream imports required by new code.
+- `conductor_execution.go`: used upstream's payload builder while preserving the Antigravity
+  thinking-model output budget through `verificationMaxOutputTokens()`.
+- `CHANGELOG.md`/`session.md`: kept both histories. `static/management.html`: took the `main`
+  bundle to match the preserved frontend pointer.
+
+## Preservation verification (all pass)
+
+- RESP error before close, TCP keep-alive, 30s version-check timeout, `oauthProxyOverride`,
+  `access.api-key-names` mapping and pruning, Live Flow config/server/route, fork compose image,
+  request-timeout config paths, and served bundle markers (`Request Timeout`, `do_not_use_proxy`,
+  `oauth-result-modal`) are present.
+- Submodule pointers: `frontend` `7ecfb8a9`, `cpauk` `bfc1f5a1`.
+
+## Validation
+
+- `go build -o /tmp/cpa-merge-check ./cmd/server`: pass.
+- Targeted Go suites (config, watcher diff, SDK handlers/auth, management handlers, internal API,
+  Live Flow media): all pass.
+- Frontend targeted tests: 80 pass, 0 fail; `bun run type-check`: pass.
+- Full `go test ./... -count=1 -p 4`: fails only in watcher/service tests with inotify `no space
+  left on device`; the same failures reproduce on the pre-merge `main` baseline, so they are
+  environmental rather than merge regressions.
+
+## Release
+
+- Previous latest tag: `v8.1.0`; next version derived automatically: `8.1.1` (git-flow
+  `versiontag` prefix `v` produces `v8.1.1`).
+- Release branch: `release/8.1.1`, started from `dev`.
+- `CHANGELOG.md` gained a `[v8.1.1]` section; `[Unreleased]` is empty.
+
+## Known issues / discrepancies
+
+- Upstream's `config_basic.go` error-response branch was intentionally not adopted because it
+  conflicts with the fork's tolerant version-check contract.
+- Full-suite watcher/service failures are environmental (inotify ENOSPC) and pre-existing.
+
+---
+
+
 # Session: Fix False Update Available Notification
 
 **Date:** 2026-11-21

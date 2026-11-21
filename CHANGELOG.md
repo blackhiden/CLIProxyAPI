@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [v8.1.1] - 2026-11-22
+
+### Added (from upstream sync)
+
+- **Server identity persistence**: The server now persists a stable identity and exposes it to
+  authenticated management clients through the v8 identity header/context path.
+- **Copilot execution support**: Home-dispatched Copilot execution, preset-based in-memory
+  catalogs, refresh handling, and model-fetch tooling were added.
+- **Antigravity hardening**: Retry-After fallback, TOS pause windows, Host/custom auth headers,
+  version updater lifecycle wiring, capability-hint freshness, credential filtering, and
+  structured-output model matching.
+- **Auth and translator fixes**: Active plugin scheduler checks in affinity lookup, mixed legacy
+  provider-key normalization, terminal 401 state preservation, Devin reasoning preservation, and
+  Claude native helper preservation on custom base URLs.
+
 ### Added
 
 - **Configurable request timeout**: `requests.request-timeout` is a soft
@@ -21,6 +38,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **False update notification**: The management UI now opens the update modal only when the
   upstream semantic version is newer than the running server version. Differing commit hashes no
   longer report an update when the local fork is already ahead of the upstream release.
+- **Upstream merge conflicts**: Combined upstream server-identity snapshot handling with the
+  fork's actor audit log and configurable management ban settings; kept both upstream config-path
+  conflict removal and fork API-key-name pruning; preserved the Antigravity verification thinking
+  budget through the upstream payload builder; kept both CI vulnerability scanning and Solaris
+  cross-build steps.
+- **Media relay regression test**: Adapted the adversarial WebRTC test to the upstream
+  `newMediaRelay` constructor.
+
+### Upstream merge
+
+- Merged `upstream/main` at `696076345` (`v8.1.0`) into `dev`: 47 commits, 728 files changed
+  (+45,163 / -13,029). Nine conflicts were resolved by combining both sides.
+- Merged `main` into `dev` afterward to retain the local request-timeout feature and its frontend
+  pointer; three conflicts were resolved by keeping both changelog/session histories and taking
+  the `main` generated management bundle.
+
+### Preserved (fork-specific)
+
+- OAuth "Do Not Use Proxy" toggle, OAuth result modal, Live Flow feature and `/live-flow/ws`
+  route, RESP error on disabled management, TCP keep-alive, 30s version-check timeout,
+  `access.api-key-names` v8 mapping, per-model credential verification, configurable request
+  timeout, false-update-notification fix, and the fork compose image default. Submodule pointers
+  remain `frontend` `7ecfb8a9` and `cpauk` `bfc1f5a1`.
+
+### Validation
+
+- Server build passed; targeted Go suites passed for config, watcher diff, API handlers, SDK
+  handlers/auth, management handlers, Live Flow media, and internal API.
+- Frontend targeted tests passed (80 pass, 0 fail) and `bun run type-check` passed.
+- Full `go test ./...` still reports pre-existing inotify/ENOSPC failures in watcher/service
+  tests; the same failures reproduce on the pre-merge `main` baseline.
 
 ---
 
