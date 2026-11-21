@@ -223,7 +223,7 @@ func (h *Handler) isStaleConfigFileSnapshotLocked(cfg *config.Config) bool {
 	if cfg == nil || cfg.SourceHash == "" || h.configFilePath == "" {
 		return false
 	}
-	data, errRead := os.ReadFile(h.configFilePath)
+	data, errRead := config.ReadConfigFile(h.configFilePath)
 	if errRead != nil {
 		return false
 	}
@@ -390,10 +390,16 @@ func (h *Handler) Middleware() gin.HandlerFunc {
 			provided = c.GetHeader("X-Management-Key")
 		}
 
-		allowed, statusCode, errMsg, actor := h.AuthenticateManagementKey(clientIP, localClient, provided)
+		snapshot := h.managementAuthSnapshot()
+		allowed, statusCode, errMsg, actor := h.authenticateManagementKey(snapshot, clientIP, localClient, provided)
 		if !allowed {
 			c.AbortWithStatusJSON(statusCode, gin.H{"error": errMsg})
 			return
+		}
+		if c.Request.Method != http.MethodOptions {
+			setHeader := func(id string) { c.Header(ServerIDHeader, id) }
+			setHeader(snapshot.serverID)
+			c.Set(managementIdentityKey, managementIdentity{id: snapshot.serverID, setHeader: setHeader})
 		}
 		c.Next()
 
@@ -426,35 +432,56 @@ func isMutationMethod(method string) bool {
 	}
 }
 
+type managementAuthConfig struct {
+	allowRemote bool
+	secretHash  string
+	serverID    string
+	maxFailures int
+	banDuration time.Duration
+}
+
+func (h *Handler) managementAuthSnapshot() managementAuthConfig {
+	if h == nil {
+		return managementAuthConfig{}
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.cfg == nil {
+		return managementAuthConfig{}
+	}
+	return managementAuthConfig{
+		allowRemote: h.cfg.RemoteManagement.AllowRemote,
+		secretHash:  h.cfg.RemoteManagement.SecretKey,
+		serverID:    h.cfg.ServerID,
+		maxFailures: h.cfg.RemoteManagement.MaxFailures(),
+		banDuration: h.cfg.RemoteManagement.BanWindow(),
+	}
+}
+
 // AuthenticateManagementKey verifies the provided management key for the given client.
 // It mirrors the behaviour of Middleware() so non-HTTP callers can reuse the same logic.
 // The returned actor identifies which credential authenticated the request:
 // "local" (local password), "env" (MANAGEMENT_PASSWORD), or a pseudonymous
 // 8-character prefix of the bcrypt-hashed config secret-key. It is empty on failure.
 func (h *Handler) AuthenticateManagementKey(clientIP string, localClient bool, provided string) (bool, int, string, string) {
-	maxFailures := 5
-	banDuration := 30 * time.Minute
+	return h.authenticateManagementKey(h.managementAuthSnapshot(), clientIP, localClient, provided)
+}
+
+func (h *Handler) authenticateManagementKey(cfg managementAuthConfig, clientIP string, localClient bool, provided string) (bool, int, string, string) {
+	maxFailures := cfg.maxFailures
+	if maxFailures <= 0 {
+		maxFailures = 5
+	}
+	banDuration := cfg.banDuration
+	if banDuration <= 0 {
+		banDuration = 30 * time.Minute
+	}
 
 	if h == nil {
 		return false, http.StatusForbidden, "remote management disabled", ""
 	}
-
-	h.mu.Lock()
-	cfg := h.cfg
-	var (
-		allowRemote bool
-		secretHash  string
-	)
-	if cfg != nil {
-		allowRemote = cfg.RemoteManagement.AllowRemote
-		secretHash = cfg.RemoteManagement.SecretKey
-		maxFailures = cfg.RemoteManagement.MaxFailures()
-		banDuration = cfg.RemoteManagement.BanWindow()
-	}
-	h.mu.Unlock()
-	if h.allowRemoteOverride {
-		allowRemote = true
-	}
+	allowRemote := cfg.allowRemote || h.allowRemoteOverride
+	secretHash := cfg.secretHash
 	envSecret := h.envSecret
 
 	now := time.Now()
