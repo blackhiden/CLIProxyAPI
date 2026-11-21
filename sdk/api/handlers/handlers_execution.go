@@ -35,6 +35,19 @@ type pluginExecutorAttributionHost interface {
 	ExecutePluginExecutorStreamWithAttribution(context.Context, string, coreexecutor.Request, coreexecutor.Options) (*coreexecutor.StreamResult, *pluginapi.UsageAttribution, error)
 }
 
+// withHardRequestDeadline applies the opt-in hard deadline to non-streaming
+// execution. The soft request-timeout budget never reaches this helper.
+func (h *BaseAPIHandler) withHardRequestDeadline(ctx context.Context, providers []string) (context.Context, context.CancelFunc) {
+	if h == nil || ctx == nil {
+		return ctx, func() {}
+	}
+	deadline := h.CurrentConfig().HardRequestDeadlineDurationForProvider(firstRequestProvider(providers))
+	if deadline <= 0 {
+		return ctx, func() {}
+	}
+	return context.WithTimeout(ctx, deadline)
+}
+
 // ExecuteWithAuthManager executes a non-streaming request via the core auth manager.
 // This path is the only supported execution route.
 func (h *BaseAPIHandler) ExecuteWithAuthManager(ctx context.Context, handlerType, modelName string, rawJSON []byte, alt string) ([]byte, http.Header, *interfaces.ErrorMessage) {
@@ -67,6 +80,8 @@ func (h *BaseAPIHandler) executeWithAuthManagerFormats(ctx context.Context, entr
 		return nil, nil, errMsg
 	}
 	providers = adjustExecutionProvidersForEntryProtocol(entryProtocol, providers)
+	ctx, cancelHardDeadline := h.withHardRequestDeadline(ctx, providers)
+	defer cancelHardDeadline()
 	reqMeta := requestExecutionMetadata(ctx)
 	if execOptions.Path != "" {
 		reqMeta[coreexecutor.RequestPathMetadataKey] = execOptions.Path
@@ -147,6 +162,8 @@ func (h *BaseAPIHandler) executeCountWithAuthManager(ctx context.Context, handle
 		return nil, nil, errMsg
 	}
 	providers = adjustExecutionProvidersForEntryProtocol(handlerType, providers)
+	ctx, cancelHardDeadline := h.withHardRequestDeadline(ctx, providers)
+	defer cancelHardDeadline()
 	reqMeta := requestExecutionMetadata(ctx)
 	addCallerScopeMetadata(reqMeta, execOptions.CallerScope)
 	reqMeta[coreexecutor.RequestedModelMetadataKey] = originalRequestedModel

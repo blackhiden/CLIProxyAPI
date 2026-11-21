@@ -8,10 +8,52 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/router-for-me/CLIProxyAPI/v8/internal/interfaces"
 	coreexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 )
 
 const continuityWaitSignalContextKey = "_cpa_continuity_wait_signal"
+
+var requestTimeoutNow = time.Now
+
+// withStreamingBootstrapDeadline bounds only the pre-first-token bootstrap when an
+// explicit hard deadline is configured. The timer is stopped as soon as bootstrap
+// returns so an established stream is never cancelled by this feature.
+func withStreamingBootstrapDeadline(ctx context.Context, cfg *config.SDKConfig) (context.Context, func()) {
+	if ctx == nil || cfg == nil {
+		return ctx, func() {}
+	}
+	deadline := cfg.HardRequestDeadlineDuration()
+	if deadline <= 0 {
+		return ctx, func() {}
+	}
+	deadlineCtx, cancel := context.WithCancel(ctx)
+	timer := time.AfterFunc(deadline, cancel)
+	return deadlineCtx, func() { timer.Stop() }
+}
+
+// logRequestBudgetExceeded emits one non-fatal diagnostic when a soft budget is
+// exceeded. It never cancels the request or mutates the response.
+func logRequestBudgetExceeded(cfg *config.SDKConfig, handlerType, modelName string, start time.Time) {
+	if cfg == nil {
+		return
+	}
+	budget := cfg.RequestTimeoutDuration()
+	if budget <= 0 {
+		return
+	}
+	elapsed := requestTimeoutNow().Sub(start)
+	if elapsed <= budget {
+		return
+	}
+	log.WithFields(log.Fields{
+		"handler_type": handlerType,
+		"model":        modelName,
+		"budget":       budget.String(),
+		"elapsed":      elapsed.String(),
+	}).Warn("request timeout budget exceeded")
+}
 
 type continuityWaitSignal struct {
 	mu          sync.Mutex
@@ -156,9 +198,26 @@ func (h *BaseAPIHandler) ExecuteStreamWithPreFTKeepAlive(
 	keepAliveC <-chan time.Time,
 	writeKeepAlive func() bool,
 ) (<-chan []byte, http.Header, <-chan *interfaces.ErrorMessage, bool) {
+	cfg := h.CurrentConfig()
+	start := requestTimeoutNow()
+	budgetLogged := false
+	maybeLogBudget := func() {
+		if budgetLogged || cfg == nil || cfg.RequestTimeoutDuration() <= 0 {
+			return
+		}
+		if requestTimeoutNow().Sub(start) <= cfg.RequestTimeoutDuration() {
+			return
+		}
+		budgetLogged = true
+		logRequestBudgetExceeded(cfg, handlerType, modelName, start)
+	}
+	bootstrapCtx, stopBootstrapDeadline := withStreamingBootstrapDeadline(cliCtx, cfg)
+	defer stopBootstrapDeadline()
+
 	waitOnlyKeepAlive := keepAliveC == nil && alt == "" && writeKeepAlive != nil && h != nil && h.HasSchedulerContinuity()
 	if keepAliveC == nil && !waitOnlyKeepAlive {
-		dataChan, upstreamHeaders, errChan := h.ExecuteStreamWithAuthManager(cliCtx, handlerType, modelName, rawJSON, alt)
+		dataChan, upstreamHeaders, errChan := h.ExecuteStreamWithAuthManager(bootstrapCtx, handlerType, modelName, rawJSON, alt)
+		maybeLogBudget()
 		return dataChan, upstreamHeaders, errChan, true
 	}
 
@@ -173,7 +232,7 @@ func (h *BaseAPIHandler) ExecuteStreamWithPreFTKeepAlive(
 		waitSignal = newContinuityWaitSignal()
 		waitNotify = waitSignal.notify
 		c.Set(continuityWaitSignalContextKey, waitSignal)
-		cliCtx = coreexecutor.WithContinuityWaitObserver(cliCtx, waitSignal)
+		bootstrapCtx = coreexecutor.WithContinuityWaitObserver(bootstrapCtx, waitSignal)
 	}
 
 	type streamBootstrapResult struct {
@@ -183,7 +242,7 @@ func (h *BaseAPIHandler) ExecuteStreamWithPreFTKeepAlive(
 	}
 	bootstrapResult := make(chan streamBootstrapResult, 1)
 	go func() {
-		data, headers, errs := h.ExecuteStreamWithAuthManager(cliCtx, handlerType, modelName, rawJSON, alt)
+		data, headers, errs := h.ExecuteStreamWithAuthManager(bootstrapCtx, handlerType, modelName, rawJSON, alt)
 		bootstrapResult <- streamBootstrapResult{data: data, headers: headers, errs: errs}
 	}()
 
@@ -196,11 +255,12 @@ func (h *BaseAPIHandler) ExecuteStreamWithPreFTKeepAlive(
 			<-bootstrapResult
 			return nil, nil, nil, false
 		case result := <-bootstrapResult:
+			maybeLogBudget()
 			return result.data, result.headers, result.errs, true
 		case <-waitNotify:
 			if waitSignal != nil && waitSignal.isActive() {
 				if waitKeepAliveC == nil {
-					waitKeepAliveC, stopWaitKeepAlive = NewContinuityKeepAliveTicker(h.CurrentConfig())
+					waitKeepAliveC, stopWaitKeepAlive = NewContinuityKeepAliveTicker(cfg)
 				}
 			} else {
 				stopWaitKeepAlive()
@@ -208,6 +268,7 @@ func (h *BaseAPIHandler) ExecuteStreamWithPreFTKeepAlive(
 				stopWaitKeepAlive = func() {}
 			}
 		case <-waitKeepAliveC:
+			maybeLogBudget()
 			if waitSignal != nil && waitSignal.isActive() && writeKeepAlive != nil && !writeKeepAlive() {
 				if cliCancel != nil {
 					cliCancel(context.Canceled)
@@ -216,6 +277,7 @@ func (h *BaseAPIHandler) ExecuteStreamWithPreFTKeepAlive(
 				return nil, nil, nil, false
 			}
 		case <-keepAliveC:
+			maybeLogBudget()
 			if writeKeepAlive != nil && !writeKeepAlive() {
 				if cliCancel != nil {
 					cliCancel(context.Canceled)

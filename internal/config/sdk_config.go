@@ -112,6 +112,27 @@ type SDKConfig struct {
 	// NonStreamKeepAliveInterval controls how often blank lines are emitted for non-streaming responses.
 	// <= 0 disables keep-alives. Value is in seconds.
 	NonStreamKeepAliveInterval int `yaml:"nonstream-keepalive-interval,omitempty" json:"nonstream-keepalive-interval,omitempty"`
+
+	// RequestTimeout is a soft long-request budget. It enables downstream keep-alives
+	// and diagnostics but never cancels an inference request. "0" disables it.
+	RequestTimeout string `yaml:"request-timeout,omitempty" json:"request-timeout,omitempty"`
+
+	// HardRequestDeadline is an opt-in hard deadline for non-streaming execution and
+	// streaming bootstrap. "0" disables it and preserves existing behavior.
+	HardRequestDeadline string `yaml:"hard-request-deadline,omitempty" json:"hard-request-deadline,omitempty"`
+
+	// Provider-specific request timeout and hard deadline overrides. A positive
+	// provider value wins over the global value; otherwise the global value applies.
+	CodexRequestTimeout            string `yaml:"codex-request-timeout,omitempty" json:"codex-request-timeout,omitempty"`
+	CodexHardRequestDeadline       string `yaml:"codex-hard-request-deadline,omitempty" json:"codex-hard-request-deadline,omitempty"`
+	ClaudeRequestTimeout           string `yaml:"claude-request-timeout,omitempty" json:"claude-request-timeout,omitempty"`
+	ClaudeHardRequestDeadline      string `yaml:"claude-hard-request-deadline,omitempty" json:"claude-hard-request-deadline,omitempty"`
+	XAIRequestTimeout              string `yaml:"xai-request-timeout,omitempty" json:"xai-request-timeout,omitempty"`
+	XAIHardRequestDeadline         string `yaml:"xai-hard-request-deadline,omitempty" json:"xai-hard-request-deadline,omitempty"`
+	AntigravityRequestTimeout      string `yaml:"antigravity-request-timeout,omitempty" json:"antigravity-request-timeout,omitempty"`
+	AntigravityHardRequestDeadline string `yaml:"antigravity-hard-request-deadline,omitempty" json:"antigravity-hard-request-deadline,omitempty"`
+	DevinRequestTimeout            string `yaml:"devin-request-timeout,omitempty" json:"devin-request-timeout,omitempty"`
+	DevinHardRequestDeadline       string `yaml:"devin-hard-request-deadline,omitempty" json:"devin-hard-request-deadline,omitempty"`
 }
 
 // TLSHandshakeTimeout returns the configured upstream TLS handshake bound
@@ -126,6 +147,113 @@ func (c *SDKConfig) TLSHandshakeTimeout() time.Duration {
 		return time.Duration(math.MaxInt64)
 	}
 	return time.Duration(c.TLSHandshakeTimeoutSeconds) * time.Second
+}
+
+// ParseRequestDuration parses an operator-supplied request duration. Empty,
+// disabled spellings, invalid values, and negative values return 0. Bare
+// non-negative integers are interpreted as seconds and saturate on overflow.
+func ParseRequestDuration(raw string) time.Duration {
+	trimmed := strings.TrimSpace(raw)
+	if trimmed == "" || trimmed == "0" || trimmed == "0s" {
+		return 0
+	}
+	switch strings.ToLower(trimmed) {
+	case "none", "unlimited", "disabled", "off", "never":
+		return 0
+	}
+	if d, err := time.ParseDuration(trimmed); err == nil {
+		if d < 0 {
+			return 0
+		}
+		return d
+	}
+	seconds, err := strconv.ParseInt(trimmed, 10, 64)
+	if err != nil || seconds < 0 {
+		return 0
+	}
+	const maxSeconds = int64(math.MaxInt64) / int64(time.Second)
+	if seconds > maxSeconds {
+		return time.Duration(math.MaxInt64)
+	}
+	d := time.Duration(seconds) * time.Second
+	if d < 0 {
+		return time.Duration(math.MaxInt64)
+	}
+	return d
+}
+
+// RequestTimeoutDuration returns the global soft long-request budget.
+func (c *SDKConfig) RequestTimeoutDuration() time.Duration {
+	if c == nil {
+		return 0
+	}
+	return ParseRequestDuration(c.RequestTimeout)
+}
+
+// HardRequestDeadlineDuration returns the global opt-in hard deadline.
+func (c *SDKConfig) HardRequestDeadlineDuration() time.Duration {
+	if c == nil {
+		return 0
+	}
+	return ParseRequestDuration(c.HardRequestDeadline)
+}
+
+func (c *SDKConfig) providerRequestTimeout(provider string) string {
+	if c == nil {
+		return ""
+	}
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "codex", "openai", "openai-response":
+		return c.CodexRequestTimeout
+	case "claude", "anthropic":
+		return c.ClaudeRequestTimeout
+	case "xai", "grok":
+		return c.XAIRequestTimeout
+	case "antigravity":
+		return c.AntigravityRequestTimeout
+	case "devin", "cognition":
+		return c.DevinRequestTimeout
+	default:
+		return ""
+	}
+}
+
+func (c *SDKConfig) providerHardRequestDeadline(provider string) string {
+	if c == nil {
+		return ""
+	}
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "codex", "openai", "openai-response":
+		return c.CodexHardRequestDeadline
+	case "claude", "anthropic":
+		return c.ClaudeHardRequestDeadline
+	case "xai", "grok":
+		return c.XAIHardRequestDeadline
+	case "antigravity":
+		return c.AntigravityHardRequestDeadline
+	case "devin", "cognition":
+		return c.DevinHardRequestDeadline
+	default:
+		return ""
+	}
+}
+
+// RequestTimeoutDurationForProvider returns the provider override when positive,
+// otherwise the global soft budget.
+func (c *SDKConfig) RequestTimeoutDurationForProvider(provider string) time.Duration {
+	if d := ParseRequestDuration(c.providerRequestTimeout(provider)); d > 0 {
+		return d
+	}
+	return c.RequestTimeoutDuration()
+}
+
+// HardRequestDeadlineDurationForProvider returns the provider override when
+// positive, otherwise the global hard deadline.
+func (c *SDKConfig) HardRequestDeadlineDurationForProvider(provider string) time.Duration {
+	if d := ParseRequestDuration(c.providerHardRequestDeadline(provider)); d > 0 {
+		return d
+	}
+	return c.HardRequestDeadlineDuration()
 }
 
 // ClientConfig configures client-facing compatibility behavior.

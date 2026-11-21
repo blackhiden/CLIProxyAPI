@@ -28,6 +28,125 @@ upstream release (current `v8.0.82`, upstream `v8.0.60`, upstream commit `adf043
 
 ---
 
+# Session: Configurable Request Timeout
+
+**Date:** 2026-11-21
+**Status:** Merged into `main`; feature branches and worktrees retained pending explicit cleanup authorization
+
+## Integration into `main`
+
+All five feature branches were merged sequentially into `main` with
+`--no-ff`, in dependency order: config (`1298bddf6`), runtime (`146f9ae15`),
+frontend (`49c26fc41`), docs (`5b0467d03`), and integration (`c088d3d63`).
+No conflicts occurred. Final `main` commit before this session-note update:
+`c088d3d63`.
+
+Final regression: full `go test ./... -count=1 -p 4` passed (exit 0), server
+build passed, `git diff --check` passed, frontend targeted tests passed
+(71 pass, 0 fail), and frontend type-check passed. The frontend gitlink is
+`69bbb190` and `static/management.html` contains the new timeout labels.
+
+`ROADMAP.md` was not changed: the root roadmap states that completed work is
+recorded in `CHANGELOG.md`, which the docs branch updated. `docs/ROADMAP.md`
+exists only on `dev`, not on the `main` baseline.
+
+
+## Objective
+
+Implement the roadmap feature "Configurable Request Timeout" with the accepted
+recommendations: a soft long-request budget, an opt-in hard deadline, a dedicated
+management UI field, and per-provider overrides.
+
+## Baseline and worktrees
+
+All branches originate from `main` commit
+`10bb5ac65deca62b56f0618d3a9e239402ccd3e6`.
+
+| Task | Branch | Worktree | Commit |
+| ---- | ------ | -------- | ------ |
+| Config contract | `feature/request-timeout-config` | `/home/denny/Project/cpa/request-timeout-config` | `a23e4c161` |
+| Runtime behavior | `feature/request-timeout-runtime` | `/home/denny/Project/cpa/request-timeout-runtime` | `af7a85346` |
+| Frontend UI | `feature/request-timeout-frontend` | `/home/denny/Project/cpa/request-timeout-frontend` | `5663a5362` |
+| Frontend submodule | `feature/request-timeout-ui` | `frontend/` inside the frontend worktree | `69bbb190` |
+| Docs/preservation | `feature/request-timeout-docs` | `/home/denny/Project/cpa/request-timeout-docs` | `d7d3b7bdd` |
+| Integration | `feature/request-timeout-integration` | `/home/denny/Project/cpa/request-timeout-integration` | this integration commit |
+
+## Implemented contract
+
+- `requests.request-timeout` — soft budget; enables pre-first-token SSE and
+  non-streaming keepalives, derives `min(budget/3, 30s)` with a 1s floor when no
+  explicit interval is set, and logs one non-fatal budget-exceeded event. It
+  never cancels a request.
+- `requests.hard-request-deadline` — opt-in deadline for non-streaming execution
+  and streaming bootstrap only; never cancels an established stream.
+- Per-provider overrides under `upstream.<provider>.request-timeout` and
+  `upstream.<provider>.hard-request-deadline` for codex, claude, xai,
+  antigravity, and devin. Positive provider values win over global values.
+- Duration parser accepts Go duration strings, bare integer seconds, and
+  disabled spellings; invalid/negative values yield 0 and overflow saturates.
+- v8 path mappings, hot-reload diff entries, config template, changelog,
+  preservation item 14 / section 3.14, and the explicit timeout-policy exception
+  are included.
+
+## Validation
+
+All commands passed in the integration worktree:
+
+```bash
+gofmt -l internal/config internal/watcher/diff sdk/api/handlers/*.go
+go test ./internal/config ./internal/watcher/diff ./sdk/api/handlers/... ./internal/api/handlers/management -count=1
+go build -o /tmp/cliproxyapi-request-timeout-check ./cmd/server && rm /tmp/cliproxyapi-request-timeout-check
+git diff --check
+cd frontend && bun test tests/configFieldParity.test.ts tests/visualConfigAdditions.test.ts && bun run type-check
+```
+
+Frontend targeted tests: 71 pass, 0 fail. Go packages: all pass. The full
+`go test ./... -count=1 -p 4` suite also passed (exit 0). Server build: pass.
+`static/management.html` was rebuilt from frontend commit `69bbb190` and
+contains the new labels.
+
+## Known limitations
+
+- The streaming hard deadline bounds only the pre-first-token bootstrap; it does
+  not cancel an established stream.
+- Keepalive ticker creation happens before provider selection, so the derived
+  keepalive interval uses the global budget. Per-provider overrides affect the
+  budget diagnostic and the non-streaming hard deadline.
+- External Nginx/Cloudflare/client read timeouts are outside this process and
+  must be raised by operators.
+- `docs/ROADMAP.md` and `docs/roadmap-worktree.md` exist on `dev` but not on the
+  `main` baseline, so they were not modified in the feature branches.
+
+## Review and merge instructions
+
+Do not merge until explicitly approved. Suggested order:
+
+```bash
+git checkout dev
+git merge --no-ff feature/request-timeout-config
+git merge --no-ff feature/request-timeout-runtime
+git merge --no-ff feature/request-timeout-frontend
+git merge --no-ff feature/request-timeout-docs
+git merge --no-ff feature/request-timeout-integration
+```
+
+After merging, rerun the validation commands above and confirm the frontend
+gitlink points at a commit containing `69bbb190`.
+
+## Cleanup instructions (only after explicit approval)
+
+```bash
+git worktree remove /home/denny/Project/cpa/request-timeout-config
+git worktree remove /home/denny/Project/cpa/request-timeout-runtime
+git worktree remove /home/denny/Project/cpa/request-timeout-frontend
+git worktree remove /home/denny/Project/cpa/request-timeout-docs
+git worktree remove /home/denny/Project/cpa/request-timeout-integration
+git branch -d feature/request-timeout-config feature/request-timeout-runtime feature/request-timeout-frontend feature/request-timeout-docs feature/request-timeout-integration
+```
+
+---
+
+
 # Session: Upstream Sync and v8.0.82 Release
 
 **Date:** 2026-11-21

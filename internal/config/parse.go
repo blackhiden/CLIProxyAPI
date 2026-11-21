@@ -159,6 +159,8 @@ func validateStartupConfig(data []byte, optional bool) (*startupConfig, error) {
 
 func (cfg *Config) sanitizeStartupConfig() {
 	// Apply the same sanitization pipeline.
+	// FORK-ONLY: Normalize Live Flow config for backward compatibility.
+	cfg.NormalizeLiveFlowConfig()
 	cfg.SanitizeAPIKeyNames()
 	cfg.SanitizeGeminiKeys()
 	cfg.SanitizeInteractionsKeys()
