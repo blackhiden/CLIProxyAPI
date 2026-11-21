@@ -54,9 +54,9 @@ func TestNewSessionAdversarialClientOffers(t *testing.T) {
 
 	for name, testCase := range tests {
 		t.Run(name, func(t *testing.T) {
-			relay, errRelay := newPionMediaRelay(config.CodexLiveMediaRelayConfig{
+			relay, errRelay := newMediaRelay(config.CodexLiveMediaRelayConfig{
 				Enabled: true,
-			})
+			}, nil)
 			if errRelay != nil {
 				t.Fatalf("create media relay: %v", errRelay)
 			}
@@ -100,9 +100,9 @@ func TestAcceptUpstreamAnswerAdversarialAnswers(t *testing.T) {
 			}
 			clientOffer := completeOffer(t, client)
 
-			relay, errRelay := newPionMediaRelay(config.CodexLiveMediaRelayConfig{
+			relay, errRelay := newMediaRelay(config.CodexLiveMediaRelayConfig{
 				Enabled: true,
-			})
+			}, nil)
 			if errRelay != nil {
 				t.Fatalf("create media relay: %v", errRelay)
 			}
@@ -142,10 +142,10 @@ func TestNewSessionAdversarialPrivateIPFiltering(t *testing.T) {
 	}
 	clientOffer := completeOffer(t, client)
 
-	relay, errRelay := newPionMediaRelay(config.CodexLiveMediaRelayConfig{
+	relay, errRelay := newMediaRelay(config.CodexLiveMediaRelayConfig{
 		Enabled:                 true,
 		DisablePrivateRemoteIPs: true,
-	})
+	}, nil)
 	if errRelay != nil {
 		t.Fatalf("create media relay: %v", errRelay)
 	}
@@ -178,9 +178,9 @@ func TestNewSessionAdversarialContextCancellation(t *testing.T) {
 	}
 	clientOffer := completeOffer(t, client)
 
-	relay, errRelay := newPionMediaRelay(config.CodexLiveMediaRelayConfig{
+	relay, errRelay := newMediaRelay(config.CodexLiveMediaRelayConfig{
 		Enabled: true,
-	})
+	}, nil)
 	if errRelay != nil {
 		t.Fatalf("create media relay: %v", errRelay)
 	}
