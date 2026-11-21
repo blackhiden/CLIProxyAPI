@@ -315,6 +315,32 @@ requests:
   # When > 0, emit blank lines every N seconds for non-streaming responses to prevent idle timeouts.
   nonstream-keepalive-interval: 0
 
+  # Soft long-request budget. Accepts Go duration strings ("10m", "600s") or bare
+  # integer seconds ("600"). "0", "0s", "none", "unlimited", "disabled", "off",
+  # and "never" disable it (default). A positive budget enables pre-first-token
+  # SSE keepalives and non-streaming blank-line keepalives. When
+  # streaming.keepalive-seconds is unset or non-positive, the effective interval
+  # is min(request-timeout / 3, 30s) with a 1s floor; an explicit positive
+  # keepalive-seconds wins. Exceeding the budget logs one non-fatal event per
+  # attempt. This setting NEVER cancels a request and cannot override Nginx,
+  # Cloudflare, or client read timeouts; raise those limits separately.
+  request-timeout: "0"
+
+  # Opt-in hard deadline for non-streaming execution and streaming bootstrap.
+  # Same duration forms as request-timeout; "0" disables it (default). Unlike the
+  # soft budget, a positive value cancels the request when the deadline expires,
+  # but it never cancels an established stream. This is the explicit exception to
+  # the project's no-timeout-after-connect rule.
+  hard-request-deadline: "0"
+
+  # Per-provider overrides (codex, claude, xai, antigravity, devin). A positive
+  # provider value wins over the global value; otherwise the global value applies.
+  # Example:
+  # upstream:
+  #   codex:
+  #     request-timeout: "10m"
+  #     hard-request-deadline: "0"
+
   # Streaming behavior (SSE keep-alives + safe bootstrap retries).
   # streaming:
   #   keepalive-seconds: 15         # Default: 0 (disabled). <= 0 disables keep-alives.

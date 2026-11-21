@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Configurable request timeout**: `requests.request-timeout` is a soft
+  long-request budget that keeps SSE and non-streaming connections active before
+  the first token and logs when exceeded without cancelling inference. An opt-in
+  `requests.hard-request-deadline` bounds non-streaming execution and streaming
+  bootstrap. Per-provider overrides are available for codex, claude, xai,
+  antigravity, and devin. The management visual config exposes all three controls.
+
 ---
 
 ## [v8.0.82] - 2026-11-21
