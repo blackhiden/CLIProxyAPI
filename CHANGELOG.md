@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **False update notification**: The management UI now opens the update modal only when the
+  upstream semantic version is newer than the running server version. Differing commit hashes no
+  longer report an update when the local fork is already ahead of the upstream release.
+
 ---
 
 ## [v8.0.82] - 2026-11-21

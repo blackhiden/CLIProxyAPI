@@ -1,3 +1,33 @@
+# Session: Fix False Update Available Notification
+
+**Date:** 2026-11-21
+**Status:** Completed
+
+## Objective
+
+Correct the management UI false "Update Available" modal when the running fork is ahead of the
+upstream release (current `v8.0.82`, upstream `v8.0.60`, upstream commit `adf043f`).
+
+## Changes
+
+- Frontend submodule: shared semantic-version comparison in `src/utils/updateNotification.ts`;
+  root shell and System page now gate the modal on upstream version being newer, not on commit
+  inequality.
+- System page main-repository quick link now uses the shared `blackhiden/CLIProxyAPI` URL.
+- Added regression tests for ahead/equal/behind, multi-digit segments, and missing/malformed
+  versions.
+- Refreshed the generated `static/management.html` from the rebuilt frontend bundle.
+- Updated root and frontend changelogs/session notes plus frontend architecture/spec docs.
+
+## Validation
+
+- `bun test tests/updateNotification.test.ts`: pass (9 tests).
+- Frontend full suite: 2393 pass, 1 todo, 18 pre-existing failures documented in `frontend/CHANGELOG.md`.
+- `bun run build`: pass.
+- `go build -o /tmp/cpa-verify-build ./cmd/server`: pass.
+
+---
+
 # Session: Upstream Sync and v8.0.82 Release
 
 **Date:** 2026-11-21
