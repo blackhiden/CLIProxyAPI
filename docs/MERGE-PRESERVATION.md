@@ -361,13 +361,13 @@ already in the source tree.
 image still selectable through the environment variable:
 
 ```yaml
-image: ${CLI_PROXY_IMAGE:-ghcr.io/arsydoni4326-alt/cliproxyapi:latest}
+image: ${CLI_PROXY_IMAGE:-ghcr.io/blackhiden/cliproxyapi:latest}
 ```
 
 **Verify after merge:**
 
 ```bash
-grep -n 'ghcr.io/arsydoni4326-alt/cliproxyapi' docker-compose.yml docker-compose.cluster.yml
+grep -n 'ghcr.io/blackhiden/cliproxyapi' docker-compose.yml docker-compose.cluster.yml
 ```
 
 After changing which image a host runs, recreate the container
@@ -759,7 +759,7 @@ grep -c 'do_not_use_proxy' static/management.html             # item 8 checkbox,
 grep -c 'oauth-result-modal' static/management.html           # item 9 modal, expect >= 1
 
 # 5. Compose deploys the fork build, not the upstream Docker Hub image
-grep -n 'ghcr.io/arsydoni4326-alt/cliproxyapi' docker-compose.yml docker-compose.cluster.yml
+grep -n 'ghcr.io/blackhiden/cliproxyapi' docker-compose.yml docker-compose.cluster.yml
 ```
 
 If any check fails, reapply the corresponding item from §3 **before** committing
@@ -804,6 +804,10 @@ the merge.
   peer's address but **TTL 63** (both peers emit TTL 64), so neither program nor
   host generates them; §7.2 records the finding and the MAC-forensics step that
   names the injecting device.
+- **2026-11-21** — Corrected the documented fork image from
+  `ghcr.io/arsydoni4326-alt/cliproxyapi:latest` to
+  `ghcr.io/blackhiden/cliproxyapi:latest` to match the compose defaults and the
+  v8.0.81 release notes. Historical changelog entries were left unchanged.
 
 ---
 
@@ -861,9 +865,8 @@ Checks, in order:
    ```
 
    `eceasy/cli-proxy-api:latest` is the upstream image and does **not** contain fork
-   fixes. The fork image `ghcr.io/arsydoni4326-alt/cliproxyapi:latest` is built from
-   this repository's `Dockerfile` on every push to `main` (tag `sha-da05d5e` and
-   `latest` currently point at the same digest), and contains items 1–6.
+   fixes. The fork image `ghcr.io/blackhiden/cliproxyapi:latest` is built from
+   this repository's `Dockerfile` on every push to `main`, and contains items 1–6.
 2. **Probe the RESP side directly** from the Keeper host:
 
    ```bash
