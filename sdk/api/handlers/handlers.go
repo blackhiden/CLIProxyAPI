@@ -60,6 +60,8 @@ const (
 	defaultStreamingKeepAliveSeconds   = 0
 	defaultStreamingBootstrapRetries   = 0
 	defaultContinuityKeepAliveInterval = 10 * time.Second
+	minDerivedKeepAliveInterval        = time.Second
+	maxDerivedKeepAliveInterval        = 30 * time.Second
 	// Stream interceptor history is intentionally bounded and not configurable in the first SDK surface.
 	maxStreamInterceptorHistoryChunks = 64
 	maxStreamInterceptorHistoryBytes  = 1 << 20
@@ -177,23 +179,57 @@ func defaultStreamingKeepAliveTickerWithReset(interval time.Duration) (<-chan ti
 	return ticker.C, ticker.Stop, reset
 }
 
+// firstRequestProvider returns the first selected provider for override lookup.
+func firstRequestProvider(providers []string) string {
+	for _, provider := range providers {
+		if trimmed := strings.TrimSpace(provider); trimmed != "" {
+			return trimmed
+		}
+	}
+	return ""
+}
+
+// derivedKeepAliveInterval converts a soft request budget into a conservative
+// keep-alive interval: one third of the budget, capped at 30s with a 1s floor.
+func derivedKeepAliveInterval(budget time.Duration) time.Duration {
+	if budget <= 0 {
+		return 0
+	}
+	interval := budget / 3
+	if interval < minDerivedKeepAliveInterval {
+		interval = minDerivedKeepAliveInterval
+	}
+	if interval > maxDerivedKeepAliveInterval {
+		interval = maxDerivedKeepAliveInterval
+	}
+	return interval
+}
+
 // StreamingKeepAliveInterval returns the streaming keep-alive interval for this server (SSE heartbeats and WebSocket Ping frames).
-// Returning 0 disables keep-alives (default when unset).
+// Returning 0 disables keep-alives (default when unset). A positive request-timeout
+// budget derives an interval when no explicit keepalive-seconds is configured.
 func StreamingKeepAliveInterval(cfg *config.SDKConfig) time.Duration {
 	seconds := defaultStreamingKeepAliveSeconds
 	if cfg != nil {
 		seconds = cfg.Streaming.KeepAliveSeconds
 	}
-	if seconds <= 0 {
+	if seconds > 0 {
+		return time.Duration(seconds) * time.Second
+	}
+	if cfg == nil {
 		return 0
 	}
-	return time.Duration(seconds) * time.Second
+	return derivedKeepAliveInterval(cfg.RequestTimeoutDuration())
 }
 
 // StreamingSendKeepAliveBeforeFT returns whether SSE keep-alives should be sent before the first token arrives.
-// It is active only when streaming.send-keepalive-before-ft is true and streaming.keepalive-seconds > 0.
+// It is active when streaming.send-keepalive-before-ft is true or a positive
+// request-timeout budget is configured, provided the effective interval is positive.
 func StreamingSendKeepAliveBeforeFT(cfg *config.SDKConfig) bool {
-	return cfg != nil && cfg.Streaming.SendKeepAliveBeforeFT && StreamingKeepAliveInterval(cfg) > 0
+	if cfg == nil || StreamingKeepAliveInterval(cfg) <= 0 {
+		return false
+	}
+	return cfg.Streaming.SendKeepAliveBeforeFT || cfg.RequestTimeoutDuration() > 0
 }
 
 // NewStreamingKeepAliveTickerWithReset returns a ticker channel, a stop function, and a reset function
@@ -295,16 +331,20 @@ func SetStreamingKeepAliveTickerWithResetFactoryForTest(factory func(interval ti
 }
 
 // NonStreamingKeepAliveInterval returns the keep-alive interval for non-streaming responses.
-// Returning 0 disables keep-alives (default when unset).
+// Returning 0 disables keep-alives (default when unset). A positive request-timeout
+// budget derives an interval when no explicit nonstream-keepalive-interval is configured.
 func NonStreamingKeepAliveInterval(cfg *config.SDKConfig) time.Duration {
 	seconds := 0
 	if cfg != nil {
 		seconds = cfg.NonStreamKeepAliveInterval
 	}
-	if seconds <= 0 {
+	if seconds > 0 {
+		return time.Duration(seconds) * time.Second
+	}
+	if cfg == nil {
 		return 0
 	}
-	return time.Duration(seconds) * time.Second
+	return derivedKeepAliveInterval(cfg.RequestTimeoutDuration())
 }
 
 // StreamingBootstrapRetries returns how many times a streaming request may be retried before any bytes are sent.
