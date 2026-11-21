@@ -20,20 +20,14 @@ WORKDIR /app
 ARG CPA_VERSION=v0.0.0
 ARG CPA_COMMIT=unknown
 ARG BUILD_DATE=2025-09-09
-RUN set -eux;     \
-    apt update -y; \
-    apt install -y --no-install-recommends       \
+RUN --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
         ca-certificates       \
         build-essential       \
-        git;     \
-    apt-mark showmanual > /savedAptMark.txt
-RUN set -eux;   \
-    apt-mark auto '.*' > /dev/null ;	\
-    apt-mark manual $(cat /savedAptMark.txt) > /dev/null; 	\
-    apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false;     \
-    apt clean;     \
-    apt autoclean;     \
-    rm -rf /var/lib/apt/lists/*
+        git
 COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
