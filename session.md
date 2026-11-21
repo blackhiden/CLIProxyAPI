@@ -1,7 +1,25 @@
 # Session: Configurable Request Timeout
 
 **Date:** 2026-11-21
-**Status:** Implemented on isolated feature branches; awaiting explicit merge approval
+**Status:** Merged into `main`; feature branches and worktrees retained pending explicit cleanup authorization
+
+## Integration into `main`
+
+All five feature branches were merged sequentially into `main` with
+`--no-ff`, in dependency order: config (`1298bddf6`), runtime (`146f9ae15`),
+frontend (`49c26fc41`), docs (`5b0467d03`), and integration (`c088d3d63`).
+No conflicts occurred. Final `main` commit before this session-note update:
+`c088d3d63`.
+
+Final regression: full `go test ./... -count=1 -p 4` passed (exit 0), server
+build passed, `git diff --check` passed, frontend targeted tests passed
+(71 pass, 0 fail), and frontend type-check passed. The frontend gitlink is
+`69bbb190` and `static/management.html` contains the new timeout labels.
+
+`ROADMAP.md` was not changed: the root roadmap states that completed work is
+recorded in `CHANGELOG.md`, which the docs branch updated. `docs/ROADMAP.md`
+exists only on `dev`, not on the `main` baseline.
+
 
 ## Objective
 
