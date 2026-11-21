@@ -9,6 +9,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v8.0.82] - 2026-11-21
+
+### Added (from upstream sync)
+
+- **Credential-scoped after-auth termination**: Plugins can terminate a request
+  after authentication for a specific credential.
+- **Antigravity credits fallback hardening**: Honor stop rules and retry limits,
+  bound post-refresh credit warm-up, separate 403 probe backoff from token
+  rotation, skip disabled auths, and scope synthesized `request.sessionId` per
+  credential.
+- **Codex model synthesis**: Synthesize a baseline model from the visible
+  API-supported template and refresh the Codex client model catalog.
+- **Claude advisor state handling**: Strip foreign advisor blocks after
+  credential rebind and ignore Claude Code attribution blocks in reasoning
+  replay.
+- **Request body decoding**: Decode gzip request bodies and honor
+  `Content-Encoding` on Claude routes.
+- **Responses synthesis**: Synthesize unstreamed Responses messages and
+  translate refusal parts with tighter completion tracking.
+
+### Fixed
+
+- **Auth execution parity**: Align `executeHome` and `executeHomeOnce`, stop
+  credential loops on cancellation, enforce consistent cancellation and
+  `Retry-After` cooldown handling, serialize request auth preparation with
+  refresh locks, and publish selected auth metadata only after executable model
+  checks.
+- **Streaming failures**: Preserve stream headers on invalid-request bootstrap
+  errors, scope retry-after annotations to the same upstream attempt, and
+  capture per-attempt access tokens on failure results.
+- **Model limits**: Cap Gemini 4 max completion tokens at 65536.
+- **Antigravity OAuth refresh**: Align refresh transport and User-Agent.
+- **Examples**: Update the moego dependency to v0.1.0-alpha.4 and refresh
+  sponsor copy.
+
+### Upstream merge
+
+- Merged `upstream/main` at `f5c5681a8` into `dev`: 28 commits, 96 files changed
+  (+13,899 / -357). No conflicts.
+- Formatted six upstream Go files with `gofmt` after the merge.
+
+### Preserved (fork-specific)
+
+- OAuth "Do Not Use Proxy" toggle, OAuth result modal, Live Flow feature and
+  `/live-flow/ws` route, RESP error on disabled management, TCP keep-alive, 30s
+  version-check timeout, `access.api-key-names` v8 mapping, per-model credential
+  verification, and the fork compose image default. Submodule pointers were
+  unchanged.
+
+### Documentation
+
+- Corrected the stale fork image reference in `docs/MERGE-PRESERVATION.md` to
+  `ghcr.io/blackhiden/cliproxyapi:latest`.
+
+---
+
 ## [v8.0.81] - 2026-11-20
 
 ### Added (from upstream sync)
