@@ -37,6 +37,7 @@
 | 11 | **cpauk full own-event request logs (persistent)** | `cpauk/internal/api/key_viewer_request_events.go`, `cpauk/internal/api/test/key_viewer_request_events_test.go`, `cpauk/docs/MERGE-PRESERVATION.md`, `cpauk/docs/{SPECIFICATION,CONFIGURATION}.md` | Submodule code + tests + docs | submodule pointer update or upstream merge restores request-log redaction |
 | 12 | **Client API-key names (`access.api-key-names`) persistence across v8 configuration** | `internal/config/config_v8.go`, `internal/config/api_key_names_test.go` | Go source + test | upstream merge drops `{"api-key-names", "access.api-key-names"}` from `buildV8Paths()` or drops `pruneV8APIKeyNames`; config validation rejects access section with `field access not found in type config.legacyConfig` |
 | 13 | **Per-model credential verification in the auth-files models modal** | `frontend/src/features/authFiles/{AuthFilesPage.tsx,components/AuthFileModelsModal.tsx,components/AuthFileModelsModal.module.scss,hooks/useAuthFilesModels.ts}`, `frontend/src/services/api/authFiles.ts`, `frontend/src/i18n/locales/{en,zh-CN,zh-TW,ru,vi,ko,tr}.json`, `frontend/tests/managementV8Api.test.ts`, `static/management.html` | Frontend submodule + generated artifact | frontend pointer overwritten, modal/client changes lost in submodule merge, or stale `static/management.html` deployed |
+| 14 | **Configurable request timeout (soft long-request budget)** | `internal/config/sdk_config.go`, `internal/config/config_v8.go`, `internal/watcher/diff/config_diff.go`, `sdk/api/handlers/{handlers.go,handlers_execution.go,stream_forwarder.go}`, `frontend/src/features/config/*`, `frontend/src/hooks/useVisualConfig.ts`, `frontend/src/i18n/locales/*.json`, `config.example.yaml`, `static/management.html` | Go source + Submodule content + Generated artifact + Config | upstream merge drops the `buildV8Paths()` entries, reverts handler helpers to ignore the budget, removes the UI fields, or replaces `config.example.yaml` with a version lacking the documented keys |
 
 ---
 
@@ -976,5 +977,58 @@ sudo tcpdump -nnei wlp2s0 -c 20 'tcp[13] & 4 != 0 and host 192.168.1.12'
 The RST frames' source MAC is the injector. Then disable the corresponding feature
 (router IPS/DoS-protection/AiProtection/QoS-assist, or the transparent-proxy/
 Tailscale-exit-node policy rules on that host), add a `direct` rule for `192.168.1.0/24`,
+
+---
+
+### 3.14 Configurable request timeout (item 14)
+
+**Domain:** request lifecycle / upstream-request resilience.
+
+**Contract:** `requests.request-timeout` is a soft long-request budget. It keeps
+SSE and non-streaming connections active before the first token and emits one
+non-fatal diagnostic when the budget is exceeded. It **never** cancels a request
+and must never be passed to `context.WithTimeout`, `http.Client.Timeout`,
+`http.Transport.ResponseHeaderTimeout`, or the main server write timeout.
+
+`requests.hard-request-deadline` is a separate, opt-in hard deadline. It applies
+to non-streaming execution and streaming bootstrap only; it does not cancel an
+established stream. Provider overrides under
+`upstream.<provider>.request-timeout` and
+`upstream.<provider>.hard-request-deadline` win when positive for `codex`,
+`claude`, `xai`, `antigravity`, and `devin`; otherwise the global value applies.
+
+**Files to preserve:**
+
+- `internal/config/sdk_config.go` — fields, parser, and effective-value helpers.
+- `internal/config/config_v8.go` — canonical v8 path mappings.
+- `internal/watcher/diff/config_diff.go` — hot-reload change reporting.
+- `sdk/api/handlers/handlers.go`, `handlers_execution.go`, `stream_forwarder.go`
+  — keepalive derivation, hard deadline, and non-fatal diagnostic.
+- `frontend/` submodule — visual config fields, transformers, i18n, and tests.
+- `static/management.html` — rebuilt from the matching frontend revision.
+- `config.example.yaml`, `CHANGELOG.md`, `AGENTS.md`, `SPECIFICATION.md`.
+
+**Loss modes:** an upstream merge can drop the `buildV8Paths()` entries, revert
+the handler helpers to ignore the budget, remove the management UI fields, or
+replace `config.example.yaml` with a version lacking the documented keys. A
+stale `static/management.html` can hide the UI even when the submodule source is
+intact.
+
+**Verify after merge:**
+
+```bash
+grep -n 'request-timeout' internal/config/sdk_config.go internal/config/config_v8.go config.example.yaml
+grep -n 'RequestTimeoutDuration' internal/config sdk/api/handlers
+go test ./internal/config ./internal/watcher/diff ./sdk/api/handlers/... -count=1
+go build -o /tmp/test-output ./cmd/server && rm /tmp/test-output
+git -C frontend grep -n 'requestTimeout' -- src/features/config src/hooks/useVisualConfig.ts
+grep -o 'Request Timeout' static/management.html | head
+```
+
+**Anti-pattern to reject:** any `context.WithTimeout`, client `Timeout`, or
+server write timeout derived from `requests.request-timeout`. The soft budget is
+observability plus keepalive only. External Nginx/Cloudflare/client read
+timeouts are outside this process and must be raised by operators.
+
 and re-test. A temporary wired (dumb-switch) path between the two hosts proves the
 diagnosis if the resets disappear.
