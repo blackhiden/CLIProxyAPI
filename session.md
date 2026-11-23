@@ -1,3 +1,83 @@
+# Session: Upstream Sync and v8.1.2 Release
+
+**Date:** 2026-11-23
+**Status:** Git Flow release `8.1.2` prepared from `dev`
+
+## Objective
+
+Synchronize `upstream/main` into `dev`, preserve all fork-specific features, and finalize a Git Flow
+release into `main` per `docs/merge-upstream.md`.
+
+## Upstream reference
+
+- `upstream/main` = `0d251842d2539194ebd55ef0cdcf9c08f9c4908a`
+  (`feat(docs): add 10dian-API information to README files in English, Chinese, and Japanese`).
+- 56 upstream commits; 641 files changed (+23,100 / -12,362) between the pre-merge `dev` head and
+  the upstream head.
+
+## Merge results
+
+- Submodule pointer commit `d12f5d037` preserved the pre-existing local `cpauk` `0c0864d7` and
+  `frontend` `ceee1e13` advances before the upstream merge.
+- `upstream/main` → `dev`: merge commit `9e1f6dcbf`. Four root conflicts were resolved by combining
+  both sides.
+- The frontend submodule also merged upstream: `64564b37` plus follow-up `e5edaab4` resolved three
+  conflicts. A local follow-up `27f2b6da` mapped legacy usage-page CSS variables to theme tokens.
+  Final pointers: `frontend` `27f2b6da`, `cpauk` `0c0864d7`; `static/management.html` was rebuilt
+  from the final frontend revision.
+
+## Conflict resolutions
+
+- `go.mod`/`go.sum`: kept upstream `golang.org/x/crypto v0.58.0`, `x/net v0.62.0`, `x/sync v0.24.0`,
+  `x/sys v0.49.0`, `x/text v0.43.0`, and the fork's `x/oauth2 v0.37.0`; `go mod tidy` normalized
+  checksums.
+- `antigravity_openai_request.go`: kept upstream's `sdktranslator` import required by the merged
+  envelope API.
+- `SponsorProviderForm.tsx`: kept upstream's `FormSection` redesign and the fork's direct-connection
+  checkbox/proxy-disable behavior in the same section.
+- `useVisualConfig.ts`: combined upstream's comment/anchor-preserving `writeClientKeys()` with the
+  fork's `access.api-key-names` persistence and stale-name pruning.
+- `visualConfigV8.test.ts`: kept both the fork's API-key-name test and upstream's YAML-preservation
+  tests; taught upstream's generic parity loop to use a valid JSON duration object for the fork's
+  `providerRequestTimeouts` field.
+
+## Preservation verification (all pass)
+
+- RESP error before close, TCP keep-alive, 30s version-check timeout, `oauthProxyOverride`,
+  `access.api-key-names` mapping/pruning, Live Flow config/server/route, fork compose image,
+  request-timeout config paths, per-model credential verification, OAuth result modal, and served
+  bundle markers (`Management Center Info`, `do_not_use_proxy`, `oauth-result-modal`, `Test Model`,
+  `Request Timeout`) are present.
+
+## Validation
+
+- `go build -o /tmp/cpa-merge-check ./cmd/server`: pass.
+- Targeted Go suites (config, watcher diff, API handlers, SDK handlers/auth, translators): pass.
+- Frontend targeted tests: 120 pass, 0 fail; `bun run type-check`: pass.
+- Full `go test ./... -count=1 -p 4`: four test functions fail, all reproduced unchanged on pristine
+  `upstream/main` (`TestIssue6825StreamToolIndicesAcrossChunks`,
+  `TestIssue6825ToolPolicyKeepsHistoricalSignature`, `TestIssue6825PayloadRulesRemainFinal`, and
+  `TestConvertOpenAIResponsesRequestToAntigravity_InterruptedMessageBeforeRealOutputPreservesPairingAndOrder`).
+  They are upstream baseline failures, not merge regressions.
+
+## Release
+
+- Previous latest tag: `v8.1.1`; next version derived automatically: `8.1.2` (git-flow
+  `versiontag` prefix `v` produces `v8.1.2`).
+- Release branch: `release/8.1.2`, started from `dev`.
+- `CHANGELOG.md` gained a `[v8.1.2]` section; `[Unreleased]` is empty.
+
+## Known issues / discrepancies
+
+- The four full-suite test failures are pre-existing on upstream `0d251842d`; no fork-specific
+  failure was introduced by this merge.
+- The frontend submodule merge required a follow-up commit because upstream's generic visual-config
+  parity test assumed all string fields accept arbitrary text; the fork's JSON-valued provider
+  timeout field now uses a valid duration object in that test.
+
+---
+
+
 # Session: Upstream Sync and v8.1.1 Release
 
 **Date:** 2026-11-22

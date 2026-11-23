@@ -9,6 +9,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v8.1.2] - 2026-11-23
+
+### Added (from upstream sync)
+
+- **Antigravity hardening**: route grouped models by requested thinking level; preserve stream
+  filter errors across terminal frames; strip unsupported schema keywords; surface in-band
+  count-token errors; preserve grounding metadata; merge tool-response follow-up turns; preserve
+  signed tool continuations and user parts beside tool responses; exclude cached tokens from
+  non-stream Claude input; retry credits after unauthorized and honor credential lockouts; align
+  and minify upstream model requests; isolate credits state and reasoning replay keys per
+  credential and subagent; emit uppercase `thinkingLevel` values; and default omitted
+  `minimumCreditAmountForUsage` to zero.
+- **Copilot support**: v8 OAuth support, static model lookup and published routes, native assistant
+  text flattening across protocols, upstream API logging, and identity tests.
+- **Registry and management UI**: Gemini 4 Neon model definition, unified Copilot/Devin published
+  routes, deployment UUID validation, OAuth error rules, native provider groups and connection
+  pool controls, and the provider workbench redesign in the management frontend.
+- **Dependencies**: upgraded `moego` to `v0.1.0-alpha.5` and refreshed Go modules.
+
+### Fixed (from upstream sync)
+
+- Preserved requested Responses `include` values by upstream backend; isolated session identities
+  for header-based sessions; allowed the pluginhost scheduler to fall through when `PickAuth`
+  declines; guarded schema normalization passes; preserved Devin bare-Tink thought signatures on
+  Responses replay; failed Antigravity OAuth when project ID discovery fails; evicted idle xAI
+  websocket ID states; and fixed multiple stream/reasoning replay and tool-continuation issues.
+
+### Upstream merge
+
+- Merged `upstream/main` at `0d251842d` into `dev`: 56 commits, 641 files changed
+  (+23,100 / -12,362). Four conflicts were resolved by combining both sides: `go.mod`/`go.sum`
+  (upstream `golang.org/x/*` upgrades plus the fork's `x/oauth2 v0.37.0`), the Antigravity
+  chat-completions translator import, and three frontend submodule conflicts in
+  `SponsorProviderForm`, `useVisualConfig`, and `visualConfigV8.test.ts`.
+- Submodule pointers advanced to `frontend` `27f2b6da` and `cpauk` `0c0864d7`; their own upstream
+  merges were preserved. The frontend also includes a local usage-page CSS token fix, and
+  `static/management.html` was rebuilt from that revision.
+
+### Preserved (fork-specific)
+
+- OAuth "Do Not Use Proxy" toggle, OAuth result modal, Live Flow feature and `/live-flow/ws`
+  route, RESP error on disabled management, TCP keep-alive, 30s version-check timeout,
+  `access.api-key-names` v8 mapping, per-model credential verification, configurable request
+  timeout, false-update-notification fix, direct-connection control in sponsor provider forms,
+  and the fork compose image default.
+
+### Validation
+
+- Server build passed; targeted Go suites passed for config, watcher diff, API handlers, SDK
+  handlers/auth, and translators.
+- Frontend targeted tests passed (120 pass, 0 fail) and `bun run type-check` passed.
+- Full `go test ./...` reports four test functions that reproduce unchanged on pristine
+  `upstream/main`: three `TestIssue6825*` executor tests and
+  `TestConvertOpenAIResponsesRequestToAntigravity_InterruptedMessageBeforeRealOutputPreservesPairingAndOrder`.
+  No merge-specific regression was observed.
+
+---
+
 ## [v8.1.1] - 2026-11-22
 
 ### Added (from upstream sync)
