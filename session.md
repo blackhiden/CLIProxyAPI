@@ -66,7 +66,8 @@ release into `main` per `docs/merge-upstream.md`.
   `versiontag` prefix `v` produces `v8.1.2`).
 - Release branch: `release/8.1.2`, started from `dev` and deleted after finishing.
 - `main` release merge: `5d4139dad`; tag `v8.1.2` points to that commit.
-- Back-merge into `dev`: `f18e0d166`; `main` and `dev` trees are identical.
+- Back-merge into `dev`: `f18e0d166`; the release trees were identical at that point. `dev` then
+  received this session-record commit only.
 - `CHANGELOG.md` gained a `[v8.1.2]` section; `[Unreleased]` is empty.
 
 ## Known issues / discrepancies
