@@ -6,7 +6,6 @@ import (
 	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
 	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
 	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
-
 )
 
 // Applier implements thinking.ProviderApplier for Claude models.
@@ -155,7 +154,8 @@ func (a *Applier) normalizeClaudeBudgetDoc(doc *ojson.Doc, budgetTokens int, mod
 	if modelInfo != nil && modelInfo.Thinking != nil {
 		minBudget = modelInfo.Thinking.Min
 	}
-	if minBudget > 0 && adjustedBudget > 0 && adjustedBudget < minBudget {
+	if minBudget > 0 && adjustedBudget >= 0 && adjustedBudget < minBudget {
+		disableThinkingDoc(doc, modelInfo)
 		return
 	}
 

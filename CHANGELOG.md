@@ -9,6 +9,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v8.1.3] - 2026-11-23
+
+### Added / changed (from upstream sync)
+
+- **Antigravity hardening**: isolate signature cache and connection pools by credential, honor retry
+  hints on capacity errors, preserve mixed native tools and signatures on empty function calls,
+  normalize assistant image data URLs, validate compaction summaries, propagate Responses
+  translation errors, preserve models for unknown catalogs, and normalize thinking-config aliases.
+- **Gemini / Vertex**: normalize Imagen predict protocol, suppress pending filter frames on stream
+  errors, default omitted tool arguments to an empty object, preserve parameterless Claude tool
+  calls, and prevent premature Claude stream termination.
+- **Auth and thinking**: preserve parent affinity after fork failure and stream-bootstrap attempt
+  identity, retain terminal TOS violation state, disable invalid Claude budgets, clamp budgets to
+  model levels for OpenAI models, and use canonical Devin thinking clamping.
+- **Other upstream fixes**: preserve uncited Claude web-search text, handle uppercase object schema
+  placeholders, default missing Claude tool input arguments for Codex, and add regression tests for
+  the new thinking and translator behavior.
+
+### Upstream merge
+
+- Merged `upstream/main` at `85225381d` into `dev`: 31 commits, 73 files changed
+  (+2,984 / -503). The merge commit touched 75 files (+3,395 / -622) after fork adjustments.
+- Resolved two root conflicts by combining both sides: kept the upstream `sdktranslator` import in
+  `antigravity_claude_request_test.go`, and restored the upstream LCP test block in
+  `selector_lcp_test.go`.
+- Completed the pre-existing `frontend` submodule merge of upstream `3128b0ba` into fork `12ce1139`.
+  The `BaseProviderForm.tsx` conflict was resolved by combining upstream's `memberField` wrapper
+  with the fork's direct-connection control and `savedProxyUrl` preservation. The final pointer is
+  `3923fa80`, and `static/management.html` was rebuilt from that revision.
+
+### Preserved (fork-specific)
+
+- All 14 preservation items remain intact: RESP error on disabled management, TCP keep-alive, 30s
+  version-check timeout, OAuth "Do Not Use Proxy" toggle and result modal, Live Flow and
+  `/live-flow/ws`, cpauk full own-event request logs, `access.api-key-names`, per-model credential
+  verification, configurable request timeout, false-update-notification fix, direct-connection
+  controls, fork compose image default, locale structure, and rebuilt management bundle.
+
+### Validation
+
+- Server build and `gofmt` check passed; targeted Go tests for both conflict packages passed.
+- Full `go test ./...` reports four test functions that reproduce unchanged on pristine
+  `upstream/main` `85225381d`: three `TestIssue6825*` executor tests and
+  `TestConvertOpenAIResponsesRequestToAntigravity_InterruptedMessageBeforeRealOutputPreservesPairingAndOrder`.
+- Frontend type-check and production build passed; targeted frontend tests passed (105 pass, 0 fail).
+  The full frontend suite has 14 pre-existing `dev` failures in visual-config rebase tests and no
+  merge-specific regressions; locale parity passes.
+
+---
+
 ## [v8.1.2] - 2026-11-23
 
 ### Added (from upstream sync)

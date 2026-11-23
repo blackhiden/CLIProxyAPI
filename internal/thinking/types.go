@@ -9,7 +9,6 @@ import (
 	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
 )
 
-
 // ThinkingMode represents the type of thinking configuration mode.
 type ThinkingMode int
 
@@ -58,8 +57,7 @@ const (
 	LevelHigh ThinkingLevel = "high"
 	// LevelXHigh sets extra-high thinking effort
 	LevelXHigh ThinkingLevel = "xhigh"
-	// LevelMax sets maximum thinking effort.
-	// This is currently used by Claude 4.6 adaptive thinking (opus supports "max").
+	// LevelMax sets maximum thinking effort on models that support it.
 	LevelMax ThinkingLevel = "max"
 )
 

@@ -19,7 +19,6 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	. "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/gemini/openai/chat-completions"
-
 )
 
 // convertCliResponseToOpenAIChatParams holds parameters for response conversion.
@@ -230,7 +229,10 @@ func ConvertAntigravityResponseToOpenAI(_ context.Context, _ string, originalReq
 
 				functionCallIndex := params.FunctionIndex
 				params.FunctionIndex++
-				fcDoc := ojson.NewDocString(`{"id":"","index":0,"type":"function","function":{"name":"","arguments":""}}`)
+				fcDoc := ojson.NewDocString(`{"id":"","index":0,"type":"function","function":{"name":"","arguments":"{}"}}`)
+				if translatorcommon.IsVertexStreamingFunctionCall(functionCallResult) && !functionCallResult.Get("args").Exists() {
+					_ = fcDoc.Set("function.arguments", "")
+				}
 				fcName := util.RestoreSanitizedToolName(params.SanitizedNameMap, rawName)
 				fcID := upstreamID
 				if fcID == "" {

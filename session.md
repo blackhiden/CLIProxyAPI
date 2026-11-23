@@ -1,7 +1,77 @@
+# Session: Upstream Sync and v8.1.3 Release
+
+**Date:** 2026-11-23
+**Status:** `upstream/main` merged into `dev`; Git Flow release `8.1.3` prepared
+
+## Objective
+
+Synchronize `upstream/main` into `dev`, preserve all fork-specific features, and finalize a Git Flow
+release into `main` per `docs/merge-upstream.md`.
+
+## Upstream reference
+
+- `upstream/main` = `85225381d89915595598ed13766cd79890c03a84`
+  (`fix(antigravity): isolate signature cache by credential`).
+- 31 upstream commits; 73 files changed (+2,984 / -503) between the previous sync point
+  `0d251842d` and the new upstream head.
+
+## Merge results
+
+- Root merge commit: `a04e5755c1b344ee5e011829528bc8760da3aab4`, parents `acb302207` (pre-merge
+  `dev`) and `85225381d` (upstream).
+- Two root conflicts were resolved by combining both sides:
+  - `internal/translator/antigravity/claude/antigravity_claude_request_test.go`: kept upstream's
+    `sdktranslator` import required by the new envelope test.
+  - `sdk/cliproxy/auth/selector_lcp_test.go`: restored the upstream LCP test block, including the
+    new fork-failure preservation test; no fork feature behavior was removed.
+- The `frontend` submodule had a pre-existing merge in progress (`12ce1139` + upstream `3128b0ba`).
+  Its `BaseProviderForm.tsx` conflict was resolved by combining upstream's `memberField` wrapper
+  with the fork's direct-connection checkbox and `savedProxyUrl` preservation. Final pointer:
+  `3923fa80`. `static/management.html` was rebuilt from that revision.
+- `cpauk` pointer unchanged at `0c0864d7`.
+
+## Preservation verification (all pass)
+
+- RESP error before close, TCP keep-alive, 30s version-check timeout, `oauthProxyOverride`,
+  `access.api-key-names` mapping/pruning, Live Flow config/server/route, fork compose image,
+  request-timeout config paths, per-model credential verification, OAuth result modal, direct
+  connection controls, and served bundle markers (`Management Center Info`, `do_not_use_proxy`,
+  `oauth-result-modal`, `Test Model`, `Request Timeout`) are present.
+
+## Validation
+
+- `go build -o /tmp/cpa-merge-check ./cmd/server`: pass.
+- `gofmt` check on all changed Go files: clean.
+- Targeted Go tests for both conflict packages: pass.
+- Full `go test ./... -count=1 -p 4`: four test functions fail, all reproduced unchanged on pristine
+  `upstream/main` `85225381d` (`TestIssue6825StreamToolIndicesAcrossChunks`,
+  `TestIssue6825ToolPolicyKeepsHistoricalSignature`, `TestIssue6825PayloadRulesRemainFinal`, and
+  `TestConvertOpenAIResponsesRequestToAntigravity_InterruptedMessageBeforeRealOutputPreservesPairingAndOrder`).
+- Frontend `bun run type-check` and `bun run build`: pass. Targeted frontend tests: 105 pass, 0 fail.
+  Full frontend suite: 14 pre-existing `dev` failures in visual-config rebase tests; locale parity
+  passes and no merge-specific regression was introduced.
+
+## Release
+
+- Previous latest tag: `v8.1.2`; next version derived automatically: `8.1.3` (git-flow
+  `versiontag` prefix `v` produces `v8.1.3`).
+- `CHANGELOG.md` gained a `[v8.1.3]` section; `[Unreleased]` is empty.
+
+## Known issues / discrepancies
+
+- The four full-suite Go failures are pre-existing on upstream `85225381d`; no fork-specific failure
+  was introduced by this merge.
+- The 14 full-suite frontend failures are pre-existing on the fork's `dev` parent `12ce1139`; the
+  upstream parent has none, and the merge did not add new failures.
+- Running the full frontend suite rewrites several locale/visual-config source files as a test side
+  effect. Those files were restored to the committed merge state before release.
+
+---
+
 # Session: Upstream Sync and v8.1.2 Release
 
 **Date:** 2026-11-23
-**Status:** Git Flow release `8.1.2` prepared from `dev`
+**Status:** Git Flow release `8.1.2` finalized; `main` and `dev` synchronized
 
 ## Objective
 
@@ -64,7 +134,10 @@ release into `main` per `docs/merge-upstream.md`.
 
 - Previous latest tag: `v8.1.1`; next version derived automatically: `8.1.2` (git-flow
   `versiontag` prefix `v` produces `v8.1.2`).
-- Release branch: `release/8.1.2`, started from `dev`.
+- Release branch: `release/8.1.2`, started from `dev` and deleted after finishing.
+- `main` release merge: `5d4139dad`; tag `v8.1.2` points to that commit.
+- Back-merge into `dev`: `f18e0d166`; the release trees were identical at that point. `dev` then
+  received this session-record commit only.
 - `CHANGELOG.md` gained a `[v8.1.2]` section; `[Unreleased]` is empty.
 
 ## Known issues / discrepancies

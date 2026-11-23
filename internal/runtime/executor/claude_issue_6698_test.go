@@ -12,7 +12,6 @@ import (
 	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
 	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
 	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
-
 )
 
 const claudeIssue6698SSE = "event: message_start\ndata: {\"type\":\"message_start\",\"message\":{\"id\":\"msg_test\",\"type\":\"message\",\"role\":\"assistant\",\"model\":\"claude-opus-5-5\",\"content\":[],\"stop_reason\":null,\"usage\":{\"input_tokens\":1,\"output_tokens\":0}}}\n\n" +
@@ -134,7 +133,7 @@ func TestClaudeExecutor_AdaptiveOnlyThinkingOffKeepsThinkingHidden(t *testing.T)
 
 func TestClaudeExecutor_AdaptiveOnlyGeminiBudgetAndAuto(t *testing.T) {
 	for _, model := range []string{"claude-opus-4-7", "claude-opus-4-8", "claude-fable-5", "claude-fable-5-1"} {
-		t.Run(model+" gemini budget 64000 maps to xhigh", func(t *testing.T) {
+		t.Run(model+" gemini budget 64000 maps to max", func(t *testing.T) {
 			var upstreamBody []byte
 			transport := roundTripperFunc(func(req *http.Request) (*http.Response, error) {
 				upstreamBody, _ = io.ReadAll(req.Body)
@@ -159,8 +158,8 @@ func TestClaudeExecutor_AdaptiveOnlyGeminiBudgetAndAuto(t *testing.T) {
 			if ojson.GetBytes(upstreamBody, "thinking.budget_tokens").Exists() {
 				t.Fatalf("upstream thinking.budget_tokens still present: %s", upstreamBody)
 			}
-			if got := ojson.GetBytes(upstreamBody, "output_config.effort").String(); got != "xhigh" {
-				t.Fatalf("upstream output_config.effort = %q, want xhigh; body=%s", got, upstreamBody)
+			if got := ojson.GetBytes(upstreamBody, "output_config.effort").String(); got != "max" {
+				t.Fatalf("upstream output_config.effort = %q, want max; body=%s", got, upstreamBody)
 			}
 		})
 

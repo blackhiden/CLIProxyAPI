@@ -480,6 +480,365 @@ func TestSessionAffinityCodexSubagentInheritsParentThread(t *testing.T) {
 	if got := childOpts.Metadata[cliproxyexecutor.CanonicalSessionIDMetadataKey]; got != "codex:thread-child-888" {
 		t.Fatalf("child canonical session ID = %v, want codex:thread-child-888", got)
 	}
+
+	// 3. Forked thread carries X-Codex-Turn-Metadata with forked_from_thread_id
+	forkOpts := cliproxyexecutor.Options{
+		Headers: http.Header{
+			"Session-Id": []string{"thread-fork-777"},
+			"X-Codex-Turn-Metadata": []string{
+				`{"session_id":"thread-fork-777","forked_from_thread_id":"thread-parent-999","request_kind":"turn"}`,
+			},
+		},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"fork turn"}]}`),
+		Metadata:        map[string]any{},
+	}
+	forkAuth, errFork := selector.Pick(context.Background(), "openai", "model", forkOpts, auths)
+	if errFork != nil {
+		t.Fatalf("fork Pick() error = %v", errFork)
+	}
+	if forkAuth.ID != parentAuth.ID {
+		t.Fatalf("fork thread did not inherit parent auth: got %q, want %q", forkAuth.ID, parentAuth.ID)
+	}
+	if got := forkOpts.Metadata[cliproxyexecutor.CanonicalSessionIDMetadataKey]; got != "codex:thread-fork-777" {
+		t.Fatalf("fork canonical session ID = %v, want codex:thread-fork-777", got)
+	}
+}
+
+func TestSessionAffinityCodexForkInheritsParentOnGeminiModel(t *testing.T) {
+	t.Parallel()
+
+	selector := NewSessionAffinitySelectorWithConfig(SessionAffinityConfig{
+		Fallback: &RoundRobinSelector{},
+		TTL:      time.Minute,
+	})
+	defer selector.Stop()
+
+	auths := []*Auth{{ID: "auth-1", Provider: "antigravity"}, {ID: "auth-2", Provider: "antigravity"}}
+
+	// 1. Parent thread binds to an antigravity auth
+	parentOpts := cliproxyexecutor.Options{
+		Headers:         http.Header{"Session-Id": []string{"parent-gemini-thread"}},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"parent query"}]}`),
+		Metadata:        map[string]any{},
+	}
+	parentAuth, errParent := selector.Pick(context.Background(), "mixed", "gemini-3.8-flash-high", parentOpts, auths)
+	if errParent != nil {
+		t.Fatalf("parent Pick() error = %v", errParent)
+	}
+
+	// 2. Forked thread carries X-Codex-Turn-Metadata with forked_from_thread_id
+	// Even on Gemini/Antigravity where subagents are non-inheriting, conversational FORKS must inherit parent auth!
+	forkOpts := cliproxyexecutor.Options{
+		Headers: http.Header{
+			"Session-Id": []string{"fork-gemini-thread"},
+			"X-Codex-Turn-Metadata": []string{
+				`{"session_id":"fork-gemini-thread","forked_from_thread_id":"parent-gemini-thread","request_kind":"turn"}`,
+			},
+		},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"fork query"}]}`),
+		Metadata:        map[string]any{},
+	}
+	forkAuth, errFork := selector.Pick(context.Background(), "mixed", "gemini-3.8-flash-high", forkOpts, auths)
+	if errFork != nil {
+		t.Fatalf("fork Pick() error = %v", errFork)
+	}
+	if forkAuth.ID != parentAuth.ID {
+		t.Fatalf("conversational fork did not inherit parent auth on Gemini: got %q, want %q", forkAuth.ID, parentAuth.ID)
+	}
+	if got := forkOpts.Metadata[cliproxyexecutor.CanonicalSessionIDMetadataKey]; got != "codex:fork-gemini-thread" {
+		t.Fatalf("fork canonical session ID = %v, want codex:fork-gemini-thread", got)
+	}
+	if got := forkOpts.Metadata[cliproxyexecutor.ParentSessionIDMetadataKey]; got != "codex:parent-gemini-thread" {
+		t.Fatalf("fork parent session ID = %v, want codex:parent-gemini-thread", got)
+	}
+	if isFork, ok := forkOpts.Metadata[cliproxyexecutor.IsForkMetadataKey].(bool); !ok || !isFork {
+		t.Fatalf("expected is_fork=true in metadata, got %v", forkOpts.Metadata[cliproxyexecutor.IsForkMetadataKey])
+	}
+}
+
+func TestSessionAffinityCodexMultiAgentV2CollabSpawn(t *testing.T) {
+	t.Parallel()
+
+	selector := NewSessionAffinitySelectorWithConfig(SessionAffinityConfig{
+		Fallback: &RoundRobinSelector{},
+		TTL:      time.Minute,
+	})
+	defer selector.Stop()
+
+	auths := []*Auth{{ID: "auth-a"}, {ID: "auth-b"}}
+
+	// 1. Parent session in Codex CLI
+	parentOpts := cliproxyexecutor.Options{
+		Headers: http.Header{
+			"Session-Id": []string{"parent-root-100"},
+			"Thread-Id":  []string{"parent-root-100"},
+			"X-Codex-Turn-Metadata": []string{
+				`{"session_id":"parent-root-100","thread_id":"parent-root-100","agent_name":"/root","request_kind":"turn"}`,
+			},
+		},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"parent task"}]}`),
+		Metadata:        map[string]any{},
+	}
+	parentAuth, errParent := selector.Pick(context.Background(), "openai", "model", parentOpts, auths)
+	if errParent != nil {
+		t.Fatalf("parent Pick() error = %v", errParent)
+	}
+
+	// 2. Multi-Agent v2 child subagent (collab_spawn)
+	childOpts := cliproxyexecutor.Options{
+		Headers: http.Header{
+			"Session-Id":               []string{"parent-root-100"},
+			"Thread-Id":                []string{"subagent-thread-200"},
+			"X-Codex-Parent-Thread-Id": []string{"parent-root-100"},
+			"X-Openai-Subagent":        []string{"collab_spawn"},
+			"X-Codex-Turn-Metadata": []string{
+				`{"session_id":"parent-root-100","thread_id":"subagent-thread-200","agent_name":"/root/check_readme","parent_thread_id":"parent-root-100","subagent_kind":"thread_spawn"}`,
+			},
+		},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"child check readme"}]}`),
+		Metadata:        map[string]any{},
+	}
+	childAuth, errChild := selector.Pick(context.Background(), "openai", "model", childOpts, auths)
+	if errChild != nil {
+		t.Fatalf("child Pick() error = %v", errChild)
+	}
+	if childAuth.ID != parentAuth.ID {
+		t.Fatalf("child subagent did not inherit parent auth: got %q, want %q", childAuth.ID, parentAuth.ID)
+	}
+	if got := childOpts.Metadata[cliproxyexecutor.CanonicalSessionIDMetadataKey]; got != "codex:parent-root-100:agent:check_readme" {
+		t.Fatalf("child canonical session ID = %v, want codex:parent-root-100:agent:check_readme", got)
+	}
+	if got := childOpts.Metadata[cliproxyexecutor.ParentSessionIDMetadataKey]; got != "codex:parent-root-100" {
+		t.Fatalf("child parent session ID = %v, want codex:parent-root-100", got)
+	}
+
+	// 3. Failure on child subagent does not evict parent binding
+	selector.OnResult(Result{
+		Provider: "openai",
+		Model:    "model",
+		AuthID:   childAuth.ID,
+		Success:  false,
+		Options:  childOpts,
+	})
+
+	// Parent session should still be bound to parentAuth
+	parentOpts2 := cliproxyexecutor.Options{
+		Headers: http.Header{
+			"Session-Id": []string{"parent-root-100"},
+			"Thread-Id":  []string{"parent-root-100"},
+		},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"parent task 2"}]}`),
+		Metadata:        map[string]any{},
+	}
+	parentAuth2, errParent2 := selector.Pick(context.Background(), "openai", "model", parentOpts2, auths)
+	if errParent2 != nil {
+		t.Fatalf("parent Pick() 2 error = %v", errParent2)
+	}
+	if parentAuth2.ID != parentAuth.ID {
+		t.Fatalf("parent auth binding was evicted by subagent failure: got %q, want %q", parentAuth2.ID, parentAuth.ID)
+	}
+}
+
+func TestSessionAffinityBodyOnlyCodexFork(t *testing.T) {
+	t.Parallel()
+
+	selector := NewSessionAffinitySelectorWithConfig(SessionAffinityConfig{
+		Fallback: &RoundRobinSelector{},
+		TTL:      time.Minute,
+	})
+	defer selector.Stop()
+
+	auths := []*Auth{{ID: "auth-1", Provider: "antigravity"}, {ID: "auth-2", Provider: "antigravity"}}
+
+	// 1. Parent thread in body
+	parentOpts := cliproxyexecutor.Options{
+		OriginalRequest: []byte(`{"thread_id":"body-parent-100","messages":[{"role":"user","content":"parent"}]}`),
+		Metadata:        map[string]any{},
+	}
+	parentAuth, errParent := selector.Pick(context.Background(), "mixed", "gemini-3.8-flash-high", parentOpts, auths)
+	if errParent != nil {
+		t.Fatalf("parent Pick() error = %v", errParent)
+	}
+
+	// 2. Forked thread in body without headers (e.g. {"thread_id":"child","forked_from_thread_id":"parent"})
+	forkOpts := cliproxyexecutor.Options{
+		OriginalRequest: []byte(`{"thread_id":"body-fork-200","forked_from_thread_id":"body-parent-100","messages":[{"role":"user","content":"fork"}]}`),
+		Metadata:        map[string]any{},
+	}
+	forkAuth, errFork := selector.Pick(context.Background(), "mixed", "gemini-3.8-flash-high", forkOpts, auths)
+	if errFork != nil {
+		t.Fatalf("fork Pick() error = %v", errFork)
+	}
+	if forkAuth.ID != parentAuth.ID {
+		t.Fatalf("body-only fork did not inherit parent auth on Gemini: got %q, want %q", forkAuth.ID, parentAuth.ID)
+	}
+	if isFork, ok := forkOpts.Metadata[cliproxyexecutor.IsForkMetadataKey].(bool); !ok || !isFork {
+		t.Fatalf("expected is_fork=true for body-only fork, got %v", forkOpts.Metadata[cliproxyexecutor.IsForkMetadataKey])
+	}
+}
+
+func TestSessionAffinityForkFailurePreservesParentBinding(t *testing.T) {
+	t.Parallel()
+
+	selector := NewSessionAffinitySelectorWithConfig(SessionAffinityConfig{
+		Fallback: &RoundRobinSelector{},
+		TTL:      time.Minute,
+	})
+	defer selector.Stop()
+
+	auths := []*Auth{{ID: "auth-a"}, {ID: "auth-b"}}
+	parentOpts := cliproxyexecutor.Options{
+		OriginalRequest: []byte(`{"conversation":{"id":"parent-1"},"messages":[{"role":"user","content":"parent"}]}`),
+	}
+	parentAuth, errParent := selector.Pick(context.Background(), "openai", "model", parentOpts, auths)
+	if errParent != nil || parentAuth.ID != "auth-a" {
+		t.Fatalf("parent Pick() error = %v, auth = %v", errParent, parentAuth)
+	}
+
+	forkOpts := cliproxyexecutor.Options{
+		OriginalRequest: []byte(`{"prompt_cache_key":"fork-1","conversation":{"id":"parent-1"},"messages":[{"role":"user","content":"fork"}]}`),
+		Metadata: map[string]any{
+			cliproxyexecutor.IsForkMetadataKey: true,
+		},
+	}
+	forkAuth, errFork := selector.Pick(context.Background(), "openai", "model", forkOpts, auths)
+	if errFork != nil || forkAuth.ID != "auth-a" {
+		t.Fatalf("fork Pick() error = %v, auth = %v", errFork, forkAuth)
+	}
+
+	selector.OnResult(Result{
+		Provider: "openai",
+		Model:    "model",
+		AuthID:   forkAuth.ID,
+		Success:  false,
+		Options:  forkOpts,
+	})
+
+	boundID, ok := selector.boundAuthForRequest([]string{"openai"}, "model", parentOpts)
+	if !ok || boundID != "auth-a" {
+		t.Fatalf("parent binding after fork failure = (%q, %v), want (auth-a, true)", boundID, ok)
+	}
+}
+
+func TestSessionAffinityForkRebindDoesNotMutateParentBinding(t *testing.T) {
+	t.Parallel()
+
+	selector := NewSessionAffinitySelectorWithConfig(SessionAffinityConfig{
+		Fallback: &RoundRobinSelector{},
+		TTL:      time.Minute,
+	})
+	defer selector.Stop()
+
+	auths := []*Auth{{ID: "auth-a"}, {ID: "auth-b"}}
+
+	// 1. Parent thread binds to auth-a
+	parentOpts := cliproxyexecutor.Options{
+		Headers:         http.Header{"Session-Id": []string{"parent-thread-alpha"}},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"parent"}]}`),
+		Metadata:        map[string]any{},
+	}
+	parentAuth, errParent := selector.Pick(context.Background(), "openai", "model", parentOpts, auths)
+	if errParent != nil || parentAuth.ID != "auth-a" {
+		t.Fatalf("parent Pick() error = %v, auth = %v", errParent, parentAuth)
+	}
+
+	// 2. Fork thread inherits parent auth-a
+	forkOpts := cliproxyexecutor.Options{
+		Headers: http.Header{
+			"Session-Id": []string{"fork-thread-beta"},
+			"X-Codex-Turn-Metadata": []string{
+				`{"session_id":"fork-thread-beta","forked_from_thread_id":"parent-thread-alpha","request_kind":"turn"}`,
+			},
+		},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"fork"}]}`),
+		Metadata:        map[string]any{},
+	}
+	forkAuth, errFork := selector.Pick(context.Background(), "openai", "model", forkOpts, auths)
+	if errFork != nil || forkAuth.ID != "auth-a" {
+		t.Fatalf("fork Pick() error = %v, auth = %v", errFork, forkAuth)
+	}
+
+	// 3. Fork thread fails and rebinds to auth-b (failover rebind)
+	selector.OnResult(Result{
+		Provider: "openai",
+		Model:    "model",
+		AuthID:   "auth-a",
+		Success:  false,
+		Options:  forkOpts,
+	})
+
+	// Re-pick fork with auth-b
+	forkOpts2 := cliproxyexecutor.Options{
+		Headers: http.Header{
+			"Session-Id": []string{"fork-thread-beta"},
+			"X-Codex-Turn-Metadata": []string{
+				`{"session_id":"fork-thread-beta","forked_from_thread_id":"parent-thread-alpha","request_kind":"turn"}`,
+			},
+		},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"fork retry"}]}`),
+		Metadata:        map[string]any{},
+	}
+	forkAuth2, errFork2 := selector.Pick(context.Background(), "openai", "model", forkOpts2, []*Auth{{ID: "auth-b"}})
+	if errFork2 != nil || forkAuth2.ID != "auth-b" {
+		t.Fatalf("fork retry Pick() error = %v, auth = %v", errFork2, forkAuth2)
+	}
+
+	// 4. Parent session MUST STILL BE BOUND to auth-a, not mutated to auth-b!
+	parentOpts2 := cliproxyexecutor.Options{
+		Headers:         http.Header{"Session-Id": []string{"parent-thread-alpha"}},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"parent turn 2"}]}`),
+		Metadata:        map[string]any{},
+	}
+	parentAuth2, errParent2 := selector.Pick(context.Background(), "openai", "model", parentOpts2, auths)
+	if errParent2 != nil || parentAuth2.ID != "auth-a" {
+		t.Fatalf("parent auth binding was mutated by fork failover: got %q, want auth-a", parentAuth2.ID)
+	}
+}
+
+func TestSessionAffinityCodexSubagentWithOmittedThreadIdRetainsParent(t *testing.T) {
+	t.Parallel()
+
+	selector := NewSessionAffinitySelectorWithConfig(SessionAffinityConfig{
+		Fallback: &RoundRobinSelector{},
+		TTL:      time.Minute,
+	})
+	defer selector.Stop()
+
+	auths := []*Auth{{ID: "auth-a"}, {ID: "auth-b"}}
+
+	// Parent binds
+	parentOpts := cliproxyexecutor.Options{
+		Headers:         http.Header{"Session-Id": []string{"sess-main-999"}},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"parent"}]}`),
+		Metadata:        map[string]any{},
+	}
+	parentAuth, _ := selector.Pick(context.Background(), "openai", "model", parentOpts, auths)
+
+	// Subagent sends Session-Id, but Thread-Id is omitted, while agent_name is set in turn metadata
+	subOpts := cliproxyexecutor.Options{
+		Headers: http.Header{
+			"Session-Id":        []string{"sess-main-999"},
+			"X-Openai-Subagent": []string{"collab_spawn"},
+			"X-Codex-Turn-Metadata": []string{
+				`{"session_id":"sess-main-999","agent_name":"/root/worker","subagent_kind":"thread_spawn"}`,
+			},
+		},
+		OriginalRequest: []byte(`{"input":[{"role":"user","content":"subagent"}]}`),
+		Metadata:        map[string]any{},
+	}
+	subAuth, errSub := selector.Pick(context.Background(), "openai", "model", subOpts, auths)
+	if errSub != nil {
+		t.Fatalf("subagent Pick() error = %v", errSub)
+	}
+	if subAuth.ID != parentAuth.ID {
+		t.Fatalf("subagent did not inherit parent auth: got %q, want %q", subAuth.ID, parentAuth.ID)
+	}
+	if got := subOpts.Metadata[cliproxyexecutor.ParentSessionIDMetadataKey]; got != "codex:sess-main-999" {
+		t.Fatalf("expected ParentSessionID=codex:sess-main-999, got %v", got)
+	}
+	if got := subOpts.Metadata[cliproxyexecutor.CanonicalSessionIDMetadataKey]; got != "codex:sess-main-999:agent:worker" {
+		t.Fatalf("expected CanonicalSessionID=codex:sess-main-999:agent:worker, got %v", got)
+	}
 }
 
 func TestSessionAffinityPayloadParentSessionInheritance(t *testing.T) {
