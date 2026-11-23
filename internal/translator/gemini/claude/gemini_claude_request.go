@@ -14,7 +14,6 @@ import (
 	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
 	"github.com/router-for-me/CLIProxyAPI/v8/internal/translator/gemini/common"
 	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
-
 )
 
 const geminiClaudeThoughtSignature = "skip_thought_signature_validator"
@@ -166,6 +165,9 @@ func convertClaudeRequestToGemini(modelName string, inputRawJSON []byte, _ bool,
 						}
 						functionName = util.SanitizeFunctionName(functionName)
 						functionArgs := contentResult.Get("input").String()
+						if functionArgs == "" {
+							functionArgs = `{}`
+						}
 						argsResult := ojson.Parse(functionArgs)
 						if argsResult.IsObject() && ojson.Valid(functionArgs) {
 							partDoc := ojson.NewDocString(`{"thoughtSignature":"","functionCall":{"name":"","args":{}}}`)

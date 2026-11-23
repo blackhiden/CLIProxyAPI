@@ -21,7 +21,6 @@ import (
 	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
 	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
 	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
-
 )
 
 // ConvertClaudeRequestToCodex parses and transforms a Claude Code API request into the internal client format.
@@ -402,7 +401,11 @@ func convertClaudeRequestToCodex(modelName string, inputRawJSON []byte, stream, 
 							}
 							_ = functionCallMessageDoc.Set("name", name)
 						}
-						_ = functionCallMessageDoc.Set("arguments", messageContentResult.Get("input").Raw)
+						arguments := strings.TrimSpace(messageContentResult.Get("input").Raw)
+						if arguments == "" {
+							arguments = "{}"
+						}
+						_ = functionCallMessageDoc.Set("arguments", arguments)
 						inputItems = append(inputItems, functionCallMessageDoc.Bytes())
 					case "tool_reference":
 						if len(pendingSystemReminders) > 0 {
