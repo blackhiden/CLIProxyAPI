@@ -1,7 +1,7 @@
 # Session: Upstream Sync and v8.1.2 Release
 
 **Date:** 2026-11-23
-**Status:** Git Flow release `8.1.2` prepared from `dev`
+**Status:** Git Flow release `8.1.2` finalized; `main` and `dev` synchronized
 
 ## Objective
 
@@ -64,7 +64,9 @@ release into `main` per `docs/merge-upstream.md`.
 
 - Previous latest tag: `v8.1.1`; next version derived automatically: `8.1.2` (git-flow
   `versiontag` prefix `v` produces `v8.1.2`).
-- Release branch: `release/8.1.2`, started from `dev`.
+- Release branch: `release/8.1.2`, started from `dev` and deleted after finishing.
+- `main` release merge: `5d4139dad`; tag `v8.1.2` points to that commit.
+- Back-merge into `dev`: `f18e0d166`; `main` and `dev` trees are identical.
 - `CHANGELOG.md` gained a `[v8.1.2]` section; `[Unreleased]` is empty.
 
 ## Known issues / discrepancies
