@@ -809,6 +809,13 @@ the merge.
   `ghcr.io/arsydoni4326-alt/cliproxyapi:latest` to
   `ghcr.io/blackhiden/cliproxyapi:latest` to match the compose defaults and the
   v8.0.81 release notes. Historical changelog entries were left unchanged.
+- **2026-11-23** — Recorded the upstream `0d251842d` sync. Submodule pointers advanced to
+  `frontend` `27f2b6da` and `cpauk` `0c0864d7`. The frontend merge required combining upstream's
+  `FormSection` redesign and comment-preserving client-key writer with the fork's direct-connection
+  control and `access.api-key-names` persistence; the generic visual-config parity test was taught
+  to use a valid JSON duration object for `providerRequestTimeouts`. The final frontend revision
+  also maps legacy usage-page CSS variables to theme tokens; `static/management.html` was rebuilt
+  from that revision.
 
 ---
 
