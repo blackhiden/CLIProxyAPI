@@ -816,6 +816,12 @@ the merge.
   to use a valid JSON duration object for `providerRequestTimeouts`. The final frontend revision
   also maps legacy usage-page CSS variables to theme tokens; `static/management.html` was rebuilt
   from that revision.
+- **2026-11-23 (second sync)** — Recorded the upstream `85225381d` sync. Root conflicts were limited
+  to two test files: the upstream `sdktranslator` import was kept, and the upstream LCP test block was
+  restored. The pre-existing `frontend` submodule merge of upstream `3128b0ba` into fork `12ce1139`
+  was completed by combining upstream's `memberField` wrapper with the fork's direct-connection
+  control and `savedProxyUrl` preservation; the final pointer is `3923fa80` and
+  `static/management.html` was rebuilt from it. All 14 preservation items were re-verified.
 
 ---
 
