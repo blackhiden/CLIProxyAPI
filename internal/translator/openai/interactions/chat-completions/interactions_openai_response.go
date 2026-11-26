@@ -138,7 +138,7 @@ func convertOpenAIChatStreamToInteractions(modelName string, rawJSON []byte, st 
 					return true
 				})
 			}
-			if finishReason := choice.Get("finish_reason"); finishReason.Exists() {
+			if finishReason := choice.Get("finish_reason"); finishReason.Type == ojson.String && strings.TrimSpace(finishReason.String()) != "" {
 				out = appendInteractionsStepStop(out, st)
 			}
 			return true
