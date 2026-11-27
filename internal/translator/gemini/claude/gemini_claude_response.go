@@ -14,9 +14,9 @@ import (
 	"sync/atomic"
 
 	"github.com/MoeForge/moego/ojson"
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
-	geminicommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/gemini/common"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
+	translatorcommon "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/common"
+	geminicommon "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/gemini/common"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
 )
 
 // Params holds parameters for response conversion.

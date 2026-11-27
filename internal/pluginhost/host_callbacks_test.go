@@ -13,13 +13,13 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/clienterror"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/interfaces"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/logging"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginabi"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/clienterror"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/interfaces"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/logging"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/api/handlers"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginabi"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 	log "github.com/sirupsen/logrus"
 )
 

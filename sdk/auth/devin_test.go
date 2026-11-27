@@ -13,8 +13,8 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/json"
-	devinauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth/devin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	devinauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth/devin"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 func TestDevinAuthenticatorProviderAndRefreshLead(t *testing.T) {

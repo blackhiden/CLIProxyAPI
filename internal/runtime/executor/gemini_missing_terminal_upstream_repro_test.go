@@ -10,12 +10,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/translator"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 // TestGeminiMissingTerminalUpstreamRepro is the regression test for issue #7005:

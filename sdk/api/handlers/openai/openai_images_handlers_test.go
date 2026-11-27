@@ -17,14 +17,14 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	"github.com/gin-gonic/gin"
-	internalconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/interfaces"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	runtimeexecutor "github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	coreexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	sdkconfig "github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	internalconfig "github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/interfaces"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	runtimeexecutor "github.com/blackhiden/CLIProxyAPI/v8/internal/runtime/executor"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/api/handlers"
+	coreauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	coreexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	sdkconfig "github.com/blackhiden/CLIProxyAPI/v8/sdk/config"
 
 )
 

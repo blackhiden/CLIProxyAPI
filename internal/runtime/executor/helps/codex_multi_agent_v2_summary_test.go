@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 
 )
 

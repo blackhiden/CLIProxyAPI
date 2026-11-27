@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/MoeForge/moego/base64"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/signature"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/signature"
 )
 
 // Gemini Claude carriers encode direction and semantic target on the client-facing wire.

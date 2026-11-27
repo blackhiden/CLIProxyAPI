@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 // ResolvePath normalizes the configured bbolt database file path into an absolute file path.

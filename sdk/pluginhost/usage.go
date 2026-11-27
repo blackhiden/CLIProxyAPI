@@ -3,8 +3,8 @@ package pluginhost
 import (
 	"context"
 
-	internalpluginhost "github.com/router-for-me/CLIProxyAPI/v8/internal/pluginhost"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	internalpluginhost "github.com/blackhiden/CLIProxyAPI/v8/internal/pluginhost"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 // ErrUsageDeliveryPending requires sender retry without relinquishing ownership.

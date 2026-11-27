@@ -8,8 +8,8 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/thinking"
 )
 
 // HomeModelsLoader loads scoped models when Home mode is active.

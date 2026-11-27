@@ -3,7 +3,7 @@ package main
 import (
 	"strings"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
 )
 
 const (

@@ -3,7 +3,7 @@ package auth
 import (
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/kvstore"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/kvstore"
 )
 
 func TestAntigravityModelEnumSnapshotMissingWithoutActiveKV(t *testing.T) {

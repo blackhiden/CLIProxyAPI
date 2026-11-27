@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/MoeForge/moego/json"
-	claudeauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth/claude"
-	xaiauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth/xai"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	claudeauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth/claude"
+	xaiauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth/xai"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	coreauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
 
 )
 

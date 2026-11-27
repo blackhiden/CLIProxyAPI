@@ -13,13 +13,13 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	"github.com/gorilla/websocket"
-	internalcache "github.com/router-for-me/CLIProxyAPI/v8/internal/cache"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/wsrelay"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	internalcache "github.com/blackhiden/CLIProxyAPI/v8/internal/cache"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/wsrelay"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 func issue7513RequestPayload(format sdktranslator.Format, model string, stream bool) []byte {

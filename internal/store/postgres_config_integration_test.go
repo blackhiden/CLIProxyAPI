@@ -9,7 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 	textunicode "golang.org/x/text/encoding/unicode"
 )
 

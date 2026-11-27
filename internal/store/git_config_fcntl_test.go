@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/go-git/go-git/v6"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 
 	"golang.org/x/sys/unix"
 )

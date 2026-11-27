@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/copilot"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/copilot"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/runtime/executor/helps"
+	coreauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
 )
 
 const copilotCatalogRetryDelay = 5 * time.Minute

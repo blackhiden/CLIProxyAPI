@@ -8,13 +8,13 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/pluginhost"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/pluginhost"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	coreauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 const (

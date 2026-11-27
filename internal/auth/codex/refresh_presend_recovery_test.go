@@ -15,7 +15,7 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 func closeTestConn(t *testing.T, c io.Closer) {

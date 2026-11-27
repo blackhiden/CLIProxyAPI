@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	coreexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	coreexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 // issue7499InterceptorHost is a minimal PluginInterceptorHost used to prove

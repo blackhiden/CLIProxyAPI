@@ -15,12 +15,12 @@ import (
 	"time"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/home"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/homeplugins"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/pluginhost"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executionregistry"
-	sdkpluginstore "github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginstore"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/home"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/homeplugins"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/pluginhost"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executionregistry"
+	sdkpluginstore "github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginstore"
 	"gopkg.in/yaml.v3"
 )
 

@@ -14,13 +14,13 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/copilot"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/pluginhost"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	sdkauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/auth"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/copilot"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/pluginhost"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	sdkauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/auth"
+	coreauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 // Exercise synthetic accounts using the same custom models.json path available to operators.

@@ -11,10 +11,10 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 const geminiIssue7956FilterText = "This request was blocked by Gemini's filters. Please review https://policies.google.com/terms/generative-ai/use-policy"

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/codex"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/codex"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 func TestResolveSIWCBindPath(t *testing.T) {

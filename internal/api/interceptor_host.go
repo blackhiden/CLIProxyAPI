@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/pluginhost"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers"
-	coreexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/pluginhost"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/api/handlers"
+	coreexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 // delegatedInterceptorHost forwards PluginInterceptorHost calls to an

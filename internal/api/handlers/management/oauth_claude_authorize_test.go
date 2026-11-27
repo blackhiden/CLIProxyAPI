@@ -14,8 +14,8 @@ import (
 	"github.com/MoeForge/moego/base64"
 	"github.com/MoeForge/moego/ojson"
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/claude"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/claude"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 type claudeAuthorizationProbe struct {

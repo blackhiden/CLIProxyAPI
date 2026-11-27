@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginabi"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginabi"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 func TestRegisterManagementRoutesSkipsReservedAndUsesPriority(t *testing.T) {

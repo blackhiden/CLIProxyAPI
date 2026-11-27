@@ -6,8 +6,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
 )
 
 // issue7730Executor records which credentials reached Execute/ExecuteStream/CountTokens and

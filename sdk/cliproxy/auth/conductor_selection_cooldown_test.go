@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	internallogging "github.com/router-for-me/CLIProxyAPI/v8/internal/logging"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	internallogging "github.com/blackhiden/CLIProxyAPI/v8/internal/logging"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
 )
 
 func TestBuiltInSelectorCooldownErrorPreservesRouteModel(t *testing.T) {

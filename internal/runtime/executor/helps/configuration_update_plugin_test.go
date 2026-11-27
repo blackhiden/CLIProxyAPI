@@ -6,14 +6,14 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	helps "github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/claude"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/codex"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	helps "github.com/blackhiden/CLIProxyAPI/v8/internal/runtime/executor/helps"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/claude"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/codex"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/translator"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 
 )
 

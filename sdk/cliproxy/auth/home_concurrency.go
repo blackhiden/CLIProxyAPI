@@ -10,7 +10,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executionregistry"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executionregistry"
 )
 
 const (

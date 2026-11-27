@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/home"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/homeplugins"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executionregistry"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/home"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/homeplugins"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executionregistry"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/config"
 )
 
 func TestServiceRebalanceReleaseOwnershipAcrossCancellation(t *testing.T) {

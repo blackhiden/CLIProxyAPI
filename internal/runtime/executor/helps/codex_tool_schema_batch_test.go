@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	toolschema "github.com/router-for-me/CLIProxyAPI/v8/internal/client/codex/tool-schema"
+	toolschema "github.com/blackhiden/CLIProxyAPI/v8/internal/client/codex/tool-schema"
 )
 
 const codexBatchUnionTool = `{"type":"function","name":"choose","parameters":{"type":"object","properties":{"action":{"oneOf":[{"const":"a"},{"const":"b"},{"const":"c"},{"const":"d"},{"const":"e"},{"const":"f"},{"const":"g"},{"const":"h"}]}}}}`

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 func (h *Host) callHostModelExecuteStream(ctx context.Context, request []byte) ([]byte, error) {

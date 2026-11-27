@@ -19,12 +19,12 @@ import (
 	"github.com/MoeForge/moego/json"
 
 	"github.com/gorilla/websocket"
-	codexauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth/codex"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	fileauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/auth"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	codexauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth/codex"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	fileauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/auth"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 func makeTestCodexRefreshJWT(planType, accountID string) string {

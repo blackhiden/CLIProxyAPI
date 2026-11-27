@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	"github.com/MoeForge/moego/ojson"
-	applypatch "github.com/router-for-me/CLIProxyAPI/v8/internal/client/codex/apply-patch"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/signature"
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
+	applypatch "github.com/blackhiden/CLIProxyAPI/v8/internal/client/codex/apply-patch"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/signature"
+	translatorcommon "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/common"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
 
 )
 

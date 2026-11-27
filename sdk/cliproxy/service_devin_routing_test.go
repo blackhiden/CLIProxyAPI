@@ -13,12 +13,12 @@ import (
 	"github.com/MoeForge/moego/ojson"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers/openai"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/runtime/executor/helps"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/api/handlers"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/api/handlers/openai"
+	coreauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/config"
 	"google.golang.org/protobuf/encoding/protowire"
 )
 

@@ -17,7 +17,7 @@ import (
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 func objectConfigTestStore(t *testing.T, path string, handler http.HandlerFunc) *ObjectTokenStore {

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
 )
 
 func TestAntigravityCreditsStateDoesNotCrossRegistrationEpochHomeKV(t *testing.T) {

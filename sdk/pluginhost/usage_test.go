@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 func TestExternalUsagePublicSurface(t *testing.T) {

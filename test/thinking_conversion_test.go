@@ -5,23 +5,23 @@ import (
 	"testing"
 	"time"
 
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/translator"
 
 	// Import provider packages to trigger init() registration of ProviderAppliers
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/antigravity"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/claude"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/codex"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/gemini"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/interactions"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/kimi"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/openai"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/xai"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/antigravity"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/claude"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/codex"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/gemini"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/interactions"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/kimi"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/openai"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/xai"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/runtime/executor/helps"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/thinking"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 // thinkingTestCase represents a common test case structure for both suffix and body tests.

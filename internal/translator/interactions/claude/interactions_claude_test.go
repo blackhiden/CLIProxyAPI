@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	claudeinteractions "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/claude/interactions"
-	openairesponses "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/openai/interactions/responses"
+	claudeinteractions "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/claude/interactions"
+	openairesponses "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/openai/interactions/responses"
 )
 
 func TestConvertClaudeRequestToInteractionsMapsMessagesToolsAndStream(t *testing.T) {

@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	homekv "github.com/router-for-me/CLIProxyAPI/v8/internal/home"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/kvstore"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	homekv "github.com/blackhiden/CLIProxyAPI/v8/internal/home"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/kvstore"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
 )
 
 func TestAntigravityCreditsRemovedBalanceDoesNotResurrect(t *testing.T) {

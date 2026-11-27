@@ -5,7 +5,7 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	"github.com/google/uuid"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/translator/common"
 )
 
 // RelayChatToolMedia only rewrites media inside actual tool results. In

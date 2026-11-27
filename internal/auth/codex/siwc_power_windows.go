@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 
-	baseauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth"
+	baseauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth"
 )
 
 // CheckCodexWindowsReadiness checks whether Windows is ready for Codex/SIWC OAuth renewal.

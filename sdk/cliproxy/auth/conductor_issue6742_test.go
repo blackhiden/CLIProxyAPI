@@ -11,8 +11,8 @@ import (
 	"github.com/MoeForge/moego/base64"
 	"github.com/MoeForge/moego/json"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
 )
 
 func makeIssue6742JWT(exp time.Time) string {

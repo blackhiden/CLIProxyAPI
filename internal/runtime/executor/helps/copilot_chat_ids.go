@@ -6,7 +6,7 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	"github.com/google/uuid"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 // Some Chat models recycle IDs in later rounds. Rename a call and its result

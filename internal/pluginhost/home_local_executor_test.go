@@ -14,16 +14,16 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers/gemini"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers/openai"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executionregistry"
-	sdkconfig "github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/api/handlers"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/api/handlers/gemini"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/api/handlers/openai"
+	coreauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executionregistry"
+	sdkconfig "github.com/blackhiden/CLIProxyAPI/v8/sdk/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 func TestHomeLocalExecutorHTTP(t *testing.T) {

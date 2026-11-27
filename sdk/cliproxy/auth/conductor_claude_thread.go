@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/MoeForge/moego/ojson"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	cliproxysession "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/session"
-	coreusage "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	cliproxysession "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/session"
+	coreusage "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 	log "github.com/sirupsen/logrus"
 )
 

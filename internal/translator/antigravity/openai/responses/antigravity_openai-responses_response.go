@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/MoeForge/moego/ojson"
-	. "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/gemini/openai/responses"
+	. "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/gemini/openai/responses"
 
 )
 

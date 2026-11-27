@@ -6,7 +6,7 @@ package thinking
 
 import (
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
 )
 
 // ThinkingMode represents the type of thinking configuration mode.

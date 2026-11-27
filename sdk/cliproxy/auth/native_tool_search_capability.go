@@ -3,7 +3,7 @@ package auth
 import (
 	"strings"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
 )
 
 // NativeToolSearchSupport optionally reports whether an executor can send Codex

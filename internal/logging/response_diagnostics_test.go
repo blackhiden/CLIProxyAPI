@@ -15,7 +15,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/interfaces"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/interfaces"
 )
 
 func TestResponseDiagnosticsAreBoundedAndReleased(t *testing.T) {

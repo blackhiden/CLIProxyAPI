@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	coreusage "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	coreusage "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 func TestExternalUsageMatchesLocalAdapter(t *testing.T) {

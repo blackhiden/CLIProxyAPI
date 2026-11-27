@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
 )
 
 func goldenHash(b []byte) string { s := sha256.Sum256(b); return hex.EncodeToString(s[:]) }

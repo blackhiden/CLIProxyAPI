@@ -10,7 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
 	"testing"
 	"time"
 )

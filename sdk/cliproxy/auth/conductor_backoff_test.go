@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	internalconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	internalconfig "github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 // --- QuotaBackoffConfig accessor tests ---

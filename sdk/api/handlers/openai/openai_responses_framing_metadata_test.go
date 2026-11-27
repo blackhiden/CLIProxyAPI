@@ -7,7 +7,7 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/interfaces"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/interfaces"
 
 )
 

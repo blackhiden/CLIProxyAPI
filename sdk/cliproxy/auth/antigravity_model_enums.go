@@ -10,12 +10,12 @@ import (
 	"time"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/antigravitycatalog"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/cache"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/home"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/kvstore"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/modelconfig"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/antigravitycatalog"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/cache"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/home"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/kvstore"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/modelconfig"
 )
 
 const (

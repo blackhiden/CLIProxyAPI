@@ -7,8 +7,8 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/MoeForge/moego/ojson"
-	applypatch "github.com/router-for-me/CLIProxyAPI/v8/internal/client/codex/apply-patch"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
+	applypatch "github.com/blackhiden/CLIProxyAPI/v8/internal/client/codex/apply-patch"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
 
 )
 

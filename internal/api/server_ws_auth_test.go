@@ -6,9 +6,9 @@ import (
 	"sync/atomic"
 	"testing"
 
-	configaccess "github.com/router-for-me/CLIProxyAPI/v8/internal/access/config_access"
-	sdkaccess "github.com/router-for-me/CLIProxyAPI/v8/sdk/access"
-	sdkconfig "github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	configaccess "github.com/blackhiden/CLIProxyAPI/v8/internal/access/config_access"
+	sdkaccess "github.com/blackhiden/CLIProxyAPI/v8/sdk/access"
+	sdkconfig "github.com/blackhiden/CLIProxyAPI/v8/sdk/config"
 )
 
 // attachTestWSRoute registers a synthetic WebSocket route guarded by the

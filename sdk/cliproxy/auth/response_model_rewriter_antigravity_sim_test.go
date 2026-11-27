@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	gemresponses "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/gemini/openai/responses"
+	gemresponses "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/gemini/openai/responses"
 
 )
 

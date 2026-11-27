@@ -8,7 +8,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/MoeForge/moego/json"
-	applypatch "github.com/router-for-me/CLIProxyAPI/v8/internal/client/codex/apply-patch"
+	applypatch "github.com/blackhiden/CLIProxyAPI/v8/internal/client/codex/apply-patch"
 )
 
 type applyPatchJSONPhase uint8

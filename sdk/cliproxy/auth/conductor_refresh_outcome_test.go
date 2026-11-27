@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	baseauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/codex"
+	baseauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/codex"
 )
 
 func TestUnknownRefreshOutcomeRequiresRecoveryWithoutDiscardingAccess(t *testing.T) {

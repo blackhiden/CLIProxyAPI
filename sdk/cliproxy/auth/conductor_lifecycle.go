@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/copilot"
-	internalconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/copilot"
+	internalconfig "github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 	log "github.com/sirupsen/logrus"
 )
 

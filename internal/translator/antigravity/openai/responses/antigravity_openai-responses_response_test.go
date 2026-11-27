@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
 )
 
 func TestConvertAntigravityResponseToOpenAIResponsesNonStream_PreservesOpenAITools(t *testing.T) {

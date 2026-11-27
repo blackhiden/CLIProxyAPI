@@ -4,11 +4,11 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/antigravity"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/claude"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/gemini"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/thinking"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/antigravity"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/claude"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/gemini"
 )
 
 func TestApplyThinking_UserDefinedNativeGeminiPreservesThinkingLevel(t *testing.T) {

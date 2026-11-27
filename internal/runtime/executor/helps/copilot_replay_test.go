@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	x "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	tr "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	x "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	tr "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 func TestCopilotParallelParentsAcrossRoutes(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 type streamOrchestrationRunner func(context.Context, pluginapi.ExecutorRequest, string, string) error

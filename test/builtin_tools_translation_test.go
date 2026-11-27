@@ -3,10 +3,10 @@ package test
 import (
 	"testing"
 
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/translator"
 
 	"github.com/MoeForge/moego/ojson"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 
 )
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	coreusage "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	coreusage "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 // ErrUsageDeliveryPending leaves ownership with the external sender while the

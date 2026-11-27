@@ -10,7 +10,7 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	"github.com/MoeForge/moego/regexp"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
 )
 
 var reGoogleMessageRetryDuration = regexp.MustCompile(`(?i)\b(?:after|retry\s+in)\s+(\d+(?:\.\d+)?(?:h|ms|m|s)(?:\d+(?:\.\d+)?(?:ms|m|s))*)\b`)

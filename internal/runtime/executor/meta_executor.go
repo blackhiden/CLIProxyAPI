@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/MoeForge/moego/ojson"
-	metaauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth/meta"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	metaauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth/meta"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/runtime/executor/helps"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/singleflight"

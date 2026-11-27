@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/copilot"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/misc"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
-	sdkAuth "github.com/router-for-me/CLIProxyAPI/v8/sdk/auth"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/copilot"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/misc"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
+	sdkAuth "github.com/blackhiden/CLIProxyAPI/v8/sdk/auth"
 	log "github.com/sirupsen/logrus"
 )
 

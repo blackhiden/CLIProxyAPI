@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/antigravity"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/thinking"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/antigravity"
 )
 
 func claudeSonnet46AntigravityModel() *registry.ModelInfo {

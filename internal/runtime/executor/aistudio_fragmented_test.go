@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 func TestAIStudioStreamReassemblesFragmentedFrames(t *testing.T) {

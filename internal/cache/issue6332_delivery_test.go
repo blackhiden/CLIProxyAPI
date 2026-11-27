@@ -12,17 +12,17 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/api/middleware"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/cache"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/logging"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	runtimeexecutor "github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers/openai"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	sdkconfig "github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/api/middleware"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/cache"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/logging"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	runtimeexecutor "github.com/blackhiden/CLIProxyAPI/v8/internal/runtime/executor"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/api/handlers"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/api/handlers/openai"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	sdkconfig "github.com/blackhiden/CLIProxyAPI/v8/sdk/config"
 )
 
 func TestIssue6332ReplayCommitPrecedesCompletion(t *testing.T) {

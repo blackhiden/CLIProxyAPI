@@ -2,8 +2,8 @@ package claude
 
 import (
 	"github.com/MoeForge/moego/ojson"
-	sigcompat "github.com/router-for-me/CLIProxyAPI/v8/internal/signature"
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
+	sigcompat "github.com/blackhiden/CLIProxyAPI/v8/internal/signature"
+	translatorcommon "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/common"
 )
 
 const geminiClaudeUnsupportedSignatureTarget = "unsupported"

@@ -14,8 +14,8 @@ import (
 	"testing"
 
 	"github.com/klauspost/compress/zstd"
-	proxyconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	sdkaccess "github.com/router-for-me/CLIProxyAPI/v8/sdk/access"
+	proxyconfig "github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	sdkaccess "github.com/blackhiden/CLIProxyAPI/v8/sdk/access"
 )
 
 type countingBodyReader struct {

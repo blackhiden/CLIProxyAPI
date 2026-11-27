@@ -8,9 +8,9 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/MoeForge/moego/ojson"
-	antigravityclaude "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/antigravity/claude"
-	antigravitychat "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/antigravity/openai/chat-completions"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
+	antigravityclaude "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/antigravity/claude"
+	antigravitychat "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/antigravity/openai/chat-completions"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
 
 )
 

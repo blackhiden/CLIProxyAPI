@@ -11,9 +11,9 @@ import (
 	"sync"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/clienterror"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/kvstore"
-	cliproxysession "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/session"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/clienterror"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/kvstore"
+	cliproxysession "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/session"
 	log "github.com/sirupsen/logrus"
 )
 

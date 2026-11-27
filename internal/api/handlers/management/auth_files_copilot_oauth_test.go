@@ -14,8 +14,8 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	sdkAuth "github.com/router-for-me/CLIProxyAPI/v8/sdk/auth"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	sdkAuth "github.com/blackhiden/CLIProxyAPI/v8/sdk/auth"
 )
 
 func TestCopilotV8DeviceOAuth(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/MoeForge/moego/json"
-	internalcopilot "github.com/router-for-me/CLIProxyAPI/v8/internal/auth/copilot"
+	internalcopilot "github.com/blackhiden/CLIProxyAPI/v8/internal/auth/copilot"
 )
 
 // Provider identifies GitHub Copilot credentials.

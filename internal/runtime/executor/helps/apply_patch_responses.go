@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/MoeForge/moego/ojson"
-	applypatch "github.com/router-for-me/CLIProxyAPI/v8/internal/client/codex/apply-patch"
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	applypatch "github.com/blackhiden/CLIProxyAPI/v8/internal/client/codex/apply-patch"
+	translatorcommon "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/common"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 
 )
 

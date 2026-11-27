@@ -6,11 +6,11 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	codexclaude "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/codex/claude"
-	codexchat "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/codex/openai/chat-completions"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	codexclaude "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/codex/claude"
+	codexchat "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/codex/openai/chat-completions"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/translator/common"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 // These are standard Responses conversions, not Codex wire defaults. Only a

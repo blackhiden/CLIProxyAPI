@@ -10,10 +10,10 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	"github.com/gorilla/websocket"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	auth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	core "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	translator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	auth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	core "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	translator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 
 )
 

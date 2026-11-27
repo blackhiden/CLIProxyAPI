@@ -10,13 +10,13 @@ import (
 	"strings"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/cache"
-	sigcompat "github.com/router-for-me/CLIProxyAPI/v8/internal/signature"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
-	antigravitygemini "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/antigravity/gemini"
-	translatorcommon "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/common"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/translator/gemini/common"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/cache"
+	sigcompat "github.com/blackhiden/CLIProxyAPI/v8/internal/signature"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/thinking"
+	antigravitygemini "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/antigravity/gemini"
+	translatorcommon "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/common"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/translator/gemini/common"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
 
 	log "github.com/sirupsen/logrus"
 )

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/logging"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/logging"
 )
 
 // subscribedHub returns a hub with an attached subscriber so sniffFlowModel's

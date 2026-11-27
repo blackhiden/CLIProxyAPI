@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/MoeForge/moego/json"
-	internalconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/home"
+	internalconfig "github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/home"
 	log "github.com/sirupsen/logrus"
 )
 

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/codex"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/codex"
 )
 
 // IsCodexAuthRecord reports whether auth represents a Codex credential record.

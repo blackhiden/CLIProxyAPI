@@ -5,17 +5,17 @@ import (
 	"net/http"
 
 	"github.com/MoeForge/moego/ojson"
-	multiagentv2 "github.com/router-for-me/CLIProxyAPI/v8/internal/client/codex/optimize-multi-agent-v2"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
-	openaichatclaude "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/claude/openai/chat-completions"
-	responsesclaude "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/claude/openai/responses"
-	codexclaude "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/codex/claude"
-	geminiclaude "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/gemini/claude"
-	interactionsclaude "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/interactions/claude"
-	openaiclaude "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/openai/claude"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	multiagentv2 "github.com/blackhiden/CLIProxyAPI/v8/internal/client/codex/optimize-multi-agent-v2"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/thinking"
+	openaichatclaude "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/claude/openai/chat-completions"
+	responsesclaude "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/claude/openai/responses"
+	codexclaude "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/codex/claude"
+	geminiclaude "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/gemini/claude"
+	interactionsclaude "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/interactions/claude"
+	openaiclaude "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/openai/claude"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 
 )
 

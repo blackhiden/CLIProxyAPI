@@ -7,7 +7,7 @@ import (
 	"github.com/MoeForge/moego/base64"
 	"github.com/MoeForge/moego/json"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/codex"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/codex"
 )
 
 func makeTestCodexJWT(planType, accountID string) string {

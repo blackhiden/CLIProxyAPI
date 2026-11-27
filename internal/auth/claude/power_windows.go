@@ -5,7 +5,7 @@ package claude
 import (
 	"context"
 
-	baseauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth"
+	baseauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth"
 )
 
 // CheckClaudeWindowsReadiness checks whether Windows is ready for Claude OAuth renewal.

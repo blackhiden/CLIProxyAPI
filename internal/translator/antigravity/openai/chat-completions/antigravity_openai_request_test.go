@@ -5,8 +5,8 @@ import (
 
 	"github.com/MoeForge/moego/ojson"
 	"github.com/MoeForge/moego/regexp"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/signature"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/signature"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
 
 )
 

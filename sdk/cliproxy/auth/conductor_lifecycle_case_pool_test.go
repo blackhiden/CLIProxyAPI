@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	internalconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	internalconfig "github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 func TestConductorLifecycleExecutorRegistrationNormalizesCase(t *testing.T) {

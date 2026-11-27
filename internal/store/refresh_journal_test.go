@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/codex"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/codex"
 )
 
 func TestGitRefreshJournalCoordinatesIndependentMirrors(t *testing.T) {

@@ -13,11 +13,11 @@ import (
 	"github.com/MoeForge/moego/json"
 	"github.com/MoeForge/moego/ojson"
 	"github.com/gorilla/websocket"
-	internalcache "github.com/router-for-me/CLIProxyAPI/v8/internal/cache"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	auth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	core "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	translator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	internalcache "github.com/blackhiden/CLIProxyAPI/v8/internal/cache"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	auth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	core "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	translator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 
 )
 

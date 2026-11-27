@@ -12,15 +12,15 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/gin-gonic/gin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/antigravity"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/claude"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/devin"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/kimi"
-	metaauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth/meta"
-	xaiauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth/xai"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/antigravity"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/claude"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/devin"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/kimi"
+	metaauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth/meta"
+	xaiauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth/xai"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	coreauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
 )
 
 type roundTripFunc func(*http.Request) (*http.Response, error)

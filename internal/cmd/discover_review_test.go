@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/discovery"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/discovery"
 )
 
 func TestReviewScopedIPv6AndWebSocketURLs(t *testing.T) {

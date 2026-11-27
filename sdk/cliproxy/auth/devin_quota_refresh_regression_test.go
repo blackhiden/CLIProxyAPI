@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
 )
 
 // Tests in this file cover the refresh lifecycle half of issue #6690:

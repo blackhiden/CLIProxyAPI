@@ -17,11 +17,11 @@ import (
 	"github.com/MoeForge/moego/ojson"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/home"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/wstunnel"
-	sdkaccess "github.com/router-for-me/CLIProxyAPI/v8/sdk/access"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/home"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/wstunnel"
+	sdkaccess "github.com/blackhiden/CLIProxyAPI/v8/sdk/access"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
 )
 
 func newTestTunnelAPIServer(t *testing.T, cfg *config.Config, opts ...ServerOption) *Server {

@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/MoeForge/moego/regexp"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/interfaces"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/interfaces"
 	log "github.com/sirupsen/logrus"
 )
 

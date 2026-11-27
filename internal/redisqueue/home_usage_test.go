@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	coreusage "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	coreusage "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/usage"
 )
 
 func TestHomePluginUsageSurvivesDisabledLocalStatistics(t *testing.T) {

@@ -8,8 +8,8 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/MoeForge/moego/regexp"
-	internalconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	internalconfig "github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	cliproxyexecutor "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
 )
 
 type requestScopedErrorConfigContextKey struct{}

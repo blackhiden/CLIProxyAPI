@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/MoeForge/moego/json"
-	internalconfig "github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
+	internalconfig "github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/thinking"
 )
 
 const oauthModelAliasesAttributeKey = "model_aliases"

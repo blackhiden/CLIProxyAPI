@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/json"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/homeplugins"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/homeplugins"
 )
 
 type recordingPluginStatusClient struct {

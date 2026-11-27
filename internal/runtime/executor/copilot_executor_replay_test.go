@@ -9,10 +9,10 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/copilot"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
-	x "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
-	tr "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/copilot"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
+	x "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/executor"
+	tr "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 )
 
 func TestCopilotStreamingVisibleReasoning(t *testing.T) {

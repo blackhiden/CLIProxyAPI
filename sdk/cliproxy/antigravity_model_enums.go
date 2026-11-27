@@ -5,7 +5,7 @@ import (
 	"crypto/sha256"
 	"strings"
 
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	coreauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
 )
 
 func antigravityProbeRefreshGrant(auth *coreauth.Auth) string {

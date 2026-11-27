@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/api"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/api"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 func TestServiceShutdown_ViolentShutdownImmediatelyClosesServer(t *testing.T) {

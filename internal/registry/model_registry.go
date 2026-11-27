@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/MoeForge/moego/json"
-	misc "github.com/router-for-me/CLIProxyAPI/v8/internal/misc"
+	misc "github.com/blackhiden/CLIProxyAPI/v8/internal/misc"
 	log "github.com/sirupsen/logrus"
 )
 

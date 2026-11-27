@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/json"
-	management "github.com/router-for-me/CLIProxyAPI/v8/internal/api/handlers/management"
+	management "github.com/blackhiden/CLIProxyAPI/v8/internal/api/handlers/management"
 )
 
 func TestDevinOAuthRoutes(t *testing.T) {

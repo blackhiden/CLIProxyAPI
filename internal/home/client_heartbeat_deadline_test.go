@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 func TestManagedSubscriberOrdinaryTrafficDoesNotRenewHeartbeat(t *testing.T) {

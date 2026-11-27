@@ -10,10 +10,10 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/json"
-	sdkaccess "github.com/router-for-me/CLIProxyAPI/v8/sdk/access"
-	coreusage "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/usage"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginabi"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginapi"
+	sdkaccess "github.com/blackhiden/CLIProxyAPI/v8/sdk/access"
+	coreusage "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/usage"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginabi"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginapi"
 )
 
 func TestRPCCapabilitiesIncludeFrontendAuthProviderExclusive(t *testing.T) {

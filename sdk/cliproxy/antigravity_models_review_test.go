@@ -12,8 +12,8 @@ import (
 	"testing/synctest"
 	"time"
 
-	coreauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
-	"github.com/router-for-me/CLIProxyAPI/v8/sdk/config"
+	coreauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	"github.com/blackhiden/CLIProxyAPI/v8/sdk/config"
 )
 
 func TestAntigravityStaleAuthCannotRestoreExcludedModel(t *testing.T) {

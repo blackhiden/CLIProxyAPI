@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/MoeForge/moego/regexp"
-	sdkpluginstore "github.com/router-for-me/CLIProxyAPI/v8/sdk/pluginstore"
+	sdkpluginstore "github.com/blackhiden/CLIProxyAPI/v8/sdk/pluginstore"
 	log "github.com/sirupsen/logrus"
 )
 

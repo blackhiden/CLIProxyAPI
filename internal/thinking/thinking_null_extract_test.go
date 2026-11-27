@@ -3,7 +3,7 @@ package thinking
 import (
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
 )
 
 func TestExtractThinkingConfig_NullAndEmptyFields(t *testing.T) {

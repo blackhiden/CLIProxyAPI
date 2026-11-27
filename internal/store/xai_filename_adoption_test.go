@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	git "github.com/go-git/go-git/v6"
-	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
+	cliproxyauth "github.com/blackhiden/CLIProxyAPI/v8/sdk/cliproxy/auth"
 )
 
 // TestFileNameStoresExposeBaseDirCapability pins the capability marker the

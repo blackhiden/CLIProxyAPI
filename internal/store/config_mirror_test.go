@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 const mirrorTestServer = "server:\n  server-id: aaaaaaaa-1111-4444-8888-bbbbbbbbbbbb\n"

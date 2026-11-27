@@ -13,7 +13,7 @@ import (
 	"github.com/go-git/go-git/v6/plumbing/filemode"
 	gitindex "github.com/go-git/go-git/v6/plumbing/format/index"
 	"github.com/go-git/go-git/v6/plumbing/object"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 const gitConfigPath = "config/config.yaml"

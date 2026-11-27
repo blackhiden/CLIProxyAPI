@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/codex"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/registry"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/thinking"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/codex"
 )
 
 func TestApplyThinkingNativeResponsesValidatesEffort(t *testing.T) {

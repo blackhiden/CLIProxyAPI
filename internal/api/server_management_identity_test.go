@@ -8,7 +8,7 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/google/uuid"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 const (

@@ -9,7 +9,7 @@ import (
 
 	"github.com/MoeForge/moego/base64"
 	"github.com/MoeForge/moego/ojson"
-	sigcompat "github.com/router-for-me/CLIProxyAPI/v8/internal/signature"
+	sigcompat "github.com/blackhiden/CLIProxyAPI/v8/internal/signature"
 )
 
 func TestGeminiClaudeCarrierPlacement(t *testing.T) {

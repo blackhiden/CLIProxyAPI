@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/json"
-	chat "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/claude/openai/chat-completions"
-	responses "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/claude/openai/responses"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
+	chat "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/claude/openai/chat-completions"
+	responses "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/claude/openai/responses"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/util"
 
 )
 

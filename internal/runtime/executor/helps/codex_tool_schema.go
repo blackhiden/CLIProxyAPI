@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/MoeForge/moego/ojson"
-	toolschema "github.com/router-for-me/CLIProxyAPI/v8/internal/client/codex/tool-schema"
+	toolschema "github.com/blackhiden/CLIProxyAPI/v8/internal/client/codex/tool-schema"
 
 )
 

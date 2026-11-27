@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/codex"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/codex"
 )
 
 func TestSIWCWakeCancellationPreservesOuterRefreshFailure(t *testing.T) {

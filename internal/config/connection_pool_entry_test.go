@@ -3,7 +3,7 @@ package config_test
 import (
 	"testing"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/config"
 )
 
 // TestPerEntryConnectionPoolAccepted pins the per-credential opt-in shape: the

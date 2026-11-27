@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/minio/minio-go/v7"
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/codex"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/codex"
 	log "github.com/sirupsen/logrus"
 )
 

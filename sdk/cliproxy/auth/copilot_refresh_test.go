@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/router-for-me/CLIProxyAPI/v8/internal/auth/copilot"
+	"github.com/blackhiden/CLIProxyAPI/v8/internal/auth/copilot"
 )
 
 func TestCopilotCatalogDoesNotDriveSharedCredentialRefresh(t *testing.T) {

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	baseauth "github.com/router-for-me/CLIProxyAPI/v8/internal/auth"
+	baseauth "github.com/blackhiden/CLIProxyAPI/v8/internal/auth"
 )
 
 func TestCodexRefreshDefersOnWindowsStandbyThenRenews(t *testing.T) {

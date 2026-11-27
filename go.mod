@@ -1,4 +1,4 @@
-module github.com/router-for-me/CLIProxyAPI/v8
+module github.com/blackhiden/CLIProxyAPI/v8
 
 go 1.26.10
 

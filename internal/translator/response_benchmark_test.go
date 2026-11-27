@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	translatorapi "github.com/router-for-me/CLIProxyAPI/v8/internal/translator/translator"
+	translatorapi "github.com/blackhiden/CLIProxyAPI/v8/internal/translator/translator"
 
 )
 

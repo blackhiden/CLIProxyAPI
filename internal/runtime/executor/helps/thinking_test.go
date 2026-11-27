@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/MoeForge/moego/ojson"
-	helps "github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/thinking/provider/gemini"
-	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
-	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
+	helps "github.com/blackhiden/CLIProxyAPI/v8/internal/runtime/executor/helps"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/thinking/provider/gemini"
+	_ "github.com/blackhiden/CLIProxyAPI/v8/internal/translator"
+	sdktranslator "github.com/blackhiden/CLIProxyAPI/v8/sdk/translator"
 
 )
 
