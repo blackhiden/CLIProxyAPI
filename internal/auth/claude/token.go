@@ -11,7 +11,6 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/blackhiden/CLIProxyAPI/v8/internal/misc"
-	log "github.com/sirupsen/logrus"
 )
 
 // ClaudeTokenStorage stores OAuth2 token information for Anthropic Claude API authentication.

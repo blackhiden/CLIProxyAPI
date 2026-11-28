@@ -8,7 +8,6 @@ import (
 
 	"github.com/MoeForge/moego/json"
 	"github.com/blackhiden/CLIProxyAPI/v8/internal/misc"
-	log "github.com/sirupsen/logrus"
 )
 
 // TokenStorage stores xAI OAuth credentials on disk.
