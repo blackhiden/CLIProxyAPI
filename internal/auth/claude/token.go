@@ -4,6 +4,7 @@
 package claude
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -85,20 +86,14 @@ func (ts *ClaudeTokenStorage) SaveTokenToFile(authFilePath string) error {
 		return fmt.Errorf("failed to merge metadata: %w", errMerge)
 	}
 
-	// Create the token file
-	f, err := os.Create(authFilePath)
-	if err != nil {
-		return fmt.Errorf("failed to create token file: %w", err)
+	// Encode the token data as JSON before atomically replacing the target file
+	var buf bytes.Buffer
+	if errEncode := json.NewEncoder(&buf).Encode(data); errEncode != nil {
+		return fmt.Errorf("failed to encode token data: %w", errEncode)
 	}
-	defer func() {
-		if errClose := f.Close(); errClose != nil {
-			log.Errorf("claude token storage: close token file error: %v", errClose)
-		}
-	}()
 
-	// Encode and write the token data as JSON
-	if err = json.NewEncoder(f).Encode(data); err != nil {
-		return fmt.Errorf("failed to write token to file: %w", err)
+	if errWrite := misc.WriteFileAtomic(authFilePath, buf.Bytes(), 0o600); errWrite != nil {
+		return fmt.Errorf("failed to write token to file: %w", errWrite)
 	}
 	return nil
 }

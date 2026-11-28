@@ -3,6 +3,7 @@
 package vertex
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -66,19 +67,15 @@ func (s *VertexCredentialStorage) SaveTokenToFile(authFilePath string) error {
 		return fmt.Errorf("vertex credential: merge metadata failed: %w", errMerge)
 	}
 
-	f, err := os.Create(authFilePath)
-	if err != nil {
-		return fmt.Errorf("vertex credential: create file failed: %w", err)
-	}
-	defer func() {
-		if errClose := f.Close(); errClose != nil {
-			log.Errorf("vertex credential: failed to close file: %v", errClose)
-		}
-	}()
-	enc := json.NewEncoder(f)
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
 	enc.SetIndent("", "  ")
-	if err = enc.Encode(data); err != nil {
-		return fmt.Errorf("vertex credential: encode failed: %w", err)
+	if errEncode := enc.Encode(data); errEncode != nil {
+		return fmt.Errorf("vertex credential: encode failed: %w", errEncode)
+	}
+
+	if errWrite := misc.WriteFileAtomic(authFilePath, buf.Bytes(), 0o600); errWrite != nil {
+		return fmt.Errorf("vertex credential: write file failed: %w", errWrite)
 	}
 	return nil
 }
